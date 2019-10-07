@@ -1,7 +1,12 @@
 Library
+Assets/sandbox
+Assets/sandbox.*
 /Temp
 /Obj
+/.vs
 /*.csproj
+/*.sln
+
 *.suo
 *.lock
 *.ide
