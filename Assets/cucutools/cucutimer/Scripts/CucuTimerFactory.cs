@@ -154,6 +154,14 @@ namespace cucu.tools
             return this;
         }
 
+        private void OnDestroy()
+        {
+            OnStart.RemoveAllListeners();
+            OnTick.RemoveAllListeners();
+            OnStop.RemoveAllListeners();
+            OnForceStop.RemoveAllListeners();
+        }
+
         #region States
 
         /// <summary>

@@ -26,16 +26,21 @@ namespace cucu.example
                 var messageStop = $"{_timers.Count} - Стоп";
                 var messageForceStop = $"{_timers.Count} - Ручной стоп";
 
-                var onStart = new UnityAction(() => { Debug.Log(messageStart); });
+                var onStart = new Action(() => { Debug.Log(messageStart); });
 
-                var onTick = new UnityAction(() => { Debug.Log(messageTick); });
+                var onTick = new Action(() => { Debug.Log(messageTick); });
 
-                var onStop = new UnityAction(() => { Debug.Log(messageStop); });
-
-                var onForceStop = new UnityAction(() => { Debug.Log(messageForceStop); });
+                var onStop = new Action(() => { Debug.Log(messageStop); });
 
                 var timer = CucuTimerFactory.CreateTimer();
 
+                var onForceStop = new Action(() =>
+                {
+                    Debug.Log(messageForceStop);
+                    timer.OnStart.RemoveListener(onStart);
+                    timer.OnTick.RemoveListener(onTick);
+                });
+                
                 timer.OnStart.AddListener(onStart);
                 timer.OnTick.AddListener(onTick);
                 timer.OnStop.AddListener(onStop);
