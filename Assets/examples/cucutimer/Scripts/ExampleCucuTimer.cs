@@ -19,15 +19,46 @@ namespace cucu.example
         {
             if (Input.GetKeyDown(KeyCode.C))
             {
-                _timers.Add(new TimerUnit() { timer = CucuTimerFactory.CreateTimer()});
+                var timerUnit = new TimerUnit();
+
+                var messageStart = $"{_timers.Count} - Старт";
+                var messageTick = $"{_timers.Count} - Тик";
+                var messageStop = $"{_timers.Count} - Стоп";
+                var messageForceStop = $"{_timers.Count} - Ручной стоп";
+
+                var onStart = new UnityAction(() => { Debug.Log(messageStart); });
+
+                var onTick = new UnityAction(() => { Debug.Log(messageTick); });
+
+                var onStop = new UnityAction(() => { Debug.Log(messageStop); });
+
+                var onForceStop = new UnityAction(() => { Debug.Log(messageForceStop); });
+
+                var timer = CucuTimerFactory.CreateTimer();
+
+                timer.OnStart.AddListener(onStart);
+                timer.OnTick.AddListener(onTick);
+                timer.OnStop.AddListener(onStop);
+                timer.OnForceStop.AddListener(onForceStop);
+
+                timerUnit.timer = timer;
+
+                _timers.Add(timerUnit);
             }
 
             if (Input.GetKeyDown(KeyCode.S))
             {
                 foreach (var timerUnit in _timers)
                 {
-                    timerUnit.Initail();
-                    timerUnit.timer.StartTimer();
+                    timerUnit.timer.StartTimer(timerUnit.duration, timerUnit.tick, timerUnit.delay);
+                }
+            }
+
+            if (Input.GetKey(KeyCode.LeftControl) && Input.GetKeyDown(KeyCode.S))
+            {
+                foreach (var timerUnit in _timers)
+                {
+                    timerUnit.timer.StopTimer();
                 }
             }
         }
@@ -36,36 +67,10 @@ namespace cucu.example
     [Serializable]
     public class TimerUnit
     {
-        public float delay;
-        public string messageStart;
-        public float tick;
-        public string messageTick;
-        public float duration;
-        public string messageStop;
         public CucuTimer timer;
-
-        public void Initail()
-        {
-            var onStart = new UnityAction(() =>
-            {
-                Debug.Log(messageStart);
-            });
-
-            var onTick = new UnityAction(() =>
-            {
-                Debug.Log(messageTick);
-            });
-
-            var onStop = new UnityAction(() =>
-            {
-                Debug.Log(messageStop);
-            });
-
-            timer.Initial(duration, tick, delay);
-
-            timer.OnStart.AddListener(onStart);
-            timer.OnStart.AddListener(onTick);
-            timer.OnStart.AddListener(onStop);
-        }
+        
+        [Range(0f, 60f)] public float duration;
+        [Range(0f, 30f)] public float tick;
+        [Range(0f, 15f)] public float delay;
     }
 }
