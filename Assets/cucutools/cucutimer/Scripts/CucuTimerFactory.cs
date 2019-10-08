@@ -62,6 +62,7 @@ namespace cucu.tools
 
         private bool RemoveTimer(Guid guid)
         {
+            if (_timers.TryGetValue(guid, out var value)) Destroy(value);
             return _timers.Remove(guid);
         }
 
