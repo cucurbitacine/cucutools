@@ -5,7 +5,11 @@ using UnityEngine.Events;
 namespace cucu.tools
 {
     /// <inheritdoc />
-    public class CucuEvent : UnityEvent, ICucuEvent<Action>
+    public class CucuEvent : CucuEventBase
+    {
+    }
+
+    public abstract class CucuEventBase : UnityEvent, ICucuEvent<Action>
     {
         public void AddListener(Action action)
         {
@@ -70,7 +74,7 @@ namespace cucu.tools
     public class CucuObjectEvent : CucuEventBase<object>
     {
     }
-    
+
     public interface ICucuEvent<TAction>
     {
         void AddListener(TAction action);
