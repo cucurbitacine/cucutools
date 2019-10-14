@@ -14,6 +14,8 @@ namespace cucu.tools
             Exit,
         }
 
+        public LayerMask LayerMask => _layerMask;
+
         public CucuEvent OnUpdateListOnEnter { get; private set; } = new CucuEvent();
         public CucuEvent OnUpdateListOnStay { get; private set; } = new CucuEvent();
         public CucuEvent OnUpdateListOnExit { get; private set; } = new CucuEvent();
@@ -24,6 +26,11 @@ namespace cucu.tools
         public IReadOnlyList<Type> RegTypesOnStay => GetDictionaryByState(TriggerState.Stay).Keys.ToList();
 
         public IReadOnlyList<Type> RegTypesOnExit => GetDictionaryByState(TriggerState.Exit).Keys.ToList();
+
+        [Header("Layer mask")]
+        [SerializeField] private LayerMask _layerMask = new LayerMask {value = -1};
+
+        [Space]
 
         [Header("List of registered types from editor")]
         [SerializeField] private RegCompUnit[] _registeredComponentsOnEnter;
@@ -160,13 +167,26 @@ namespace cucu.tools
                 if (component.Component != null) RegisterType(component.Component.GetType(), TriggerState.Exit).AddListener(component.Event.Invoke);
         }
 
+        private bool IsValidObjectLayer(GameObject gObj)
+        {
+            return (_layerMask.value & (1 << gObj.layer)) > 0;
+        }
+
         private void OnTrigger(Collider other, TriggerState state)
         {
+            var gObj = other.gameObject;
+
+            if (!IsValidObjectLayer(gObj)) return;
+
             var regTypes = GetDictionaryByState(state);
 
-            foreach (var component in other.gameObject.GetComponents<Component>())
+            foreach (var component in gObj.GetComponents<Component>())
+            {
+                if (component == null) continue;
+
                 if (regTypes.TryGetValue(component.GetType(), out var cucuEvent))
                     cucuEvent.Invoke(component);
+            }
         }
 
         private void OnTriggerEnter(Collider other) => OnTrigger(other, TriggerState.Enter);
@@ -174,7 +194,7 @@ namespace cucu.tools
         private void OnTriggerStay(Collider other) => OnTrigger(other, TriggerState.Stay);
 
         private void OnTriggerExit(Collider other) => OnTrigger(other, TriggerState.Exit);
-
+        
         [Serializable]
         private struct RegCompUnit
         {
