@@ -7,6 +7,8 @@ namespace cucu.tools
 {
     public class CucuTrigger : MonoBehaviour
     {
+        #region Public
+
         public enum TriggerState
         {
             Enter,
@@ -14,21 +16,33 @@ namespace cucu.tools
             Exit,
         }
 
+        public bool Active
+        {
+            get => _active;
+            set => _active = value;
+        }
+
         public LayerMask LayerMask => _layerMask;
 
-        public CucuEvent OnUpdateListOnEnter { get; private set; } = new CucuEvent();
-        public CucuEvent OnUpdateListOnStay { get; private set; } = new CucuEvent();
-        public CucuEvent OnUpdateListOnExit { get; private set; } = new CucuEvent();
-        public CucuEvent OnUpdateListAny { get; private set; } = new CucuEvent();
+        public CucuEvent OnUpdateList { get; private set; } = new CucuEvent();
 
-        public IReadOnlyList<Type> RegTypesOnEnter => GetDictionaryByState(TriggerState.Enter).Keys.ToList();
+        #endregion
 
-        public IReadOnlyList<Type> RegTypesOnStay => GetDictionaryByState(TriggerState.Stay).Keys.ToList();
+        #region Protected
 
-        public IReadOnlyList<Type> RegTypesOnExit => GetDictionaryByState(TriggerState.Exit).Keys.ToList();
+
+
+        #endregion
+
+        #region From editor
+
+        [Header("Active state")]
+        [SerializeField] private bool _active = true;
+
+        [Space]
 
         [Header("Layer mask")]
-        [SerializeField] private LayerMask _layerMask = new LayerMask {value = -1};
+        [SerializeField] private LayerMask _layerMask = new LayerMask { value = -1 };
 
         [Space]
 
@@ -44,9 +58,23 @@ namespace cucu.tools
         [SerializeField] private RegTypeUnit[] _registeredTypesOnStay;
         [SerializeField] private RegTypeUnit[] _registeredTypesOnExit;
 
+        #endregion
+
+        #region Private
+
         private Collider _collider;
         private Rigidbody _rigidbody;
         private Dictionary<TriggerState, Dictionary<Type, CucuObjectEvent>> _registeredTypes;
+
+        #endregion
+
+        #region Hashing
+
+        private List<Type> _lastHashList = new List<Type>();
+        private TriggerState _lastHashState;
+        private bool _isHashActual;
+
+        #endregion
 
         private void Awake()
         {
@@ -59,54 +87,45 @@ namespace cucu.tools
             _rigidbody.isKinematic = true;
 
 #if UNITY_EDITOR
-            OnUpdateListOnEnter.AddListener(() =>
+            OnUpdateList.AddListener(() =>
             {
                 _registeredTypesOnEnter =
-                    RegTypesOnEnter.Select(rtl => new RegTypeUnit {Type = rtl.ToString()}).ToArray();
-            });
+                    GetListTypesByState(TriggerState.Enter).Select(rtl => new RegTypeUnit {Type = rtl.ToString()}).ToArray();
 
-            OnUpdateListOnStay.AddListener(() =>
-            {
                 _registeredTypesOnStay =
-                    RegTypesOnStay.Select(rtl => new RegTypeUnit {Type = rtl.ToString()}).ToArray();
-            });
+                    GetListTypesByState(TriggerState.Stay).Select(rtl => new RegTypeUnit { Type = rtl.ToString() }).ToArray();
 
-            OnUpdateListOnExit.AddListener(() =>
-            {
                 _registeredTypesOnExit =
-                    RegTypesOnExit.Select(rtl => new RegTypeUnit {Type = rtl.ToString()}).ToArray();
+                    GetListTypesByState(TriggerState.Exit).Select(rtl => new RegTypeUnit { Type = rtl.ToString() }).ToArray();
             });
 #endif
 
-            OnUpdateListOnEnter.AddListener(OnUpdateListAny.Invoke);
-            OnUpdateListOnStay.AddListener(OnUpdateListAny.Invoke);
-            OnUpdateListOnExit.AddListener(OnUpdateListAny.Invoke);
+            OnUpdateList.AddListener(() => _isHashActual = false);
 
             RegisterComponentsFromEditor();
         }
 
-        public CucuObjectEvent RegisterComponent<TComponent>(TriggerState state = TriggerState.Enter)
-            where TComponent : Component =>
+        #region Registry
+
+        public CucuObjectEvent RegisterComponent<TComponent>(TriggerState state = TriggerState.Enter) where TComponent : Component =>
             RegisterType(typeof(TComponent), state);
 
-        public void RemoveComponent<TComponent>(TriggerState state = TriggerState.Enter)
-            where TComponent : Component =>
+        public void RemoveComponent<TComponent>(TriggerState state = TriggerState.Enter) where TComponent : Component =>
             RemoveType(typeof(TComponent), state);
 
-        public void RemoveComponentFromAll<TComponent>()
-            where TComponent : Component =>
+        public void RemoveComponentFromAll<TComponent>() where TComponent : Component =>
             RemoveTypeFromAll(typeof(TComponent));
 
         public CucuObjectEvent RegisterType(Type type, TriggerState state = TriggerState.Enter)
         {
             if (type == null) throw new NullReferenceException($"Type is null");
 
-            var regTypes = GetDictionaryByState(state);
+            var regTypes = GetDictionaryTypesByState(state);
 
             if (!regTypes.ContainsKey(type))
             {
                 regTypes.Add(type, new CucuObjectEvent());
-                UpdateListInvoke(state);
+                OnUpdateList.Invoke();
             }
 
             return regTypes[type];
@@ -114,12 +133,12 @@ namespace cucu.tools
 
         public void RemoveType(Type type, TriggerState state = TriggerState.Enter)
         {
-            var regTypes = GetDictionaryByState(state);
+            var regTypes = GetDictionaryTypesByState(state);
 
             if (regTypes.TryGetValue(type, out var cucuEvent))
             {
                 cucuEvent.RemoveAllListeners();
-                if (regTypes.Remove(type)) UpdateListInvoke(state);
+                if (regTypes.Remove(type)) OnUpdateList.Invoke();
             }
         }
 
@@ -130,7 +149,28 @@ namespace cucu.tools
             RemoveType(type, TriggerState.Exit);
         }
 
-        private Dictionary<Type, CucuObjectEvent> GetDictionaryByState(TriggerState state)
+        #endregion
+
+        #region Public methods
+
+        public List<Type> GetListTypesByState(TriggerState state)
+        {
+            if (_isHashActual && _lastHashState == state) return _lastHashList;
+
+            _lastHashList.Clear();
+            _lastHashList = GetDictionaryTypesByState(TriggerState.Enter).Keys.ToList();
+
+            _lastHashState = state;
+            _isHashActual = true;
+
+            return _lastHashList;
+        }
+
+        #endregion
+
+        #region Protected methods
+
+        protected Dictionary<Type, CucuObjectEvent> GetDictionaryTypesByState(TriggerState state)
         {
             if (_registeredTypes == null)
                 _registeredTypes = new Dictionary<TriggerState, Dictionary<Type, CucuObjectEvent>>();
@@ -141,36 +181,33 @@ namespace cucu.tools
             return _registeredTypes[state];
         }
 
-        private void UpdateListInvoke(TriggerState state)
+        protected bool IsValidObjectLayer(GameObject gObj)
         {
-            switch (state)
-            {
-                case TriggerState.Enter:
-                    OnUpdateListOnEnter.Invoke();
-                    break;
-                case TriggerState.Stay:
-                    OnUpdateListOnStay.Invoke();
-                    break;
-                case TriggerState.Exit:
-                    OnUpdateListOnExit.Invoke();
-                    break;
-            }
+            return (_layerMask.value & (1 << gObj.layer)) > 0;
         }
+
+        #endregion
+
+        #region Private methods
 
         private void RegisterComponentsFromEditor()
         {
             foreach (var component in _registeredComponentsOnEnter)
-                if(component.Component != null) RegisterType(component.Component.GetType(), TriggerState.Enter).AddListener(component.Event.Invoke);
+                if (component.Component != null)
+                    RegisterType(component.Component.GetType(), TriggerState.Enter).AddListener(component.Event.Invoke);
+
             foreach (var component in _registeredComponentsOnStay)
-                if (component.Component != null) RegisterType(component.Component.GetType(), TriggerState.Stay).AddListener(component.Event.Invoke);
+                if (component.Component != null)
+                    RegisterType(component.Component.GetType(), TriggerState.Stay).AddListener(component.Event.Invoke);
+
             foreach (var component in _registeredComponentsOnExit)
-                if (component.Component != null) RegisterType(component.Component.GetType(), TriggerState.Exit).AddListener(component.Event.Invoke);
+                if (component.Component != null)
+                    RegisterType(component.Component.GetType(), TriggerState.Exit).AddListener(component.Event.Invoke);
         }
 
-        private bool IsValidObjectLayer(GameObject gObj)
-        {
-            return (_layerMask.value & (1 << gObj.layer)) > 0;
-        }
+        #endregion
+
+        #region Triggers
 
         private void OnTrigger(Collider other, TriggerState state)
         {
@@ -178,7 +215,7 @@ namespace cucu.tools
 
             if (!IsValidObjectLayer(gObj)) return;
 
-            var regTypes = GetDictionaryByState(state);
+            var regTypes = GetDictionaryTypesByState(state);
 
             foreach (var component in gObj.GetComponents<Component>())
             {
@@ -186,6 +223,7 @@ namespace cucu.tools
 
                 if (regTypes.TryGetValue(component.GetType(), out var cucuEvent))
                     cucuEvent.Invoke(component);
+
             }
         }
 
@@ -194,9 +232,13 @@ namespace cucu.tools
         private void OnTriggerStay(Collider other) => OnTrigger(other, TriggerState.Stay);
 
         private void OnTriggerExit(Collider other) => OnTrigger(other, TriggerState.Exit);
-        
+
+        #endregion
+
+        #region Structs
+
         [Serializable]
-        private struct RegCompUnit
+        protected struct RegCompUnit
         {
             public Component Component;
 
@@ -204,9 +246,11 @@ namespace cucu.tools
         }
 
         [Serializable]
-        private struct RegTypeUnit
+        protected struct RegTypeUnit
         {
             public string Type;
         }
+
+        #endregion
     }
 }
