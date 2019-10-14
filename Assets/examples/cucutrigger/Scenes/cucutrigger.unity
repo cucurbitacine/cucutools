@@ -348,7 +348,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1023716857}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -1.833, y: 0, z: 0}
+  m_LocalPosition: {x: -2, y: 0, z: 0}
   m_LocalScale: {x: 0.5, y: 0.5, z: 0.5}
   m_Children: []
   m_Father: {fileID: 0}
@@ -637,7 +637,7 @@ Transform:
   m_GameObject: {fileID: 2109598362}
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 0.25, y: 1, z: 1}
+  m_LocalScale: {x: 0.1, y: 2, z: 2}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 3
@@ -654,7 +654,54 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 573062860c81ad64caef3bebbeda0bd6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _registerComponents:
-  - {fileID: 1845115957}
-  - {fileID: 1023716859}
-  _typeNames: []
+  _registeredComponentsOnEnter:
+  - Component: {fileID: 1023716858}
+    Event:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1244327415}
+          m_MethodName: TestRight
+          m_Mode: 2
+          m_Arguments:
+            m_ObjectArgument: {fileID: 1845115960}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Transform, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  _registeredComponentsOnStay:
+  - Component: {fileID: 2109598366}
+    Event:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1244327415}
+          m_MethodName: TestRotateX
+          m_Mode: 2
+          m_Arguments:
+            m_ObjectArgument: {fileID: 2109598366}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Transform, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  _registeredComponentsOnExit:
+  - Component: {fileID: 1845115957}
+    Event:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1244327415}
+          m_MethodName: TestLeft
+          m_Mode: 2
+          m_Arguments:
+            m_ObjectArgument: {fileID: 1023716861}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Transform, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  _registeredTypesOnEnter: []
+  _registeredTypesOnStay: []
+  _registeredTypesOnExit: []
