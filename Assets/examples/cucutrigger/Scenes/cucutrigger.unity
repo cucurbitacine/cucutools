@@ -660,10 +660,25 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 1244327415}
-          m_MethodName: TestRight
+          m_MethodName: TestSmaller
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 1845115960}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Transform, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - Component: {fileID: 1845115957}
+    Event:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1244327415}
+          m_MethodName: TestSmaller
+          m_Mode: 2
+          m_Arguments:
+            m_ObjectArgument: {fileID: 1023716861}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Transform, UnityEngine
             m_IntArgument: 0
             m_FloatArgument: 0
@@ -692,10 +707,25 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 1244327415}
-          m_MethodName: TestLeft
+          m_MethodName: TestBigger
           m_Mode: 2
           m_Arguments:
             m_ObjectArgument: {fileID: 1023716861}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Transform, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
+  - Component: {fileID: 1023716858}
+    Event:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1244327415}
+          m_MethodName: TestBigger
+          m_Mode: 2
+          m_Arguments:
+            m_ObjectArgument: {fileID: 1845115960}
             m_ObjectArgumentAssemblyTypeName: UnityEngine.Transform, UnityEngine
             m_IntArgument: 0
             m_FloatArgument: 0

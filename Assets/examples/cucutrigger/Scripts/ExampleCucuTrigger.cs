@@ -26,16 +26,16 @@ namespace cucu.example
             });
         }
 
-        public void TestLeft(Transform transform)
+        public void TestSmaller(Transform transform)
         {
-            Debug.Log($"[From editor] : [{transform.gameObject.name}]");
-            transform.position += Vector3.left;
+            Debug.Log($"[From editor smaller] : [{transform.gameObject.name}]");
+            transform.localScale /= 2f;
         }
 
-        public void TestRight(Transform transform)
+        public void TestBigger(Transform transform)
         {
-            Debug.Log($"[From editor] : [{transform.gameObject.name}]");
-            transform.position += Vector3.right;
+            Debug.Log($"[From editor bigger] : [{transform.gameObject.name}]");
+            transform.localScale *= 2f;
         }
 
         public void TestRotateX(Transform transform)
