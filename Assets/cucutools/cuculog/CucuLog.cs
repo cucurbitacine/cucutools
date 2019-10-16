@@ -6,168 +6,133 @@ namespace cucu.tools
 {
     public class CucuLog
     {
-        public TagParams CurrentTagParams { get; set; }
-
-        public LogParams CurrentLogParams { get; set; }
-
-        public static void Log(LogArgs args)
+        public enum LogType
         {
-            switch (args.logParams.logArea)
+            Log,
+            Warning,
+            Error,
+        }
+
+        public enum LogArea
+        {
+            Application,
+            Editor,
+            Build,
+            File, // TODO write to file and make binary enum
+            Nowhere,
+        }
+
+        public Color TagColor { get; private set; }
+        public LogType Type { get; private set; }
+        public LogArea Area { get; private set; }
+
+        public string Tag { get; private set; }
+
+        private static IReadOnlyDictionary<LogType, UnityEngine.LogType> _logTypeSet =
+            new Dictionary<LogType, UnityEngine.LogType>
             {
-                case LogParams.LogArea.Anywhere:
-                    args.Log();
+                {LogType.Log, UnityEngine.LogType.Log},
+                {LogType.Warning, UnityEngine.LogType.Warning},
+                {LogType.Error, UnityEngine.LogType.Error},
+            };
+
+        private CucuLog(Color tagColor, LogType logType, LogArea logArea)
+        {
+            TagColor = tagColor;
+            Type = logType;
+            Area = logArea;
+        }
+
+        public static CucuLog Create() => new CucuLog(Color.black, LogType.Log, LogArea.Application);
+
+        public static void Log(
+            object message, string tag = "",
+            Color tagColor = new Color(),
+            LogType type = LogType.Log,
+            LogArea area = LogArea.Application)
+        {
+            switch (area)
+            {
+                case LogArea.Application:
+                    Log(message, tag, tagColor, type);
                     break;
-                case LogParams.LogArea.Editor:
+                case LogArea.Editor:
 #if UNITY_EDITOR
-                    args.Log();
+                    Log(message, tag, tagColor, type);
 #endif
                     break;
-                case LogParams.LogArea.Build:
-#if UNITY_STANDALONE
-                    args.Log();
+                case LogArea.Build:
+#if !UNITY_EDITOR
+                    Log(message, tag, tagType, type);
 #endif
                     break;
+                case LogArea.Nowhere:
                 default:
                     break;
             }
         }
 
-        public CucuLog(TagParams tagParams = new TagParams(), LogParams logParams = new LogParams())
+        public static void Log(
+            object message, string tag = "",
+            Color tagColor = new Color(),
+            LogType type = LogType.Log)
         {
-            CurrentTagParams = tagParams;
-            CurrentLogParams = logParams;
+            Debug.unityLogger.Log(_logTypeSet[type], BuildMessage(tag, tagColor, message));
         }
 
-        public static void Log(object message, TagParams? tagParams = null, LogParams? logParams = null)
+        public CucuLog SetTag(Color tagColor, string tag = null)
         {
-            var args = new LogArgs {message = message};
-
-            if (tagParams != null) args.tagParams = tagParams.Value;
-            if (logParams != null) args.logParams = logParams.Value;
-
-            Log(args);
+            TagColor = tagColor;
+            if (tag != null) Tag = tag;
+            return this;
         }
 
-        public void Log(object message, LogParams logParams)
+        public CucuLog SetTag(string tag)
         {
-            Log(message, CurrentTagParams, logParams);
+            if (tag != null) Tag = tag;
+            return this;
         }
 
-        public void Log(object message, TagParams tagParams)
+        public CucuLog SetType(LogType type)
         {
-            Log(message, tagParams, CurrentLogParams);
+            Type = type;
+            return this;
+        }
+
+        public CucuLog SetArea(LogArea area)
+        {
+            Area = area;
+            return this;
+        }
+
+        public void Log(object message, string tag)
+        {
+            Log(message, tag, TagColor, Type, Area);
         }
 
         public void Log(object message)
         {
-            Log(message, CurrentTagParams, CurrentLogParams);
+            Log(message, Tag, TagColor, Type, Area);
         }
 
-        public class LogArgs
+        private static string BuildMessage(string tag, Color tagColor, object message) =>
+            BuildTag(tag, tagColor) + message + "\n";
+
+        private static string BuildTag(string text, Color color) =>
+            !string.IsNullOrEmpty(text) ? $"[<color=\"#{ColorToHex(color)}\">{text}</color>] : " : "";
+
+        public static string ColorToHex(Color color)
         {
-            public object message;
-            public TagParams tagParams;
-            public LogParams logParams;
+            var red = Convert.ToString((int) Mathf.Clamp(color.r * 255, 0, 255), 16);
+            if (red.Length < 2) red = "0" + red;
+            var green = Convert.ToString((int) Mathf.Clamp(color.g * 255, 0, 255), 16);
+            if (green.Length < 2) green = "0" + green;
+            var blue = Convert.ToString((int) Mathf.Clamp(color.b * 255, 0, 255), 16);
+            if (blue.Length < 2) blue = "0" + blue;
 
-            public LogArgs()
-            {
-                message = "";
-                tagParams = new TagParams();
-                logParams = new LogParams();
-            }
+            var result = red + green + blue;
 
-            public void Log()
-            {
-                if (tagParams.Type != TagParams.TagType.None)
-                    Debug.unityLogger.Log(logParams.GetUnityLogType(), tagParams.TextFormatted, message);
-                else
-                    Debug.unityLogger.Log(logParams.GetUnityLogType(), message);
-            }
-        }
-
-        public struct LogParams
-        {
-            public enum LogType
-            {
-                Default,
-                Warning,
-                Error,
-            }
-
-            public enum LogArea
-            {
-                Anywhere,
-                Editor,
-                Build,
-                Nowhere,
-            }
-
-            public LogType logType;
-            public LogArea logArea;
-
-            private readonly IReadOnlyDictionary<LogType, UnityEngine.LogType> _logTypeSet;
-
-            public LogParams(LogType type, LogArea area)
-            {
-                logType = type;
-                logArea = area;
-
-                _logTypeSet =
-                    new Dictionary<LogType, UnityEngine.LogType>
-                    {
-                        {LogType.Default, UnityEngine.LogType.Log},
-                        {LogType.Warning, UnityEngine.LogType.Warning},
-                        {LogType.Error, UnityEngine.LogType.Error},
-                    };
-            }
-
-            public UnityEngine.LogType GetUnityLogType(LogType? type = null)
-            {
-                var sType = type ?? logType;
-                return _logTypeSet.ContainsKey(sType) ? _logTypeSet[sType] : UnityEngine.LogType.Log;
-            }
-        }
-
-        public struct TagParams
-        {
-            public enum TagType
-            {
-                None,
-                Info,
-                Success,
-                Fail,
-            }
-
-            public TagType Type { get; set; }
-
-            public string Text
-            {
-                get => _text;
-                set => _text = value;
-            }
-
-            public string TextFormatted => GetTextFormatted(Text, Type);
-
-            private string _text;
-
-            private static readonly IReadOnlyDictionary<TagType, string> _colorSet = new Dictionary<TagType, string>
-            {
-                {TagType.None, "black"},
-                {TagType.Info, "yellow"},
-                {TagType.Success, "green"},
-                {TagType.Fail, "red"},
-            };
-
-            public TagParams(TagType type, string text = "")
-            {
-                Type = type;
-                _text = text;
-            }
-
-            public static string GetTextFormatted(string text, TagType type = TagType.Info)
-            {
-                return $"[<color={_colorSet[type]}>{text}</color>]";
-            }
+            return result;
         }
     }
 }
