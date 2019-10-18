@@ -46,19 +46,19 @@ namespace cucu.tools
         public static CucuLog Create() => new CucuLog(Color.black, LogType.Log, LogArea.Application);
 
         public static void Log(
-            object message, string tag = "",
-            Color tagColor = new Color(),
+            object message,
+            string tag = null, Color? tagColor = null,
             LogType type = LogType.Log,
             LogArea area = LogArea.Application)
         {
             switch (area)
             {
                 case LogArea.Application:
-                    Log(message, tag, tagColor, type);
+                    LogInternal(message, tag, tagColor, type);
                     break;
                 case LogArea.Editor:
 #if UNITY_EDITOR
-                    Log(message, tag, tagColor, type);
+                    LogInternal(message, tag, tagColor, type);
 #endif
                     break;
                 case LogArea.Build:
@@ -72,12 +72,12 @@ namespace cucu.tools
             }
         }
 
-        public static void Log(
+        private static void LogInternal(
             object message, string tag = "",
-            Color tagColor = new Color(),
+            Color? tagColor = null,
             LogType type = LogType.Log)
         {
-            Debug.unityLogger.Log(_logTypeSet[type], BuildMessage(tag, tagColor, message));
+            Debug.unityLogger.Log(_logTypeSet[type], BuildMessage(tag, tagColor ?? Color.black, message));
         }
 
         public CucuLog SetTag(Color tagColor, string tag = null)
@@ -121,7 +121,7 @@ namespace cucu.tools
         private static string BuildTag(string text, Color color) =>
             !string.IsNullOrEmpty(text) ? $"[<color=\"#{ColorToHex(color)}\">{text}</color>] : " : "";
 
-        public static string ColorToHex(Color color)
+        private static string ColorToHex(Color color)
         {
             var red = Convert.ToString((int) Mathf.Clamp(color.r * 255, 0, 255), 16);
             if (red.Length < 2) red = "0" + red;

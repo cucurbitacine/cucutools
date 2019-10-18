@@ -1,6 +1,5 @@
 ﻿using cucu.tools;
 using UnityEngine;
-using Random = UnityEngine.Random;
 
 namespace cucu.example
 {
@@ -9,7 +8,7 @@ namespace cucu.example
         private void Start()
         {
             CucuLog.Log("Message", "Tag", Color.cyan, CucuLog.LogType.Warning);
-
+            CucuLog.Log("I'm Justin");
             var logger = CucuLog.Create()
                 .SetTag(Color.blue, "Loading")
                 .SetType(CucuLog.LogType.Log)
