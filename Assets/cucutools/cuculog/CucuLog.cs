@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace cucu.tools
 {
-    public class CucuLog
+    public class CucuLogger
     {
         public enum LogType
         {
@@ -36,86 +36,81 @@ namespace cucu.tools
                 {LogType.Error, UnityEngine.LogType.Error},
             };
 
-        private CucuLog(Color tagColor, LogType logType, LogArea logArea)
+        private CucuLogger()
         {
-            TagColor = tagColor;
-            Type = logType;
-            Area = logArea;
+            TagColor = Color.black;
+            Type = LogType.Log;
+            Area = LogArea.Application;
         }
 
-        public static CucuLog Create() => new CucuLog(Color.black, LogType.Log, LogArea.Application);
+        public static CucuLogger Create() => new CucuLogger();
 
-        public static void Log(
+        private static void LogInternal(
             object message,
-            string tag = null, Color? tagColor = null,
-            LogType type = LogType.Log,
-            LogArea area = LogArea.Application)
+            string tag,
+            Color tagColor,
+            LogType type,
+            LogArea area)
         {
             switch (area)
             {
                 case LogArea.Application:
-                    LogInternal(message, tag, tagColor, type);
+                    LogInternalLocated(message, tag, tagColor, type);
                     break;
                 case LogArea.Editor:
 #if UNITY_EDITOR
-                    LogInternal(message, tag, tagColor, type);
+                    LogInternalLocated(message, tag, tagColor, type);
 #endif
                     break;
                 case LogArea.Build:
 #if !UNITY_EDITOR
-                    Log(message, tag, tagType, type);
+                    LogInternalLocated(message, tag, tagType, type);
 #endif
                     break;
                 case LogArea.Nowhere:
                 default:
                     break;
             }
-        }
 
-        private static void LogInternal(
-            object message, string tag = "",
-            Color? tagColor = null,
-            LogType type = LogType.Log)
-        {
-            Debug.unityLogger.Log(_logTypeSet[type], BuildMessage(tag, tagColor ?? Color.black, message));
+            void LogInternalLocated(
+                object messageInternal,
+                string tagInternal,
+                Color tagColorInternal,
+                LogType typeInternal)
+                => Debug.unityLogger.Log(_logTypeSet[typeInternal], BuildMessage(messageInternal, tagInternal, tagColorInternal));
         }
-
-        public CucuLog SetTag(Color tagColor, string tag = null)
+               
+        public CucuLogger SetTag(Color tagColor, string tag = null)
         {
             TagColor = tagColor;
             if (tag != null) Tag = tag;
             return this;
         }
 
-        public CucuLog SetTag(string tag)
+        public CucuLogger SetTag(string tag)
         {
             if (tag != null) Tag = tag;
             return this;
         }
 
-        public CucuLog SetType(LogType type)
+        public CucuLogger SetType(LogType type)
         {
             Type = type;
             return this;
         }
 
-        public CucuLog SetArea(LogArea area)
+        public CucuLogger SetArea(LogArea area)
         {
             Area = area;
             return this;
         }
 
-        public void Log(object message, string tag)
+        public void Log(object message, string tag = null, Color? tagColor = null, LogType? logType = null, LogArea? logArea = null)
         {
-            Log(message, tag, TagColor, Type, Area);
+            LogInternal(message, tag ?? Tag, tagColor ?? TagColor, logType ?? Type, logArea ?? Area);
         }
 
-        public void Log(object message)
-        {
-            Log(message, Tag, TagColor, Type, Area);
-        }
-
-        private static string BuildMessage(string tag, Color tagColor, object message) =>
+        private static string BuildMessage(object message, string tag, Color tagColor) =>
             BuildTag(tag, tagColor) + message + "\n";
 
         private static string BuildTag(string text, Color color) =>

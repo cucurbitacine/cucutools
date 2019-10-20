@@ -7,12 +7,13 @@ namespace cucu.example
     {
         private void Start()
         {
-            CucuLog.Log("Message", "Tag", Color.cyan, CucuLog.LogType.Warning);
-            CucuLog.Log("I'm Justin");
-            var logger = CucuLog.Create()
+            Cucu.Log(null, null, null, null, null);
+            Cucu.Log("I'm Justin", "Hi");
+            
+            var logger = CucuLogger.Create()
                 .SetTag(Color.blue, "Loading")
-                .SetType(CucuLog.LogType.Log)
-                .SetArea(CucuLog.LogArea.Editor);
+                .SetType(CucuLogger.LogType.Log)
+                .SetArea(CucuLogger.LogArea.Editor);
             
             logger.Log($"Let's begin!", "Info");
             var count = 8;
@@ -26,8 +27,8 @@ namespace cucu.example
                     : Color.Lerp(Color.yellow, Color.green, newVal);
 
                 var message = ((int) (val * 100)).ToString() + "%";
-                if (message.Length < 3) message = "0" + message; 
-                if (message.Length < 4) message = " " + message; 
+                message = $"{(message.Length < 3 ? "0" : "")}{message}";
+                message = $"{(message.Length < 4 ? " " : "")}{message}";
 
                 logger.SetTag(color).Log(message);
             }
