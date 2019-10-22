@@ -28,15 +28,19 @@ namespace cucu.example
             logger.SetType(CucuLogger.LogType.Log);
             logger.Log("Let's begin!", "Info");
 
-            var count = 8;
+            var colors = new[]
+            {
+                Color.red, Color.yellow.LerpTo(Color.red), Color.yellow, Color.green, Color.cyan,
+                Color.blue, Color.magenta
+            };
+
+            var count = 16;
             for (var i = 0; i < count; i++)
             {
-                var val = Mathf.Clamp01(1f * i / (count - 1));
-                var newVal = Mathf.Clamp01(2 * (val < 0.5f ? val : val - 0.5f));
+                float val = Mathf.Clamp01(1f * i / (count - 1));
 
-                var color = val < 0.5f
-                    ? Color.Lerp(Color.red, Color.yellow, newVal)
-                    : Color.Lerp(Color.yellow, Color.green, newVal);
+
+                var color = val.GetColorLerp(colors);
 
                 var message = (int) (val * 100) + "%";
                 message = $"{(message.Length < 3 ? "0" : "")}{message}";
