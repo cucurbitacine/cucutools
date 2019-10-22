@@ -77,9 +77,10 @@ namespace cucu.tools
                 string tagInternal,
                 Color tagColorInternal,
                 LogType typeInternal)
-                => Debug.unityLogger.Log(_logTypeSet[typeInternal], BuildMessage(messageInternal, tagInternal, tagColorInternal));
+                => Debug.unityLogger.Log(_logTypeSet[typeInternal],
+                    BuildMessage(messageInternal, tagInternal, tagColorInternal));
         }
-               
+
         public CucuLogger SetTag(Color tagColor, string tag = null)
         {
             TagColor = tagColor;
@@ -105,29 +106,20 @@ namespace cucu.tools
             return this;
         }
 
-        public void Log(object message, string tag = null, Color? tagColor = null, LogType? logType = null, LogArea? logArea = null)
+        public void Log(
+            object message,
+            string tag = null,
+            Color? tagColor = null,
+            LogType? logType = null,
+            LogArea? logArea = null)
         {
             LogInternal(message, tag ?? Tag, tagColor ?? TagColor, logType ?? Type, logArea ?? Area);
         }
 
         private static string BuildMessage(object message, string tag, Color tagColor) =>
-            BuildTag(tag, tagColor) + message + "\n";
+            BuildTag(tag, tagColor) + message;
 
         private static string BuildTag(string text, Color color) =>
-            !string.IsNullOrEmpty(text) ? $"[<color=\"#{ColorToHex(color)}\">{text}</color>] : " : "";
-
-        private static string ColorToHex(Color color)
-        {
-            var red = Convert.ToString((int) Mathf.Clamp(color.r * 255, 0, 255), 16);
-            if (red.Length < 2) red = "0" + red;
-            var green = Convert.ToString((int) Mathf.Clamp(color.g * 255, 0, 255), 16);
-            if (green.Length < 2) green = "0" + green;
-            var blue = Convert.ToString((int) Mathf.Clamp(color.b * 255, 0, 255), 16);
-            if (blue.Length < 2) blue = "0" + blue;
-
-            var result = red + green + blue;
-
-            return result;
-        }
+            !string.IsNullOrEmpty(text) ? $"[{Cucu.StringSetColor(text, color)}] : " : "";
     }
 }
