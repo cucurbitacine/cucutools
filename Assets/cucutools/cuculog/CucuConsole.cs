@@ -6,112 +6,107 @@ using UnityEngine;
 namespace cucu.tools
 {
     /// <summary>
-    /// A console to display Unity's debug logs in-game.
+    ///   A console to display Unity's debug logs in-game.
     /// </summary>
+    [DisallowMultipleComponent]
     public class CucuConsole : MonoBehaviour
     {
-        struct Log
-        {
-            public string message;
-            public string stackTrace;
-            public LogType type;
-            public DateTime time;
-        }
-
-        /// <summary>
-        /// The hotkey to show and hide the console window.
-        /// </summary>
-        [Header("Ctrl + ")]
-        public KeyCode toggleKey = KeyCode.BackQuote;
-
-        List<Log> logs = new List<Log>();
-        Vector2 scrollPosition;
-        bool show;
-        bool collapse;
+        private const int Margin = 20;
 
         // Visual elements:
 
-        static readonly Dictionary<LogType, Color> logTypeColors = new Dictionary<LogType, Color>()
+        private static readonly Dictionary<LogType, Color> LogTypeColors = new Dictionary<LogType, Color>
         {
             {LogType.Assert, Color.white},
             {LogType.Error, Color.red},
             {LogType.Exception, Color.red},
             {LogType.Log, Color.white},
-            {LogType.Warning, Color.yellow},
+            {LogType.Warning, Color.yellow}
         };
 
-        const int margin = 20;
+        private readonly GUIContent _clearLabel = new GUIContent("Clear", "Clear the contents of the console.");
+        private readonly GUIContent _collapseLabel = new GUIContent("Collapse", "Hide repeated messages.");
 
-        Rect windowRect = new Rect(margin, margin, Screen.width - (margin * 2), Screen.height - (margin * 2));
-        Rect titleBarRect = new Rect(0, 0, 10000, 20);
-        GUIContent clearLabel = new GUIContent("Clear", "Clear the contents of the console.");
-        GUIContent collapseLabel = new GUIContent("Collapse", "Hide repeated messages.");
+        private readonly List<Log> _logs = new List<Log>();
+        private readonly Rect _titleBarRect = new Rect(0, 0, 10000, 20);
 
-        void OnEnable()
+        /// <summary>
+        ///   The hotkey to show and hide the console window.
+        /// </summary>
+        [Header("Ctrl + ")] [SerializeField] private readonly KeyCode _toggleKey = KeyCode.BackQuote;
+
+        private bool _collapse;
+        private Vector2 _scrollPosition;
+        private bool _show;
+
+        private Rect _windowRect = new Rect(Margin, Margin, Screen.width - Margin * 2, Screen.height - Margin * 2);
+
+        private CucuConsole()
+        {
+        }
+
+        private static CucuConsole Instance { get; set; }
+
+        private void Awake()
+        {
+            if (Instance != null) Destroy(this);
+            else Instance = this;
+        }
+
+        private void OnEnable()
         {
             Application.logMessageReceived += HandleLog;
         }
 
-        void OnDisable()
+        private void OnDisable()
         {
             Application.logMessageReceived -= HandleLog;
         }
 
-        void Update()
+        private void Update()
         {
-            if ((show || Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) && Input.GetKeyDown(toggleKey))
-            {
-                show = !show;
-            }
+            if ((_show || Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl)) &&
+                Input.GetKeyDown(_toggleKey)) _show = !_show;
         }
 
-        void OnGUI()
+        // ReSharper disable once InconsistentNaming
+        private void OnGUI()
         {
-            if (!show)
-            {
-                return;
-            }
+            if (!_show) return;
 
-            windowRect = GUILayout.Window(123456, windowRect, ConsoleWindow, "Console");
+            _windowRect = GUILayout.Window(123456, _windowRect, ConsoleWindow, "Console");
         }
 
         /// <summary>
-        /// A window that displayss the recorded logs.
+        ///   A window that displays the recorded logs.
         /// </summary>
-        /// <param name="windowID">Window ID.</param>
-        void ConsoleWindow(int windowID)
+        /// <param name="windowId">Window ID.</param>
+        private void ConsoleWindow(int windowId)
         {
-            scrollPosition = GUILayout.BeginScrollView(scrollPosition);
+            _scrollPosition = GUILayout.BeginScrollView(_scrollPosition);
 
             // Iterate through the recorded logs.
-            for (int i = 0; i < logs.Count; i++)
+            for (var i = 0; i < _logs.Count; i++)
             {
-                var log = logs[i];
+                var log = _logs[i];
 
                 // Combine identical messages if collapse option is chosen.
-                if (collapse)
+                if (_collapse)
                 {
-                    var messageSameAsPrevious = i > 0 && log.message == logs[i - 1].message;
+                    var messageSameAsPrevious = i > 0 && log.Message == _logs[i - 1].Message;
 
-                    if (messageSameAsPrevious)
-                    {
-                        continue;
-                    }
+                    if (messageSameAsPrevious) continue;
                 }
 
-                GUI.contentColor = logTypeColors[log.type];
-                GUILayout.Label($"\n[{log.time.ToString(CultureInfo.CurrentCulture)}] {log.message}");
+                GUI.contentColor = LogTypeColors[log.Type];
+                GUILayout.Label($"\n[{log.Time.ToString(CultureInfo.CurrentCulture)}] {log.Message}");
 
-                if (log.type == LogType.Error || log.type == LogType.Exception)
-                {
-                    GUI.contentColor = new Color(0.8f, 0.1f, 0.1f, 1f);
-                    var ss = log.stackTrace.Split(new[] {"\n"}, StringSplitOptions.RemoveEmptyEntries);
-                    for (var index = ss.Length - 1; index >= 0; index--)
-                    {
-                        var s = ss[index];
-                        GUILayout.Label($"\t[{ss.Length - 1 - index}] {s}");
-                    }
-                }
+                if (log.Type != LogType.Error && log.Type != LogType.Exception) continue;
+
+                GUI.contentColor = new Color(0.8f, 0.1f, 0.1f, 1f);
+                var stackTrace = log.StackTrace.Split(new[] {"\n"}, StringSplitOptions.RemoveEmptyEntries);
+                for (var index = stackTrace.Length - 1; index >= 0; index--)
+                    GUILayout.Label($"\t[{stackTrace.Length - 1 - index}] {stackTrace[index]}");
             }
 
             GUILayout.EndScrollView();
@@ -120,35 +115,40 @@ namespace cucu.tools
 
             GUILayout.BeginHorizontal();
 
-            if (GUILayout.Button(clearLabel))
-            {
-                logs.Clear();
-            }
+            if (GUILayout.Button(_clearLabel)) _logs.Clear();
 
-            collapse = GUILayout.Toggle(collapse, collapseLabel, GUILayout.ExpandWidth(false));
+            _collapse = GUILayout.Toggle(_collapse, _collapseLabel, GUILayout.ExpandWidth(false));
 
             GUILayout.EndHorizontal();
 
             // Allow the window to be dragged by its title bar.
-            GUI.DragWindow(titleBarRect);
+            GUI.DragWindow(_titleBarRect);
         }
 
         /// <summary>
-        /// Records a log from the log callback.
+        ///   Records a log from the log callback.
         /// </summary>
         /// <param name="message">Message.</param>
         /// <param name="stackTrace">Trace of where the message came from.</param>
         /// <param name="type">Type of message (error, exception, warning, assert).</param>
-        void HandleLog(string message, string stackTrace, LogType type)
+        private void HandleLog(string message, string stackTrace, LogType type)
         {
             var time = DateTime.Now;
-            logs.Add(new Log()
+            _logs.Add(new Log
             {
-                message = message,
-                stackTrace = stackTrace,
-                type = type,
-                time = time
+                Message = message,
+                StackTrace = stackTrace,
+                Type = type,
+                Time = time
             });
+        }
+
+        private struct Log
+        {
+            public string Message;
+            public string StackTrace;
+            public LogType Type;
+            public DateTime Time;
         }
     }
 }

@@ -7,10 +7,7 @@ namespace cucu.example
     {
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.A))
-            {
-                Do();
-            }
+            if (Input.GetKeyDown(KeyCode.A)) Do();
         }
 
         private void Do()
@@ -28,9 +25,8 @@ namespace cucu.example
             logger.SetType(CucuLogger.LogType.Error).Log("i am simple logger");
 
 
-
             logger.SetType(CucuLogger.LogType.Log);
-            logger.Log($"Let's begin!", "Info");
+            logger.Log("Let's begin!", "Info");
 
             var count = 8;
             for (var i = 0; i < count; i++)
@@ -42,7 +38,7 @@ namespace cucu.example
                     ? Color.Lerp(Color.red, Color.yellow, newVal)
                     : Color.Lerp(Color.yellow, Color.green, newVal);
 
-                var message = ((int)(val * 100)).ToString() + "%";
+                var message = (int) (val * 100) + "%";
                 message = $"{(message.Length < 3 ? "0" : "")}{message}";
                 message = $"{(message.Length < 4 ? " " : "")}{message}";
 
