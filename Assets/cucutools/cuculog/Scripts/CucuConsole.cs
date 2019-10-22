@@ -33,7 +33,7 @@ namespace cucu.tools
         /// <summary>
         ///   The hotkey to show and hide the console window.
         /// </summary>
-        [Header("Ctrl + ")] [SerializeField] private readonly KeyCode _toggleKey = KeyCode.BackQuote;
+        [Header("Ctrl + ")] [SerializeField] private KeyCode _toggleKey = KeyCode.BackQuote;
 
         private bool _collapse;
         private Vector2 _scrollPosition;
@@ -49,8 +49,15 @@ namespace cucu.tools
 
         private void Awake()
         {
-            if (Instance != null) Destroy(this);
-            else Instance = this;
+            if (Instance != null)
+            {
+                Destroy(this);
+            }
+            else
+            {
+                Instance = this;
+                DontDestroyOnLoad(this.gameObject);
+            }
         }
 
         private void OnEnable()
