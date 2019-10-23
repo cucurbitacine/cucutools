@@ -11,8 +11,8 @@ namespace cucu
         {
             Logger = CucuLogger.Create()
                 .SetTag(null)
-                .SetType(CucuLogger.LogType.Log)
-                .SetArea(CucuLogger.LogArea.Application);
+                .SetType(LogType.Log)
+                .SetArea(LogArea.Application);
         }
 
         private Cucu()
@@ -22,8 +22,8 @@ namespace cucu
         public static void Log(object message,
             string tag = null,
             Color? tagColor = null,
-            CucuLogger.LogType? logType = null,
-            CucuLogger.LogArea? logArea = null)
+            LogType? logType = null,
+            LogArea? logArea = null)
         {
             Logger.Log(message, tag, tagColor, logType, logArea);
         }

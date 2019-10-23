@@ -29,18 +29,19 @@ namespace cucu
             return Color.Lerp(color, target, Mathf.Clamp01(t));
         }
 
-        public static Color GetColorLerp(this float t, params Color[] colors)
+        public static Color GetColorLerp(this float value, params Color[] colors)
         {
             if (colors == null || colors.Length == 0) return Color.white;
             if (colors.Length == 1) return colors.First();
 
+            var x = Mathf.Clamp01(value);
             var dt = 1f / (colors.Length - 1);
-            var begin = 0.0f;
+
             for (var i = 0; i < colors.Length-1; i++)
             {
-                if (begin <= t && t <= begin + dt)
-                    return colors[i].LerpTo(colors[i + 1], Mathf.Clamp01((t - begin) / dt));
-                begin += dt;
+                var t = dt * i;
+                if (t <= x && x <= t + dt)
+                    return colors[i].LerpTo(colors[i + 1], Mathf.Clamp01((x - t) / dt));
             }
 
             return colors.Last();

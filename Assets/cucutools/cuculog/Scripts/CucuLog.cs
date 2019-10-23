@@ -1,46 +1,33 @@
-﻿using System.Collections.Generic;
+﻿using System;
 using UnityEngine;
+using Object = UnityEngine.Object;
 
 namespace cucu.tools
 {
+    public enum LogArea
+    {
+        Application,
+        Editor,
+        Build,
+        File, // TODO write to file and make binary enum
+        Nowhere
+    }
+
     public class CucuLogger
     {
-        public enum LogArea
-        {
-            Application,
-            Editor,
-            Build,
-            File, // TODO write to file and make binary enum
-            Nowhere
-        }
-
-        public enum LogType
-        {
-            Log,
-            Warning,
-            Error
-        }
-
-        private static readonly IReadOnlyDictionary<LogType, UnityEngine.LogType> _logTypeSet =
-            new Dictionary<LogType, UnityEngine.LogType>
-            {
-                {LogType.Log, UnityEngine.LogType.Log},
-                {LogType.Warning, UnityEngine.LogType.Warning},
-                {LogType.Error, UnityEngine.LogType.Error}
-            };
-
         private CucuLogger()
         {
             TagColor = Color.black;
             Type = LogType.Log;
-            Area = LogArea.Application;
+            LogArea = LogArea.Application;
         }
 
-        public Color TagColor { get; private set; }
-        public LogType Type { get; private set; }
-        public LogArea Area { get; private set; }
-
         public string Tag { get; private set; }
+        public Color TagColor { get; private set; }
+
+        public LogType Type { get; private set; }
+        public LogArea LogArea { get; private set; }
+
 
         public static CucuLogger Create()
         {
@@ -52,9 +39,9 @@ namespace cucu.tools
             string tag,
             Color tagColor,
             LogType type,
-            LogArea area)
+            LogArea logArea)
         {
-            switch (area)
+            switch (logArea)
             {
                 case LogArea.Application:
                     LogInternalLocated(message, tag, tagColor, type);
@@ -80,8 +67,7 @@ namespace cucu.tools
                 Color tagColorInternal,
                 LogType typeInternal)
             {
-                Debug.unityLogger.Log(_logTypeSet[typeInternal],
-                    BuildMessage(messageInternal, tagInternal, tagColorInternal));
+                Debug.unityLogger.Log(typeInternal, BuildMessage(messageInternal, tagInternal, tagColorInternal));
             }
         }
 
@@ -104,9 +90,9 @@ namespace cucu.tools
             return this;
         }
 
-        public CucuLogger SetArea(LogArea area)
+        public CucuLogger SetArea(LogArea logArea)
         {
-            Area = area;
+            LogArea = logArea;
             return this;
         }
 
@@ -117,7 +103,7 @@ namespace cucu.tools
             LogType? logType = null,
             LogArea? logArea = null)
         {
-            LogInternal(message, tag ?? Tag, tagColor ?? TagColor, logType ?? Type, logArea ?? Area);
+            LogInternal(message, tag ?? Tag, tagColor ?? TagColor, logType ?? Type, logArea ?? LogArea);
         }
 
         private static string BuildMessage(object message, string tag, Color tagColor)

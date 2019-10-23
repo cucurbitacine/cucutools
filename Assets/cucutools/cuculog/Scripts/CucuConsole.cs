@@ -39,7 +39,7 @@ namespace cucu.tools
         private Vector2 _scrollPosition;
         private bool _show;
 
-        private Rect _windowRect = new Rect(Margin, Margin, Screen.width - Margin * 2, Screen.height - Margin * 2);
+        private Rect _windowRect; 
 
         private CucuConsole()
         {
@@ -81,7 +81,8 @@ namespace cucu.tools
         {
             if (!_show) return;
 
-            _windowRect = GUILayout.Window(123456, _windowRect, ConsoleWindow, "Console");
+            _windowRect = new Rect(Margin, Margin, Screen.width - Margin * 2, Screen.height - Margin * 2);
+            GUILayout.Window(123456, _windowRect, ConsoleWindow, "Console");
         }
 
         /// <summary>
