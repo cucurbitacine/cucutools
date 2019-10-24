@@ -1,41 +1,74 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
-using UnityEditor;
 using UnityEngine;
 
 namespace cucu.tools
 {
     public class CucuTagManager : MonoBehaviour
     {
-        [SerializeField] private readonly string search = "";
-        [SerializeField] private ObjectsOfTag[] _objectsOfTag;
+        public static CucuTagManager Instance { get; }
+#if UNITY_EDITOR
+        [SerializeField] private bool UpdateViewList = true;
+        [Header("Online")]
+        [SerializeField] private StackTagInfo[] _stackTagsOnline;
+        [Space]
+        [Header("Offline")]
+        [SerializeField] private StackTagInfo[] _stackTagsOffline;
+
+        [Space]
+        [Header("Search")]
+        [SerializeField] private string search = "";
+#endif
+        private TagStorage Storage => _storage ?? (_storage = new TagStorage());
         private TagStorage _storage;
-        [SerializeField] private TagsOfObject[] _tagsOfObjects;
 
         static CucuTagManager()
         {
             Instance = Init();
         }
-
-        public static CucuTagManager Instance { get; }
-
-        private TagStorage Storage
+#if UNITY_EDITOR
+        private void Update()
         {
-            get
-            {
-                if (_storage != null) return _storage;
-                _storage = new TagStorage();
-                return _storage;
-            }
+            UpdateData();
         }
-
+#endif
+#if UNITY_EDITOR
         [ContextMenu("Search")]
         private void Search()
         {
             var tags = search.Split(new[] {" "}, StringSplitOptions.RemoveEmptyEntries);
-        }
 
+            var count = tags.Length;
+
+            var all = tags
+                .SelectMany(t =>
+                {
+                    var key = t;
+                    var data = Storage.GetData(key);
+                    var gO = data.Select(l => l.gameObject);
+                    var res = gO.Distinct();
+                    return res;
+                })
+                .ToArray();
+
+            var unique = all
+                .Distinct()
+                .Select(a => (a.GetInstanceID(), a));
+
+            var result = unique
+                .Where(u => all.Count(x => x.GetInstanceID() == u.Item1) == count)
+                .Select(u => u.a);
+
+            var info = $"({search}) : [";
+            foreach (var r in result)
+            {
+                info += r.name + ",";
+            }
+
+            info += "]";
+            Cucu.Log(info, "Searching");
+        }
+#endif
         private static CucuTagManager Init()
         {
             var iam = new GameObject("CucuTagManager");
@@ -44,207 +77,90 @@ namespace cucu.tools
 
             return instance;
         }
-
-        public void AddTag(CucuTag cucuTag)
+        
+        public bool Register(CucuTag cucuTag)
         {
-            Storage.Add(cucuTag);
+            return Storage.Create(cucuTag);
         }
 
-        public void EditTag(CucuTag cucuTag)
+        public bool Unregistering(CucuTag cucuTag)
         {
-            if (Storage.Remove(cucuTag)) Storage.Add(cucuTag);
+            return Storage.Delete(cucuTag);
         }
 
-        public void RemoveTag(CucuTag cucuTag)
+        public bool UpdateTag(CucuTag cucuTag)
         {
-            Storage.Remove(cucuTag);
+            return Storage.Update(cucuTag);
         }
 
-        public GameObject[] GetObjectsByTags(params string[] keys)
+        public bool LogIn(CucuTag cucuTag)
         {
-            return keys.SelectMany(key => Storage.GetObjects(key)).ToArray();
+            if (!Storage.Data.ContainsKey(cucuTag.Guid)) return false;
+            return !cucuTag.IsOnline;
+
         }
 
-        public CucuTag[] GetTagsByObjects(params GameObject[] objects)
+        public bool LogOut(CucuTag cucuTag)
         {
-            return objects.SelectMany(o => Storage.GetTags(o).SelectMany(s => Storage.GetTags(s))).ToArray();
+            if (!Storage.Data.ContainsKey(cucuTag.Guid)) return false;
+            return cucuTag.IsOnline;
         }
 
+        public bool TagIsOnline(CucuTag cucuTag)
+        {
+            return cucuTag != null && Storage.Data.ContainsKey(cucuTag.Guid) && cucuTag.IsOnline;
+        }
+
+        public GameObject[] FindObjectsByTag(string key)
+        {
+            var tags = Storage.GetData(key);
+
+            var onlineTags = tags.Where(TagIsOnline);
+
+            return onlineTags.Select(d => d.gameObject).ToArray();
+        }
+#if UNITY_EDITOR
+        [ContextMenu("Refresh")]
         private void UpdateData()
         {
-            _objectsOfTag = Storage.GetTags()
-                .Select(t => new ObjectsOfTag
-                    {key = t, gameObjects = Storage.GetTags(t).Select(s => s.gameObject).ToArray()})
-                .ToArray();
+            var allTags = !UpdateViewList
+                ? null
+                : Storage.StackedData
+                    .Select(sd => new StackTagInfo
+                    {
+                        key = sd.Key,
+                        tags = sd.Value.Select(g => Storage.Data[g])
+                            .Select(t => new TagInfo
+                            {
+                                nameObject = t.gameObject.name,
+                                online = TagIsOnline(t),
+                                gameObjects = t.gameObject,
+                            })
+                            .ToArray(),
+                    });
 
-            _tagsOfObjects = Storage.GetObjects()
-                .Select(go => new TagsOfObject {gameObject = go, tags = Storage.GetTags(go)})
-                .ToArray();
+            _stackTagsOnline = allTags?
+                .Select(at => new StackTagInfo {key = at.key, tags = at.tags.Where(ts => ts.online).ToArray()})
+                .Where(on => on.tags.Any())?.ToArray();
+
+            _stackTagsOffline = allTags?
+                .Select(at => new StackTagInfo { key = at.key, tags = at.tags.Where(ts => !ts.online).ToArray() })
+                .Where(on => on.tags.Any()).ToArray();
         }
-
-        private void Awake()
-        {
-            Storage.OnChanged.AddListener(UpdateData);
-        }
-
-        private void Start()
-        {
-            UpdateData();
-        }
-
-        private void OnDestroy()
-        {
-            foreach (var tagKey in Storage.GetTags())
-            foreach (var cucuTag in Storage.GetTags(tagKey))
-                cucuTag.OnChanged.RemoveListener(() => EditTag(cucuTag));
-        }
-
+#endif
         [Serializable]
-        private struct ObjectsOfTag
+        private struct StackTagInfo
         {
             public string key;
-            public GameObject[] gameObjects;
+            public TagInfo[] tags;
         }
 
         [Serializable]
-        private struct TagsOfObject
+        private struct TagInfo
         {
-            public GameObject gameObject;
-            public string[] tags;
-        }
-
-        private class TagStorage
-        {
-            private readonly Dictionary<int, KeyValuePair<GameObject, List<string>>> _storage_object2tags;
-
-            private readonly Dictionary<string, List<CucuTag>> _storage_tag2objects;
-
-            private readonly Dictionary<GUID, string> _storage_tag2tag;
-
-            public readonly CucuEvent OnChanged = new CucuEvent();
-
-            public TagStorage()
-            {
-                _storage_tag2objects = new Dictionary<string, List<CucuTag>>();
-
-                _storage_object2tags = new Dictionary<int, KeyValuePair<GameObject, List<string>>>();
-
-                _storage_tag2tag = new Dictionary<GUID, string>();
-            }
-
-            public bool Add(CucuTag cucuTag)
-            {
-                var guid = cucuTag.Guid;
-
-                //
-
-                if (_storage_tag2tag.ContainsKey(guid))
-                    return false;
-
-                _storage_tag2tag.Add(guid, cucuTag.Key);
-
-                if (!_storage_tag2tag.TryGetValue(guid, out var key))
-                    return false;
-
-                //
-
-                if (!_storage_tag2objects.ContainsKey(key))
-                    _storage_tag2objects.Add(key, new List<CucuTag>());
-
-                if (!_storage_tag2objects.TryGetValue(key, out var cucuTags))
-                    return false;
-
-                cucuTags.Add(cucuTag);
-
-                //
-
-                var go = cucuTag.gameObject;
-                var id = go.GetInstanceID();
-
-                if (!_storage_object2tags.ContainsKey(id))
-                    _storage_object2tags.Add(id, new KeyValuePair<GameObject, List<string>>(go, new List<string>()));
-
-                if (!_storage_object2tags.TryGetValue(id, out var pair))
-                    return false;
-
-                if (!pair.Value.Contains(key))
-                    pair.Value.Add(key);
-
-                //
-
-                OnChanged.Invoke();
-                return true;
-            }
-
-            public bool Remove(CucuTag cucuTag)
-            {
-                return _storage_tag2tag.TryGetValue(cucuTag.Guid, out var key) && RemoveFrom(key, cucuTag);
-            }
-
-            private bool RemoveFrom(string key, CucuTag cucuTag)
-            {
-                var guid = cucuTag.Guid;
-
-                //
-
-                _storage_tag2tag.Remove(guid);
-
-                //
-
-                if (_storage_tag2objects.TryGetValue(key, out var cucuTags))
-                {
-                    cucuTags.Remove(cucuTag);
-
-                    if (!cucuTags.Any()) _storage_tag2objects.Remove(key);
-                }
-
-                //
-
-                var id = cucuTag.gameObject.GetInstanceID();
-
-                if (_storage_object2tags.TryGetValue(id, out var pair))
-                {
-                    pair.Value.Remove(key);
-
-                    if (!pair.Value.Any()) _storage_object2tags.Remove(id);
-                }
-
-                //
-
-                OnChanged.Invoke();
-                return true;
-            }
-
-            public string[] GetTags()
-            {
-                return _storage_tag2objects.Keys.ToArray();
-            }
-
-            public CucuTag[] GetTags(string key)
-            {
-                return _storage_tag2objects[key].ToArray();
-            }
-
-            public CucuTag GetTag(string key)
-            {
-                return GetTags(key).FirstOrDefault();
-            }
-
-            public GameObject[] GetObjects()
-            {
-                return _storage_object2tags.Select(t => t.Value.Key).ToArray();
-            }
-
-            public GameObject[] GetObjects(string key)
-            {
-                return _storage_tag2objects[key].Select(c => c.gameObject).ToArray();
-            }
-
-            public string[] GetTags(GameObject gameObject)
-            {
-                var id = gameObject.GetInstanceID();
-                return _storage_object2tags.TryGetValue(id, out var pair) ? pair.Value.ToArray() : new string[0];
-            }
+            public string nameObject;
+            [NonSerialized] public bool online;
+            public GameObject gameObjects;
         }
     }
 }

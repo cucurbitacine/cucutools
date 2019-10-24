@@ -260,7 +260,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbe3da9f04269b04bb08cf71e012bcda, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _key: building
+  _keyFromEditor: checkpoint
+  _autoRegister: 1
 --- !u!114 &1668925895
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -273,7 +274,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbe3da9f04269b04bb08cf71e012bcda, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _key: checkpoint
+  _keyFromEditor: building
+  _autoRegister: 1
 --- !u!1 &1773939148
 GameObject:
   m_ObjectHideFlags: 0
@@ -306,7 +308,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bbe3da9f04269b04bb08cf71e012bcda, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _key: player
+  _keyFromEditor: player
+  _autoRegister: 1
 --- !u!65 &1773939150
 BoxCollider:
   m_ObjectHideFlags: 0
