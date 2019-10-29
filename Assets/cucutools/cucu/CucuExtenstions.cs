@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using cucu.tools;
 using UnityEngine;
 
 namespace cucu
@@ -45,6 +46,13 @@ namespace cucu
             }
 
             return colors.Last();
+        }
+
+        public static CucuTag CucuTag(this GameObject gameObject, string tag)
+        {
+            var cucuTag = gameObject.AddComponent<CucuTag>();
+            cucuTag.Key = tag;
+            return cucuTag;
         }
     }
 }
