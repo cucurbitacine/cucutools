@@ -51,7 +51,7 @@ namespace cucu
         public static CucuTag CucuTag(this GameObject gameObject, string tag)
         {
             var cucuTag = gameObject.AddComponent<CucuTag>();
-            cucuTag.RegisterAs(tag);
+            cucuTag.Key = tag;
             return cucuTag;
         }
     }
