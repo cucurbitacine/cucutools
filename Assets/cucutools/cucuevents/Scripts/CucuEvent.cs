@@ -82,6 +82,24 @@ namespace cucu.tools
 
     /// <inheritdoc />
     [Serializable]
+    public class CucuTransformEvent : CucuEventBase<Transform>
+    {
+    }
+
+    /// <inheritdoc />
+    [Serializable]
+    public class CucuGameObjectEvent : CucuEventBase<GameObject>
+    {
+    }
+
+    /// <inheritdoc />
+    [Serializable]
+    public class CucuTagEvent : CucuEventBase<CucuTag>
+    {
+    }
+
+    /// <inheritdoc />
+    [Serializable]
     public class CucuObjectEvent : CucuEventBase<object>
     {
     }

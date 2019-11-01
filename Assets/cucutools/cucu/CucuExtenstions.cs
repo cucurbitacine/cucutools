@@ -1,9 +1,9 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
-using cucu.tools;
 using UnityEngine;
 
-namespace cucu
+namespace cucu.tools
 {
     public static class CucuExtenstions
     {
@@ -38,7 +38,7 @@ namespace cucu
             var x = Mathf.Clamp01(value);
             var dt = 1f / (colors.Length - 1);
 
-            for (var i = 0; i < colors.Length-1; i++)
+            for (var i = 0; i < colors.Length - 1; i++)
             {
                 var t = dt * i;
                 if (t <= x && x <= t + dt)
@@ -48,11 +48,21 @@ namespace cucu
             return colors.Last();
         }
 
-        public static CucuTag CucuTag(this GameObject gameObject, string tag)
+        public static CucuTag AddCucuTag(this GameObject gameObject, string tag)
         {
             var cucuTag = gameObject.AddComponent<CucuTag>();
-            cucuTag.Key = tag;
+            cucuTag.SetKey(tag);
             return cucuTag;
+        }
+
+        public static Color SetAlpha(this Color color, float a)
+        {
+            return new Color(color.r, color.g, color.b, a);
+        }
+
+        public static IEnumerable<CucuTag> GetTagsByArgs(this IEnumerable<CucuTag> tags, IEnumerable<TagArg> args)
+        {
+            return CucuTag.GetTagsByArgs(args, tags);
         }
     }
 }

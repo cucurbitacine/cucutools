@@ -12,7 +12,7 @@ namespace cucu.example
             if (Input.GetKeyDown(KeyCode.A))
             {
                 var go = new GameObject($"#{Random.Range(1000, 9999)}");
-                go.CucuTag("npc");
+                go.AddCucuTag("npc");
             }
         }
     }

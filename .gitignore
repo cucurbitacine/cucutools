@@ -1,10 +1,12 @@
 Library
 Assets/sandbox
 Assets/sandbox.*
+Assets/Plugins/Editor/JetBrains
 
 /Temp
 /Obj
 /.vs
+/.idea
 /*.csproj
 /*.sln*
 

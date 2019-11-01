@@ -30,31 +30,25 @@ namespace cucu.tools
 
         #region Protected
 
-
-
         #endregion
 
         #region From editor
 
-        [Header("Active state")]
-        [SerializeField] private bool _active = true;
+        [Header("Active state")] [SerializeField]
+        private bool _active = true;
 
-        [Space]
+        [Space] [Header("Layer mask")] [SerializeField]
+        private LayerMask _layerMask = new LayerMask {value = -1};
 
-        [Header("Layer mask")]
-        [SerializeField] private LayerMask _layerMask = new LayerMask { value = -1 };
+        [Space] [Header("List of registered types from editor")] [SerializeField]
+        private RegCompUnit[] _registeredComponentsOnEnter;
 
-        [Space]
-
-        [Header("List of registered types from editor")]
-        [SerializeField] private RegCompUnit[] _registeredComponentsOnEnter;
         [SerializeField] private RegCompUnit[] _registeredComponentsOnStay;
         [SerializeField] private RegCompUnit[] _registeredComponentsOnExit;
 
-        [Space]
+        [Space] [Header("List of ALL registered types")] [SerializeField]
+        private RegTypeUnit[] _registeredTypesOnEnter;
 
-        [Header("List of ALL registered types")]
-        [SerializeField] private RegTypeUnit[] _registeredTypesOnEnter;
         [SerializeField] private RegTypeUnit[] _registeredTypesOnStay;
         [SerializeField] private RegTypeUnit[] _registeredTypesOnExit;
 
@@ -90,13 +84,16 @@ namespace cucu.tools
             OnUpdateList.AddListener(() =>
             {
                 _registeredTypesOnEnter =
-                    GetListTypesByState(TriggerState.Enter).Select(rtl => new RegTypeUnit {Type = rtl.ToString()}).ToArray();
+                    GetListTypesByState(TriggerState.Enter).Select(rtl => new RegTypeUnit {Type = rtl.ToString()})
+                        .ToArray();
 
                 _registeredTypesOnStay =
-                    GetListTypesByState(TriggerState.Stay).Select(rtl => new RegTypeUnit { Type = rtl.ToString() }).ToArray();
+                    GetListTypesByState(TriggerState.Stay).Select(rtl => new RegTypeUnit {Type = rtl.ToString()})
+                        .ToArray();
 
                 _registeredTypesOnExit =
-                    GetListTypesByState(TriggerState.Exit).Select(rtl => new RegTypeUnit { Type = rtl.ToString() }).ToArray();
+                    GetListTypesByState(TriggerState.Exit).Select(rtl => new RegTypeUnit {Type = rtl.ToString()})
+                        .ToArray();
             });
 #endif
 
@@ -105,9 +102,10 @@ namespace cucu.tools
             RegisterComponentsFromEditor();
         }
 
-        #region Registry
+        #region Register
 
-        public CucuObjectEvent RegisterComponent<TComponent>(TriggerState state = TriggerState.Enter) where TComponent : Component =>
+        public CucuObjectEvent RegisterComponent<TComponent>(TriggerState state = TriggerState.Enter)
+            where TComponent : Component =>
             RegisterType(typeof(TComponent), state);
 
         public void RemoveComponent<TComponent>(TriggerState state = TriggerState.Enter) where TComponent : Component =>
@@ -211,11 +209,13 @@ namespace cucu.tools
 
         private void OnTrigger(Collider other, TriggerState state)
         {
+            var regTypes = GetDictionaryTypesByState(state);
+
+            if (regTypes.Count == 0) return;
+
             var gObj = other.gameObject;
 
             if (!IsValidObjectLayer(gObj)) return;
-
-            var regTypes = GetDictionaryTypesByState(state);
 
             foreach (var component in gObj.GetComponents<Component>())
             {
@@ -223,7 +223,6 @@ namespace cucu.tools
 
                 if (regTypes.TryGetValue(component.GetType(), out var cucuEvent))
                     cucuEvent.Invoke(component);
-
             }
         }
 

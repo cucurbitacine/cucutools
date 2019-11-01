@@ -53,7 +53,7 @@ namespace cucu.tools
                     break;
                 case LogArea.Build:
 #if !UNITY_EDITOR
-                    LogInternalLocated(message, tag, tagType, type);
+                    LogInternalLocated(message, tag, tagColor, type);
 #endif
                     break;
                 case LogArea.Nowhere:
