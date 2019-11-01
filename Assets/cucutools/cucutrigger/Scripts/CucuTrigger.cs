@@ -72,9 +72,8 @@ namespace cucu.tools
 
         private void Awake()
         {
-            _collider = GetComponent<Collider>();
-            _collider.isTrigger = true;
-
+            SetCollider(_collider);
+            
             _rigidbody = GetComponent<Rigidbody>();
             if (_rigidbody == null) _rigidbody = gameObject.AddComponent<Rigidbody>();
             _rigidbody.useGravity = false;
@@ -164,6 +163,19 @@ namespace cucu.tools
             return _lastHashList;
         }
 
+        public CucuTrigger SetLayerMask(LayerMask layerMask)
+        {
+            _layerMask = layerMask;
+            return this;
+        }
+
+        public CucuTrigger SetCollider(Collider collider)
+        {
+            _collider = collider;
+            _collider.isTrigger = true;
+            return this;
+        }
+        
         #endregion
 
         #region Protected methods

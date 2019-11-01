@@ -16,7 +16,7 @@ namespace cucu.tools
 
         static CucuTimerFactory()
         {
-            DontDestroyOnLoad(new GameObject(nameof(CucuTimerFactory), new[] { typeof(CucuTimerFactory) }));
+            DontDestroyOnLoad(new GameObject(nameof(CucuTimerFactory), new[] {typeof(CucuTimerFactory)}));
         }
 
         private void Awake()
@@ -74,10 +74,10 @@ namespace cucu.tools
     /// </summary>
     public class CucuTimer : MonoBehaviour
     {
-        [HideInInspector] public CucuEvent OnStart { get; private set; }
-        [HideInInspector] public CucuEvent OnTick { get; private set; }
-        [HideInInspector] public CucuEvent OnStop { get; private set; }
-        [HideInInspector] public CucuEvent OnForceStop { get; private set; }
+        [HideInInspector] public CucuEvent OnStartEvent { get; private set; }
+        [HideInInspector] public CucuEvent OnTickEvent { get; private set; }
+        [HideInInspector] public CucuEvent OnStopEvent { get; private set; }
+        [HideInInspector] public CucuEvent OnForceStopEvent { get; private set; }
 
         public Guid Guid => _guidTimer;
 
@@ -103,10 +103,10 @@ namespace cucu.tools
         {
             _guidTimer = Guid.NewGuid();
 
-            OnStart = new CucuEvent();
-            OnTick = new CucuEvent();
-            OnStop = new CucuEvent();
-            OnForceStop = new CucuEvent();
+            OnStartEvent = new CucuEvent();
+            OnTickEvent = new CucuEvent();
+            OnStopEvent = new CucuEvent();
+            OnForceStopEvent = new CucuEvent();
 
             _stateCurrent = new CucuTimerStateIdle(this);
         }
@@ -139,13 +139,13 @@ namespace cucu.tools
 
         public CucuTimer SetDelay(float delay)
         {
-            if(!IsСountdown) _delay = delay;
+            if (!IsСountdown) _delay = delay;
             return this;
         }
 
         public CucuTimer SetTick(float tick)
         {
-            if(!IsTicking) _tick = tick;
+            if (!IsTicking) _tick = tick;
             return this;
         }
 
@@ -155,12 +155,36 @@ namespace cucu.tools
             return this;
         }
 
+        public CucuTimer OnStart(Action action)
+        {
+            OnStartEvent.AddListener(action);
+            return this;
+        }
+
+        public CucuTimer OnTick(Action action)
+        {
+            OnTickEvent.AddListener(action);
+            return this;
+        }
+
+        public CucuTimer OnStop(Action action)
+        {
+            OnStopEvent.AddListener(action);
+            return this;
+        }
+
+        public CucuTimer OnForceStop(Action action)
+        {
+            OnForceStopEvent.AddListener(action);
+            return this;
+        }
+
         private void OnDestroy()
         {
-            OnStart.RemoveAllListeners();
-            OnTick.RemoveAllListeners();
-            OnStop.RemoveAllListeners();
-            OnForceStop.RemoveAllListeners();
+            OnStartEvent.RemoveAllListeners();
+            OnTickEvent.RemoveAllListeners();
+            OnStopEvent.RemoveAllListeners();
+            OnForceStopEvent.RemoveAllListeners();
         }
 
         #region States
@@ -187,7 +211,9 @@ namespace cucu.tools
             /// <summary>
             /// Start timer
             /// </summary>
-            public virtual void Start() { }
+            public virtual void Start()
+            {
+            }
 
             /// <summary>
             /// Stop timer
@@ -195,13 +221,15 @@ namespace cucu.tools
             public virtual void Stop()
             {
                 _timer._stateCurrent = new CucuTimerStateIdle(_timer);
-                _timer.OnForceStop.Invoke();
+                _timer.OnForceStopEvent.Invoke();
             }
 
             /// <summary>
             /// Actions execute on MonoBehaviour-Update
             /// </summary>
-            public virtual void Update() { }
+            public virtual void Update()
+            {
+            }
         }
 
         /// <summary>
@@ -210,7 +238,9 @@ namespace cucu.tools
         private class CucuTimerStateIdle : CucuTimerStateBase
         {
             /// <inheritdoc />
-            public CucuTimerStateIdle(CucuTimer timer) : base(timer) { }
+            public CucuTimerStateIdle(CucuTimer timer) : base(timer)
+            {
+            }
 
             /// <inheritdoc />
             public override void Start()
@@ -220,7 +250,9 @@ namespace cucu.tools
             }
 
             /// <inheritdoc />
-            public override void Stop() { }
+            public override void Stop()
+            {
+            }
         }
 
         /// <summary>
@@ -267,7 +299,7 @@ namespace cucu.tools
             public CucuTimerStateTicking(CucuTimer timer) : base(timer)
             {
                 _isTick = _timer._tick > 0.0f;
-                _timer.OnStart.Invoke();
+                _timer.OnStartEvent.Invoke();
             }
 
             /// <inheritdoc />
@@ -285,16 +317,17 @@ namespace cucu.tools
                         else
                         {
                             _timeTick = 0.0f;
-                            _timer.OnTick.Invoke();
+                            _timer.OnTickEvent.Invoke();
                         }
                     }
+
                     _timer._time += deltaTime;
                 }
                 else
                 {
                     _timer._time = _timer._duration;
                     _timer._stateCurrent = new CucuTimerStateIdle(_timer);
-                    _timer.OnStop.Invoke();
+                    _timer.OnStopEvent.Invoke();
                 }
             }
         }
