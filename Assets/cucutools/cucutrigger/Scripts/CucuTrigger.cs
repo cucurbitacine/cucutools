@@ -164,6 +164,12 @@ namespace cucu.tools
             return _lastHashList;
         }
 
+        public CucuTrigger SetLayerMask(LayerMask layerMask)
+        {
+            _layerMask = layerMask;
+            return this;
+        }
+        
         #endregion
 
         #region Protected methods
