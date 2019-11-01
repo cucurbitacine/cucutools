@@ -73,7 +73,7 @@ namespace cucu.tools
             Gizmos.color = Color.blue;
             Gizmos.DrawLine(transform.position, transform.position + transform.forward);
 
-            Gizmos.color = Color.white;
+            Gizmos.color = new Color(57f / 255f, 255f / 255f, 20f / 255f, 0.382f);
             Gizmos.DrawSphere(transform.position, 0.1f);
         }
 #endif
