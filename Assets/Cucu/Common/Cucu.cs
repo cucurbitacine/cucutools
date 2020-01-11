@@ -6,18 +6,7 @@ namespace Cucu.Common
     internal class Cucu
     {
         public static readonly CucuLogger Logger;
-
-        public static readonly Color[] Rainbow = new[] // TODO in "cucu colors"
-        {
-            Color.red,
-            Color.red.LerpTo(Color.yellow),
-            Color.yellow,
-            Color.green,
-            Color.cyan,
-            Color.blue,
-            Color.magenta
-        };
-
+        
         static Cucu()
         {
             Logger = CucuLogger.Create()

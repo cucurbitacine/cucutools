@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Cucu.Common
 {
-    public static class CucuExtenstions
+    public static class CucuExtensions
     {
         public static string SetColor(this object obj, Color color)
         {
