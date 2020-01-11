@@ -1,4 +1,4 @@
-﻿using Cucu.Common;
+﻿using Cucu.Colors;
 using UnityEngine;
 
 namespace Cucu.Log
@@ -112,7 +112,7 @@ namespace Cucu.Log
 
         private static string BuildTag(string text, Color color)
         {
-            return !string.IsNullOrEmpty(text) ? $"[{text.SetColor(color)}] : " : "";
+            return !string.IsNullOrEmpty(text) ? $"[{text.ToColoredString(color)}] : " : "";
         }
     }
 }

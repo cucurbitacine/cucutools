@@ -73,6 +73,7 @@ namespace Cucu.Trigger
 
         private void Awake()
         {
+            if (_collider == null) _collider = GetComponent<Collider>();
             SetCollider(_collider);
 
             _rigidbody = GetComponent<Rigidbody>();
