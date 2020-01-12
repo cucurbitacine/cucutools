@@ -1,6 +1,7 @@
-﻿using System;
+﻿using System.Collections.Generic;
 using Cucu.Colors;
 using Cucu.Log;
+using Cucu.Trigger;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
@@ -8,80 +9,96 @@ namespace Examples.Scripts
 {
     public class CucuExampleSceneController : MonoBehaviour
     {
-        [SerializeField, Range(0f, 1f)] private float _value;
+        [SerializeField] private GameObject _increaseZone;
+        [SerializeField] private GameObject _discreaseZone;
+        [SerializeField] private GameObject _cucuMember;
+        [SerializeField] private Transform _cucuRoot;
 
-        [SerializeField] private Color _rainbowColor;
-        [SerializeField] private Color _hotColor;
-        [SerializeField] private Color _jetColor;
-        [SerializeField] private Color _grayColor;
-        [SerializeField] private Color _yargColor;
+        [SerializeField, Range(1, 2000)] private int _countMax = 500;
+        [SerializeField, Range(0, 2000)] private int _countCurr = 0;
+        private List<Transform> _cucus = new List<Transform>();
 
-        [SerializeField] private GameObject _cube;
-        [SerializeField] private GameObject _sphere;
-        [SerializeField] private GameObject _capsule;
-
-        private CucuLogger _cubeLogger;
-        private CucuLogger _sphereLogger;
-        private CucuLogger _capsuleLogger;
-        
-        private float _maxSpeed = float.Epsilon;
-        
         private void Awake()
         {
-            _cubeLogger = CucuLogger.Create()
-                .SetTag(Color.blue, "cube")
-                .SetType(LogType.Log)
-                .SetArea(LogArea.Editor);
-
-            _sphereLogger = CucuLogger.Create()
-                .SetTag(Color.red, "sphere")
-                .SetType(LogType.Log)
-                .SetArea(LogArea.Editor);
-            
-            _capsuleLogger = CucuLogger.Create()
-                .SetTag("capsule")
-                .SetType(LogType.Warning)
-                .SetArea(LogArea.Editor);
+            InitLoggers();
+            InitTriggers();
         }
 
         private void Update()
         {
-            var speed = _capsule.GetComponent<Rigidbody>().velocity.magnitude;
-
-            var color = CucuColor.Palettes.Hot.Get(speed / _maxSpeed);
-
-            _capsule.GetComponent<Renderer>().material.color = color;
+            CreateCucumber();
         }
 
-        public void CubeAction()
+        private void InitLoggers()
         {
-            var color = CucuColor.Palettes.Rainbow.Get(Random.value);
-            _cube.GetComponent<Renderer>().material.color = color;
-            _cubeLogger.Log("Action".ToColoredString(color));
+        }
 
-            var speed = _capsule.GetComponent<Rigidbody>().velocity.magnitude;
-            _maxSpeed = Mathf.Max(speed, _maxSpeed);
-            _capsuleLogger.Log($"Speed : {speed}");
-        }
-        
-        public void SphereAction()
+        private void InitTriggers()
         {
-            var color = CucuColor.Palettes.Hot.Get(Random.value);
-            _sphere.GetComponent<Renderer>().material.color = color;
-            _sphereLogger.Log("Action".ToColoredString(color));
-            
-            var speed = _capsule.GetComponent<Rigidbody>().velocity.magnitude;
-            _maxSpeed = Mathf.Max(speed, _maxSpeed);
-            _capsuleLogger.Log($"Speed : {speed}");
+            _increaseZone.GetComponent<CucuTrigger>()
+                .RegisterComponent<Transform>()
+                .AddListener(tr =>
+                {
+                    if (tr is Transform trans)
+                    {
+                        IncreaseObject(trans);
+                    }
+                });
+
+            _discreaseZone.GetComponent<CucuTrigger>()
+                .RegisterComponent<Transform>()
+                .AddListener(tr =>
+                {
+                    if (tr is Transform trans)
+                    {
+                        DiscreaseObject(trans);
+                    }
+                });
         }
-        
-        private void OnValidate()
+
+        private void CreateCucumber()
         {
-            _rainbowColor = CucuColor.Palettes.Rainbow.Get(_value);
-            _hotColor = CucuColor.Palettes.Hot.Get(_value);
-            _jetColor = CucuColor.Palettes.Jet.Get(_value);
-            _grayColor = CucuColor.Palettes.Gray.Get(_value);
-            _yargColor = CucuColor.Palettes.Yarg.Get(_value);
+            var cucu = Instantiate(_cucuMember,
+                _cucuRoot.position + Random.onUnitSphere * 2, Random.rotation,
+                _cucuRoot);
+
+            cucu.transform.localScale *= (Random.value - 0.5f) * 0.333f + 1f;
+            cucu.name = $"{_cucus.Count}_{cucu.name}";
+
+            cucu.GetComponent<Rigidbody>().AddTorque(Random.onUnitSphere * 1000);
+
+            _cucus.Add(cucu.transform);
+
+            ClearCucumbers();
+
+            _countCurr = _cucus.Count;
+        }
+
+        private void ClearCucumbers()
+        {
+            while (_cucus.Count > _countMax)
+                DeleteCucumber();
+        }
+
+        private void DeleteCucumber()
+        {
+            if (_cucus.Count > 0)
+            {
+                var cucu = _cucus[0];
+                _cucus.RemoveAt(0);
+                if (cucu != null)
+                    Destroy(cucu.gameObject);
+            }
+        }
+
+        private void IncreaseObject(Transform obj)
+        {
+            obj.localScale *= 2f;
+        }
+
+        private void DiscreaseObject(Transform obj)
+        {
+            obj.localScale *= 0.5f;
         }
     }
 }
