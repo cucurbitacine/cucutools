@@ -1,17 +1,25 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using Cucu.Colors;
 using Cucu.Log;
 using Cucu.Trigger;
 using UnityEngine;
+using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
 namespace Examples.Scripts
 {
     public class CucuExampleSceneController : MonoBehaviour
     {
-        [SerializeField] private GameObject _increaseZone;
-        [SerializeField] private GameObject _discreaseZone;
+        [FormerlySerializedAs("_increaseZone")] [SerializeField]
+        private GameObject _cubanationZone;
+
+        [FormerlySerializedAs("_discreaseZone")] [SerializeField]
+        private GameObject _spheranationZone;
+
         [SerializeField] private GameObject _cucuMember;
+        [SerializeField] private GameObject _cucuCube;
+        [SerializeField] private GameObject _cucuSphere;
         [SerializeField] private Transform _cucuRoot;
 
         [SerializeField, Range(1, 2000)] private int _countMax = 500;
@@ -35,23 +43,39 @@ namespace Examples.Scripts
 
         private void InitTriggers()
         {
-            _increaseZone.GetComponent<CucuTrigger>()
-                .RegisterComponent<Transform>()
+            var cubeTrigger = _cubanationZone.GetComponent<CucuTrigger>();
+
+            cubeTrigger.RegisterComponent<Transform>(CucuTrigger.TriggerState.Enter)
                 .AddListener(tr =>
                 {
-                    if (tr is Transform trans)
-                    {
-                        IncreaseObject(trans);
-                    }
+                    var trans = tr as Transform;
+                    trans.gameObject.GetComponentInChildren<Renderer>().material
+                        .SetColor("_EmissionColor", CucuColor.Palettes.Jet.Get(1f * _countCurr / _countMax));
                 });
 
-            _discreaseZone.GetComponent<CucuTrigger>()
-                .RegisterComponent<Transform>()
+            cubeTrigger.RegisterComponent<Transform>(CucuTrigger.TriggerState.Exit)
+                .AddListener(tr =>
+                {
+                    var trans = tr as Transform;
+                    CreateObject(trans, _cucuCube);
+                });
+
+            var sphereTrigger = _spheranationZone.GetComponent<CucuTrigger>();
+
+            sphereTrigger.RegisterComponent<Transform>(CucuTrigger.TriggerState.Enter)
+                .AddListener(tr =>
+                {
+                    var trans = tr as Transform;
+                    trans.gameObject.GetComponentInChildren<Renderer>().material
+                        .SetColor("_EmissionColor", CucuColor.Palettes.Jet.Get(1f * _countCurr / _countMax));
+                });
+
+            sphereTrigger.RegisterComponent<Transform>(CucuTrigger.TriggerState.Exit)
                 .AddListener(tr =>
                 {
                     if (tr is Transform trans)
                     {
-                        DiscreaseObject(trans);
+                        CreateObject(trans, _cucuSphere);
                     }
                 });
         }
@@ -62,7 +86,7 @@ namespace Examples.Scripts
                 _cucuRoot.position + Random.onUnitSphere * 2, Random.rotation,
                 _cucuRoot);
 
-            cucu.transform.localScale *= (Random.value - 0.5f) * 0.333f + 1f;
+            cucu.transform.localScale *= (Random.value - 0.5f) * 0.333f + 2f;
             cucu.name = $"{_cucus.Count}_{cucu.name}";
 
             cucu.GetComponent<Rigidbody>().AddTorque(Random.onUnitSphere * 1000);
@@ -91,14 +115,28 @@ namespace Examples.Scripts
             }
         }
 
-        private void IncreaseObject(Transform obj)
+        private void CreateObject(Transform origin, GameObject target)
         {
-            obj.localScale *= 2f;
-        }
+            var index = _cucus.IndexOf(origin);
 
-        private void DiscreaseObject(Transform obj)
-        {
-            obj.localScale *= 0.5f;
+            if (!(0 <= index && index < _cucus.Count))
+            {
+                Destroy(origin.gameObject);
+                return;
+            }
+
+            var obj = Instantiate(target, origin.position, origin.rotation);
+            _cucus[index] = obj.transform;
+
+            obj.transform.parent = origin.parent;
+
+            var rigOrigin = origin.gameObject.GetComponent<Rigidbody>();
+            var rigTarget = obj.GetComponent<Rigidbody>();
+
+            rigTarget.velocity = rigOrigin.velocity;
+            rigTarget.angularVelocity = rigOrigin.angularVelocity;
+
+            Destroy(origin.gameObject);
         }
     }
 }
