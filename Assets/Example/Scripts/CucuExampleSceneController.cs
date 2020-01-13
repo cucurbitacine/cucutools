@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using Cucu.Colors;
 using Cucu.Log;
@@ -137,6 +138,28 @@ namespace Examples.Scripts
             rigTarget.angularVelocity = rigOrigin.angularVelocity;
 
             Destroy(origin.gameObject);
+
+            StartCoroutine(AfterBurn(obj.transform, 1f));
+        }
+
+        private IEnumerator AfterBurn(Transform obj, float duration)
+        {
+            var renderer = obj.gameObject.GetComponent<Renderer>();
+
+            var colorInit = CucuColor.Palettes.Jet.Get(1f * _countCurr / _countMax);
+
+            var time = 0.0f;
+            while (time < duration)
+            {
+                if (renderer == null) yield break;
+
+                var t = time / duration;
+
+                renderer.material.SetColor("_EmissionColor", colorInit.LerpTo(Color.black, t));
+
+                time += Time.deltaTime;
+                yield return null;
+            }
         }
     }
 }
