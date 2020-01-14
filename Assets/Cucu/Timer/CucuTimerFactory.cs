@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using Cucu.Events;
 using UnityEngine;
 
@@ -13,7 +14,12 @@ namespace Cucu.Timer
     {
         private static CucuTimerFactory _instance { get; set; }
 
-        private Dictionary<Guid, CucuTimer> _timers;
+        private readonly Dictionary<Guid, CucuInfoTimer> _infoTimers = new Dictionary<Guid, CucuInfoTimer>();
+
+        private readonly List<CucuInfoTimer> _activeTimers = new List<CucuInfoTimer>();
+        private List<CucuInfoTimer> _internalActiveTimers;
+
+        private float _time;
 
         static CucuTimerFactory()
         {
@@ -24,315 +30,291 @@ namespace Cucu.Timer
         {
             if (_instance != null) Destroy(this);
             else _instance = this;
+        }
 
-            _timers = new Dictionary<Guid, CucuTimer>();
+        private void Update()
+        {
+            UpdateTime();
+
+            UpdateTimers();
+        }
+
+        private void OnDestroy()
+        {
+            RemoveAllListeners();
         }
 
         #region Public static
 
-        public static CucuTimer CreateTimer()
+        public static CucuTimer Create(string key)
         {
-            return _instance.AddTimer();
+            return _instance.InternalCreate(key);
         }
 
-        public static bool DestroyTimer(CucuTimer timer)
+        public static CucuTimer Create()
         {
-            return _instance.RemoveTimer(timer);
+            return _instance.InternalCreate();
         }
 
-        public static bool DestroyTimer(Guid guid)
+        public static float GetTime()
         {
-            return _instance.RemoveTimer(guid);
+            return _instance.InternalGetTime();
         }
 
-        #endregion
-
-        #region Private
-
-        private CucuTimer AddTimer()
+        public static float GetTime(Guid guid)
         {
-            var timer = gameObject.AddComponent<CucuTimer>();
-            _timers.Add(timer.Guid, timer);
-            return timer;
+            return _instance.InternalGetTime(guid);
         }
 
-        private bool RemoveTimer(CucuTimer timer)
+        public static float GetTime(CucuTimer timer)
+        {
+            return GetTime(timer.Guid);
+        }
+
+        public static bool AddListenerOnStart(Guid guid, Action action)
+        {
+            return _instance.InternalAddListenerOnStart(guid, action);
+        }
+
+        public static bool AddListenerOnTick(Guid guid, Action action)
+        {
+            return _instance.InternalAddListenerOnTick(guid, action);
+        }
+
+        public static bool AddListenerOnStop(Guid guid, Action action)
+        {
+            return _instance.InternalAddListenerOnStop(guid, action);
+        }
+
+        public static bool AddListenerOnForceStop(Guid guid, Action action)
+        {
+            return _instance.InternalAddListenerOnForceStop(guid, action);
+        }
+
+        public static void StartTimer(Guid guid)
+        {
+            _instance.InternalStartTimer(guid);
+        }
+
+        public static void StopTimer(Guid guid)
+        {
+            _instance.InternalStopTimer(guid);
+        }
+
+        public static void ForceStopTimer(Guid guid)
+        {
+            _instance.InternalForceStopTimer(guid);
+        }
+
+        public static bool RemoveTimer(Guid guid)
+        {
+            return _instance.InternalRemoveTimer(guid);
+        }
+
+        public static bool RemoveTimer(CucuTimer timer)
         {
             return RemoveTimer(timer.Guid);
         }
 
-        private bool RemoveTimer(Guid guid)
+        public static void DestroyAfterStop(Guid guid, bool value)
         {
-            if (_timers.TryGetValue(guid, out var value)) Destroy(value);
-            return _timers.Remove(guid);
+            _instance.InternalDestroyAfterStop(guid, value);
+        }
+
+        public static void RemoveAllListeners(Guid guid)
+        {
+            _instance.InternalRemoveAllListeners(guid);
+        }
+
+        public static void RemoveAllListeners()
+        {
+            _instance.InternalRemoveAllListeners();
+        }
+
+        #endregion
+
+        #region Private instance
+
+        private CucuTimer InternalCreate(string key = null)
+        {
+            var timer = gameObject.AddComponent<CucuTimer>();
+
+            var infoTimer = new CucuInfoTimer(timer);
+
+            _infoTimers.Add(infoTimer.Guid, infoTimer);
+
+            return timer.SetKey(key ?? timer.Guid.ToString());
+        }
+
+        private float InternalGetTime()
+        {
+            return _time;
+        }
+
+        private float InternalGetTime(Guid guid)
+        {
+            var time = 0.0f;
+
+            if (TryGetTimer(guid, out var infoTimer) && infoTimer.Play)
+            {
+                time = _time - infoTimer.Start;
+            }
+
+            return time;
+        }
+
+        private bool InternalAddListenerOnStart(Guid guid, Action action)
+        {
+            if (!TryGetTimer(guid, out var timer)) return false;
+            timer.OnStartEvent.AddListener(action);
+            return true;
+        }
+
+        private bool InternalAddListenerOnTick(Guid guid, Action action)
+        {
+            if (!TryGetTimer(guid, out var timer)) return false;
+            timer.OnTickEvent.AddListener(action);
+            return true;
+        }
+
+        private bool InternalAddListenerOnStop(Guid guid, Action action)
+        {
+            if (!TryGetTimer(guid, out var timer)) return false;
+            timer.OnStopEvent.AddListener(action);
+            return true;
+        }
+
+        private bool InternalAddListenerOnForceStop(Guid guid, Action action)
+        {
+            if (!TryGetTimer(guid, out var timer)) return false;
+            timer.OnForceStopEvent.AddListener(action);
+            return true;
+        }
+
+        private void InternalStartTimer(Guid guid)
+        {
+            if (!TryGetTimer(guid, out var timer) || timer.Play) return;
+            timer.Start = _time;
+            timer.LastTick = _time;
+            timer.Play = true;
+            _activeTimers.Add(timer);
+            timer.OnStartEvent.Invoke();
+        }
+
+        private void InternalStopTimer(Guid guid)
+        {
+            if (!TryGetTimer(guid, out var timer) || !timer.Play) return;
+            _activeTimers.Remove(timer);
+            timer.Play = false;
+            timer.OnStopEvent.Invoke();
+        }
+
+        private void InternalForceStopTimer(Guid guid)
+        {
+            if (!TryGetTimer(guid, out var timer) || !timer.Play) return;
+            _activeTimers.Remove(timer);
+            timer.Play = false;
+            timer.OnForceStopEvent.Invoke();
+        }
+
+        private bool InternalRemoveTimer(Guid guid)
+        {
+            InternalRemoveAllListeners(guid);
+            return _infoTimers.Remove(guid);
+        }
+
+        private void InternalDestroyAfterStop(Guid guid, bool value)
+        {
+            if (TryGetTimer(guid, out var timer)) timer.Destroy = value;
+        }
+
+        private void InternalRemoveAllListeners(Guid guid)
+        {
+            if (!TryGetTimer(guid, out var timer)) return;
+            timer.OnStartEvent.RemoveAllListeners();
+            timer.OnTickEvent.RemoveAllListeners();
+            timer.OnStopEvent.RemoveAllListeners();
+        }
+
+        private void InternalRemoveAllListeners()
+        {
+            foreach (var infoTimer in _infoTimers)
+            {
+                infoTimer.Value.OnStartEvent.RemoveAllListeners();
+                infoTimer.Value.OnTickEvent.RemoveAllListeners();
+                infoTimer.Value.OnStopEvent.RemoveAllListeners();
+            }
+        }
+
+        private void UpdateTime()
+        {
+            _time += Time.deltaTime;
+        }
+
+        private void UpdateTimers()
+        {
+            _internalActiveTimers = _activeTimers.ToList();
+
+            foreach (var infoTimer in _internalActiveTimers)
+            {
+                if (infoTimer.Timer == null)
+                {
+                    _activeTimers.Remove(infoTimer);
+                    RemoveTimer(infoTimer.Guid);
+                    continue;
+                }
+
+                var time = _time - infoTimer.Start;
+                if (time >= infoTimer.Timer.Duration)
+                {
+                    InternalStopTimer(infoTimer.Timer.Guid);
+                    if (infoTimer.Destroy) Destroy(infoTimer.Timer);
+                    continue;
+                }
+
+                if (infoTimer.Timer.Tick > 0.0f)
+                {
+                    var timeTick = _time - infoTimer.LastTick;
+                    if (timeTick >= infoTimer.Timer.Tick)
+                    {
+                        infoTimer.LastTick = _time;
+                        infoTimer.OnTickEvent.Invoke();
+                    }
+                }
+            }
+        }
+
+        private bool TryGetTimer(Guid guid, out CucuInfoTimer cucuTimer)
+        {
+            return _infoTimers.TryGetValue(guid, out cucuTimer);
         }
 
         #endregion
     }
 
-    /// <summary>
-    /// Timer
-    /// </summary>
-    public class CucuTimer : MonoBehaviour
+    [Serializable]
+    public class CucuInfoTimer
     {
-        [HideInInspector] public CucuEvent OnStartEvent { get; private set; }
-        [HideInInspector] public CucuEvent OnTickEvent { get; private set; }
-        [HideInInspector] public CucuEvent OnStopEvent { get; private set; }
-        [HideInInspector] public CucuEvent OnForceStopEvent { get; private set; }
+        [HideInInspector] public CucuEvent OnStartEvent = new CucuEvent();
+        [HideInInspector] public CucuEvent OnTickEvent = new CucuEvent();
+        [HideInInspector] public CucuEvent OnStopEvent = new CucuEvent();
+        [HideInInspector] public CucuEvent OnForceStopEvent = new CucuEvent();
 
-        public Guid Guid => _guidTimer;
+        public Guid Guid => _guid;
+        public CucuTimer Timer => _timer;
 
-        public float Time => _time;
-        public float Delay => _delay;
-        public float Tick => _tick;
-        public float Duration => _duration;
+        public float Start;
+        public float LastTick;
+        public bool Play;
+        public bool Destroy;
 
-        public bool IsIdle => _stateCurrent is CucuTimerStateIdle;
-        public bool IsСountdown => _stateCurrent is CucuTimerStateСountdown;
-        public bool IsTicking => _stateCurrent is CucuTimerStateTicking;
+        private Guid _guid;
+        public CucuTimer _timer;
 
-        private CucuTimerStateBase _stateCurrent;
-
-        private Guid _guidTimer;
-
-        private float _time;
-        private float _delay;
-        private float _tick;
-        private float _duration;
-
-        private void Awake()
+        public CucuInfoTimer(CucuTimer timer)
         {
-            _guidTimer = Guid.NewGuid();
-
-            OnStartEvent = new CucuEvent();
-            OnTickEvent = new CucuEvent();
-            OnStopEvent = new CucuEvent();
-            OnForceStopEvent = new CucuEvent();
-
-            _stateCurrent = new CucuTimerStateIdle(this);
+            _timer = timer;
+            _guid = _timer.Guid;
         }
-
-        private void Update()
-        {
-            _stateCurrent.Update();
-        }
-
-        public CucuTimer SetValues(float duration, float tick = 0.0f, float delay = 0.0f)
-        {
-            return SetDuration(duration).SetTick(tick).SetDelay(delay);
-        }
-
-        public void StartTimer(float duration, float tick = 0.0f, float delay = 0.0f)
-        {
-            SetValues(duration, tick, delay)
-                .StartTimer();
-        }
-
-        public void StartTimer()
-        {
-            _stateCurrent.Start();
-        }
-
-        public void StopTimer()
-        {
-            _stateCurrent.Stop();
-        }
-
-        public CucuTimer SetDelay(float delay)
-        {
-            if (!IsСountdown) _delay = delay;
-            return this;
-        }
-
-        public CucuTimer SetTick(float tick)
-        {
-            if (!IsTicking) _tick = tick;
-            return this;
-        }
-
-        public CucuTimer SetDuration(float duration)
-        {
-            if (!IsTicking) _duration = duration;
-            return this;
-        }
-
-        public CucuTimer OnStart(Action action)
-        {
-            OnStartEvent.AddListener(action);
-            return this;
-        }
-
-        public CucuTimer OnTick(Action action)
-        {
-            OnTickEvent.AddListener(action);
-            return this;
-        }
-
-        public CucuTimer OnStop(Action action)
-        {
-            OnStopEvent.AddListener(action);
-            return this;
-        }
-
-        public CucuTimer OnForceStop(Action action)
-        {
-            OnForceStopEvent.AddListener(action);
-            return this;
-        }
-
-        private void OnDestroy()
-        {
-            OnStartEvent.RemoveAllListeners();
-            OnTickEvent.RemoveAllListeners();
-            OnStopEvent.RemoveAllListeners();
-            OnForceStopEvent.RemoveAllListeners();
-        }
-
-        #region States
-
-        /// <summary>
-        /// Base abstract state
-        /// </summary>
-        private abstract class CucuTimerStateBase
-        {
-            /// <summary>
-            /// Personal timer
-            /// </summary>
-            protected CucuTimer _timer;
-
-            /// <summary>
-            /// Base constructor
-            /// </summary>
-            /// <param name="timer">Timer</param>
-            public CucuTimerStateBase(CucuTimer timer)
-            {
-                _timer = timer;
-            }
-
-            /// <summary>
-            /// Start timer
-            /// </summary>
-            public virtual void Start()
-            {
-            }
-
-            /// <summary>
-            /// Stop timer
-            /// </summary>
-            public virtual void Stop()
-            {
-                _timer._stateCurrent = new CucuTimerStateIdle(_timer);
-                _timer.OnForceStopEvent.Invoke();
-            }
-
-            /// <summary>
-            /// Actions execute on MonoBehaviour-Update
-            /// </summary>
-            public virtual void Update()
-            {
-            }
-        }
-
-        /// <summary>
-        /// State of idle
-        /// </summary>
-        private class CucuTimerStateIdle : CucuTimerStateBase
-        {
-            /// <inheritdoc />
-            public CucuTimerStateIdle(CucuTimer timer) : base(timer)
-            {
-            }
-
-            /// <inheritdoc />
-            public override void Start()
-            {
-                _timer._time = 0.0f;
-                _timer._stateCurrent = new CucuTimerStateСountdown(_timer);
-            }
-
-            /// <inheritdoc />
-            public override void Stop()
-            {
-            }
-        }
-
-        /// <summary>
-        /// State of countdown before start timer
-        /// </summary>
-        private class CucuTimerStateСountdown : CucuTimerStateBase
-        {
-            /// <inheritdoc />
-            public CucuTimerStateСountdown(CucuTimer timer) : base(timer)
-            {
-                _timer._time = _timer._delay;
-            }
-
-            public override void Update()
-            {
-                if (_timer._time > 0.0f)
-                {
-                    _timer._time -= UnityEngine.Time.deltaTime;
-                }
-                else
-                {
-                    _timer._time = 0.0f;
-                    _timer._stateCurrent = new CucuTimerStateTicking(_timer);
-                }
-            }
-        }
-
-        /// <summary>
-        /// State of ticking
-        /// </summary>
-        private class CucuTimerStateTicking : CucuTimerStateBase
-        {
-            /// <summary>
-            /// Ticking mode
-            /// </summary>
-            private readonly bool _isTick;
-
-            /// <summary>
-            /// Time of tick
-            /// </summary>
-            private float _timeTick;
-
-            /// <inheritdoc />
-            public CucuTimerStateTicking(CucuTimer timer) : base(timer)
-            {
-                _isTick = _timer._tick > 0.0f;
-                _timer.OnStartEvent.Invoke();
-            }
-
-            /// <inheritdoc />
-            public override void Update()
-            {
-                if (_timer._time < _timer._duration)
-                {
-                    var deltaTime = UnityEngine.Time.deltaTime;
-                    if (_isTick)
-                    {
-                        if (_timeTick < _timer._tick)
-                        {
-                            _timeTick += deltaTime;
-                        }
-                        else
-                        {
-                            _timeTick = 0.0f;
-                            _timer.OnTickEvent.Invoke();
-                        }
-                    }
-
-                    _timer._time += deltaTime;
-                }
-                else
-                {
-                    _timer._time = _timer._duration;
-                    _timer._stateCurrent = new CucuTimerStateIdle(_timer);
-                    _timer.OnStopEvent.Invoke();
-                }
-            }
-        }
-
-        #endregion
     }
 }

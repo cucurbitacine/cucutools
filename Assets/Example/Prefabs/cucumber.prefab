@@ -11,8 +11,9 @@ GameObject:
   - component: {fileID: 3717214936938100984}
   - component: {fileID: 155071051349973509}
   - component: {fileID: 2514930802288483090}
+  - component: {fileID: 6043340002004924297}
   m_Layer: 0
-  m_Name: Cucumber
+  m_Name: cucumber
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -63,6 +64,20 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 14
   m_Mesh: {fileID: -9114703323446395147, guid: 85b8c5045432d3142ac22c78a2ffb411, type: 3}
+--- !u!114 &6043340002004924297
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3381199169371549134}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 196504003cca496aabf97f0732caa0f9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  _key: cucu
+  args: []
 --- !u!1001 &921645642754483533
 PrefabInstance:
   m_ObjectHideFlags: 0
