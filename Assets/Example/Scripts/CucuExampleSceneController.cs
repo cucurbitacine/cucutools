@@ -1,8 +1,13 @@
-﻿using System.Collections.Generic;
-using Cucu.Colors;
-using Cucu.Tag;
-using Cucu.Timer;
-using Cucu.Trigger;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using CucuTools.Blend.Impl;
+using CucuTools.Colors;
+using CucuTools.Common;
+using CucuTools.Math;
+using CucuTools.Tag;
+using CucuTools.Timer;
+using CucuTools.Trigger;
 using UnityEngine;
 using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
@@ -44,11 +49,17 @@ namespace Examples.Scripts
         private List<Transform> _cucus = new List<Transform>();
         [SerializeField] private Color _color;
 
+        [SerializeField] private CucuBlendColorGradient _cucuBlendColor;
+        
         private CucuTimer _timer;
 
         private void Awake()
         {
+            Cucu.Log("Welcome to "+"CUCU WORLD".ToColoredString("3caa3c")+"!", "cucurbitacine");
+            
             InitTriggers();
+            
+            _cucuBlendColor.SetGradient(CucuColor.Palettes.Rainbow.ToGradient());
         }
 
         private void Start()
@@ -66,15 +77,27 @@ namespace Examples.Scripts
             UpdateColor();
         }
 
+        private void OnValidate()
+        {
+            UpdateGradient();
+        }
+
         private void UpdateColor()
         {
             var t = Mathf.Clamp01(_timer.TimeLocal / _timer.Duration);
 
             t = 2 * (t < 0.5f ? t : (1 - t));
 
-            _color = _colorPaletteMap[_colorMap].Get(t);
+            _cucuBlendColor.SetBlend(t);
+            
+            _color = _cucuBlendColor.Color;
         }
 
+        private void UpdateGradient()
+        {
+            _cucuBlendColor.SetGradient(_colorPaletteMap[_colorMap].ToGradient());
+        }
+        
         private void InitTriggers()
         {
             var cubeTrigger = _cubanationZone.GetComponent<CucuTrigger>();
