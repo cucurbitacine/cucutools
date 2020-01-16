@@ -1,4 +1,6 @@
 using System;
+using System.Linq;
+using System.Reflection;
 using UnityEngine;
 
 namespace CucuTools.Math
@@ -58,20 +60,22 @@ namespace CucuTools.Math
         }
     }
 
-
     [Serializable]
     public class CucuRangeFloat : CucuRange<float>
     {
-        public CucuRangeFloat()
+        public CucuRangeFloat() : this(0f, 1f, 0)
         {
-            SetMinValue(0f);
-            SetMaxValue(1f);
         }
 
-        public CucuRangeFloat(float min, float max)
+        public CucuRangeFloat(float min, float max) : this(min, max, min)
+        {
+        }
+
+        public CucuRangeFloat(float min, float max, float value)
         {
             SetMinValue(min);
             SetMaxValue(max);
+            Value = value;
         }
     }
 
@@ -79,16 +83,19 @@ namespace CucuTools.Math
     [Serializable]
     public class CucuRangeInt : CucuRange<int>
     {
-        public CucuRangeInt()
+        public CucuRangeInt() : this(0, 1, 0)
         {
-            SetMinValue(0);
-            SetMaxValue(1);
         }
 
-        public CucuRangeInt(int min, int max)
+        public CucuRangeInt(int min, int max) : this(min, max, min)
+        {
+        }
+
+        public CucuRangeInt(int min, int max, int value)
         {
             SetMinValue(min);
             SetMaxValue(max);
+            Value = value;
         }
     }
 }

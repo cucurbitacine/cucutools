@@ -17,6 +17,8 @@ namespace CucuTools.Tag
         [SerializeField] private List<CucuTagArg> args;
         private Guid? _guid;
 
+        [SerializeField] private bool _drawGizmos;
+
         public void SetKey(string key)
         {
             _key = key ?? "";
@@ -63,6 +65,8 @@ namespace CucuTools.Tag
 #if UNITY_EDITOR
         private void OnDrawGizmos()
         {
+            if (!_drawGizmos) return;
+
             Gizmos.color = Color.red;
             Gizmos.DrawLine(transform.position, transform.position + transform.right);
             Gizmos.DrawLine(transform.position, transform.position - transform.right);
@@ -73,7 +77,7 @@ namespace CucuTools.Tag
             Gizmos.color = Color.blue;
             Gizmos.DrawLine(transform.position, transform.position + transform.forward);
 
-            Gizmos.color = new Color(57f / 255f, 255f / 255f, 20f / 255f, 0.382f);
+            Gizmos.color = new Color(57f / 255f, 255f / 255f, 20f / 255f, 0.2f);
             Gizmos.DrawSphere(transform.position, 0.1f);
         }
 #endif
@@ -104,6 +108,16 @@ namespace CucuTools.Tag
         public static IEnumerable<CucuTag> GetTagsByArgs(this IEnumerable<CucuTag> tags, IEnumerable<CucuTagArg> args)
         {
             return CucuTag.GetTagsByArgs(args, tags);
+        }
+
+        public static IEnumerable<CucuTag> GetTagsByArgs(this IEnumerable<CucuTag> tags, CucuTagArg arg)
+        {
+            return CucuTag.GetTagsByArgs(arg, tags);
+        }
+
+        public static IEnumerable<CucuTag> GetTagsByArgs(this IEnumerable<CucuTag> tags, string key, string value)
+        {
+            return CucuTag.GetTagsByArgs(key, value, tags);
         }
     }
 }

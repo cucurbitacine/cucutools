@@ -10,60 +10,17 @@ namespace CucuTools.Colors
 {
     public static class CucuColor
     {
-        public static class Palettes
+        public enum ColorMap
         {
-            public static readonly CucuColorPalette Rainbow = new CucuColorPalette("Rainbow",
-                new[]
-                {
-                    Color.red,
-                    Color.red.LerpTo(Color.yellow),
-                    Color.yellow,
-                    Color.green,
-                    Color.cyan,
-                    Color.blue,
-                    "CC00FF".ToColor(),
-                });
-
-            public static readonly CucuColorPalette Jet = new CucuColorPalette("Jet",
-                new[]
-                {
-                    new Color(0f, 0f, 0.666f, 1f),
-                    new Color(0f, 0f, 1f, 1f),
-                    new Color(0f, 0.333f, 1f, 1f),
-                    new Color(0f, 0.666f, 1f, 1f),
-                    new Color(0f, 1f, 1f, 1f),
-                    new Color(0.5f, 1f, 0.5f, 1f),
-                    new Color(1f, 1f, 0.0f, 1f),
-                    new Color(1f, 0.666f, 0.0f, 1f),
-                    new Color(1f, 0.333f, 0.0f, 1f),
-                    new Color(1f, 0f, 0.0f, 1f),
-                    new Color(0.666f, 0f, 0.0f, 1f),
-                });
-
-            public static readonly CucuColorPalette Hot = new CucuColorPalette("Hot",
-                new[]
-                {
-                    Color.black,
-                    Color.red,
-                    Color.yellow,
-                    Color.white
-                });
-
-            public static readonly CucuColorPalette Gray = new CucuColorPalette("Gray",
-                new[]
-                {
-                    Color.black,
-                    Color.white,
-                });
-
-            public static readonly CucuColorPalette Yarg = new CucuColorPalette("Yarg",
-                new[]
-                {
-                    Color.white,
-                    Color.black,
-                });
+            Rainbow,
+            Jet,
+            Hot,
+            Gray,
+            Yarg,
         }
 
+        public static readonly ColorMap[] ColorMaps = (ColorMap[]) Enum.GetValues(typeof(ColorMap));
+        
         public static Color SetIntensity(Color color, float intensity)
         {
             intensity = Mathf.Clamp01(intensity);
@@ -175,6 +132,70 @@ namespace CucuTools.Colors
         {
             return colors.ToColorPalette(name).ToGradient(mode);
         }
+
+        public static class Palettes
+        {
+            public static readonly CucuColorPalette Rainbow = new CucuColorPalette("Rainbow",
+                new[]
+                {
+                    Color.red,
+                    Color.red.LerpTo(Color.yellow),
+                    Color.yellow,
+                    Color.green,
+                    Color.cyan,
+                    Color.blue,
+                    "CC00FF".ToColor(),
+                });
+
+            public static readonly CucuColorPalette Jet = new CucuColorPalette("Jet",
+                new[]
+                {
+                    new Color(0f, 0f, 0.666f, 1f),
+                    new Color(0f, 0f, 1f, 1f),
+                    new Color(0f, 0.333f, 1f, 1f),
+                    new Color(0f, 0.666f, 1f, 1f),
+                    new Color(0f, 1f, 1f, 1f),
+                    new Color(0.5f, 1f, 0.5f, 1f),
+                    new Color(1f, 1f, 0.0f, 1f),
+                    new Color(1f, 0.666f, 0.0f, 1f),
+                    new Color(1f, 0.333f, 0.0f, 1f),
+                    new Color(1f, 0f, 0.0f, 1f),
+                    new Color(0.666f, 0f, 0.0f, 1f),
+                });
+
+            public static readonly CucuColorPalette Hot = new CucuColorPalette("Hot",
+                new[]
+                {
+                    Color.black,
+                    Color.red,
+                    Color.yellow,
+                    Color.white
+                });
+
+            public static readonly CucuColorPalette Gray = new CucuColorPalette("Gray",
+                new[]
+                {
+                    Color.black,
+                    Color.white,
+                });
+
+            public static readonly CucuColorPalette Yarg = new CucuColorPalette("Yarg",
+                new[]
+                {
+                    Color.white,
+                    Color.black,
+                });
+        }
+        
+        public static readonly Dictionary<CucuColor.ColorMap, CucuColorPalette> PaletteMaps =
+            new Dictionary<CucuColor.ColorMap, CucuColorPalette>()
+            {
+                {CucuColor.ColorMap.Rainbow, CucuColor.Palettes.Rainbow},
+                {CucuColor.ColorMap.Jet, CucuColor.Palettes.Jet},
+                {CucuColor.ColorMap.Hot, CucuColor.Palettes.Hot},
+                {CucuColor.ColorMap.Gray, CucuColor.Palettes.Gray},
+                {CucuColor.ColorMap.Yarg, CucuColor.Palettes.Yarg},
+            };
     }
 
     public class CucuColorPalette : IColorPalette

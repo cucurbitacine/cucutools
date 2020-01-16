@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using CucuTools.Blend.Impl;
 using CucuTools.Colors;
 using CucuTools.Common;
@@ -7,111 +9,132 @@ using CucuTools.Tag;
 using CucuTools.Timer;
 using CucuTools.Trigger;
 using UnityEngine;
-using UnityEngine.Serialization;
 using Random = UnityEngine.Random;
 
 namespace Examples.Scripts
 {
     public class CucuExampleSceneController : MonoBehaviour
     {
-        private enum ColorMap
+        [Space]
+        [Header("Camera")]
+        [SerializeField] Camera _camera;
+        [SerializeField] private CucuRangeFloat _radiusRotation = new CucuRangeFloat(0f, 10f, 5f);
+        [SerializeField] private CucuRangeFloat _periodRotation = new CucuRangeFloat(0f, 120f, 60f);
+        
+        [Space]
+        
+        [Header("Generation")]
+        [SerializeField] private Transform _centerGeneration;
+        [SerializeField] private GameObject _objectGeneration;
+        [SerializeField] private CucuRangeFloat _radiusGeneration = new CucuRangeFloat(0f, 2f, 1f);
+        
+        [Space]
+        
+        [Header("Transformation")] 
+        [SerializeField] private GameObject _cubeTransformation;
+        [SerializeField] private GameObject _sphereTransformation;
+        [SerializeField, Range(0f, 5f)] private float _durationTransformation = 1f;
+        [SerializeField] private CucuColor.ColorMap _colorMapTransformation;
+
+        [Space]
+        
+        [Header("General")]
+        [SerializeField, Range(1, 2000)]  private int _countMaxObjects = 500;
+        [SerializeField, Range(0f, 60f)]  private float _periodChangeColor = 10f;
+        
+        [Space]
+        
+        [Header("Info")]
+        [SerializeField, Range(0, 2000)] private int _countObjects = 0;
+
+        private CucuBlendColorGradient blendColor
         {
-            Rainbow,
-            Jet,
-            Hot,
-        }
-
-        private readonly Dictionary<ColorMap, CucuColorPalette> _colorPaletteMap =
-            new Dictionary<ColorMap, CucuColorPalette>()
+            get
             {
-                {ColorMap.Rainbow, CucuColor.Palettes.Rainbow},
-                {ColorMap.Jet, CucuColor.Palettes.Jet},
-                {ColorMap.Hot, CucuColor.Palettes.Hot},
-            };
+                if (_blendColorHash != null) return _blendColorHash;
 
-        [SerializeField] private ColorMap _colorMap;
+                _blendColorHash = gameObject.GetComponent<CucuBlendColorGradient>();
 
-        [SerializeField] private GameObject _cubanationZone;
+                if (_blendColorHash != null) return _blendColorHash;
+                
+                _blendColorHash = gameObject.AddComponent<CucuBlendColorGradient>();
+                _blendColorHash.SetGradient(CucuColor.PaletteMaps[_colorMapTransformation].ToGradient());
+                
+                return _blendColorHash;
+            }
+        }
+        private CucuBlendColorGradient _blendColorHash;
 
-        [SerializeField] private GameObject _spheranationZone;
-
-        [SerializeField] private GameObject _cucuMember;
-        [SerializeField] private GameObject _cucuCube;
-        [SerializeField] private GameObject _cucuSphere;
-        [SerializeField] private Transform _cucuRoot;
-
-        [SerializeField, Range(1, 2000)] private int _countMax = 500;
-        [SerializeField, Range(0, 2000)] private int _countCurr = 0;
-
-        private CucuBlendColorGradient cucuBlendColor =>
-            _cucuBlendColorHash ?? (_cucuBlendColorHash = GetComponent<CucuBlendColorGradient>());
-
-        private CucuBlendColorGradient _cucuBlendColorHash;
-        private List<Transform> _cucus = new List<Transform>();
-        private Color _color;
-        private CucuTimer _timer;
-
-        [SerializeField] private CucuRangeFloat rangeFloat;
-        [SerializeField] private CucuRangeInt rangeInt;
+        private List<Transform> _objects = new List<Transform>();
+        private Color _colorTransformation;
+        private CucuTimer _timerColorChanger;
+        private CucuTimer _timerCameraRotation;
 
         private void Awake()
         {
             Cucu.Log("Welcome to " + "CUCU WORLD".ToColoredString("3caa3c") + "!", "cucurbitacine");
 
             InitTriggers();
-
-            cucuBlendColor.SetGradient(CucuColor.Palettes.Jet.ToGradient());
         }
 
         private void Start()
         {
-            _timer = CucuTimerFactory.Create("colorValue");
-            _timer
-                .SetDuration(10f)
-                .OnStop(() => _timer.StartTimer())
+            _timerColorChanger = CucuTimerFactory.Create("colorValue");
+            _timerColorChanger
+                .SetDuration(_periodChangeColor)
+                .OnStop(() => _timerColorChanger.StartTimer())
+                .StartTimer();
+            
+            _timerCameraRotation = CucuTimerFactory.Create("cameraRotation");
+            _timerCameraRotation
+                .SetDuration(60f)
+                .OnStop(() => _timerCameraRotation.StartTimer())
                 .StartTimer();
         }
 
         private void Update()
         {
-            CreateCucumber();
+            var t = _timerCameraRotation.TimeLocal / _timerCameraRotation.Duration;
+
+            var phi = t * 2 * Mathf.PI;
+            var radius = _radiusRotation.Value;
+            var x = radius * Mathf.Cos(phi);
+            var z = radius * Mathf.Sin(phi);
+
+            _camera.transform.position = new Vector3(x, _camera.transform.position.y, z);
+            _camera.transform.LookAt(new Vector3(0f, _camera.transform.position.y, 0f));
+            
+            CreateObject();
             UpdateColor();
         }
 
         private void OnValidate()
         {
+            _timerColorChanger?.SetDuration(_periodChangeColor);
+            _timerCameraRotation?.SetDuration(_periodRotation.Value);
             UpdateGradient();
-            rangeFloat.Validate();
-            rangeInt.Validate();
+            _radiusGeneration.Validate();
         }
 
-        private void UpdateColor()
+        private void OnDrawGizmos()
         {
-            var t = Mathf.Clamp01(_timer.TimeLocal / _timer.Duration);
-
-            t = 2 * (t < 0.5f ? t : (1 - t));
-
-            cucuBlendColor.SetBlend(t);
-
-            _color = cucuBlendColor.Color;
-        }
-
-        private void UpdateGradient()
-        {
-            cucuBlendColor.SetGradient(_colorPaletteMap[_colorMap].ToGradient());
+            Gizmos.color = CucuColor.Palettes.Jet.Get(1f * _objects.Count / _countMaxObjects).SetColorAlpha(0.2f);
+            Gizmos.DrawSphere(_centerGeneration.position, _radiusGeneration.Value);
         }
 
         private void InitTriggers()
         {
-            var cubeTrigger = _cubanationZone.GetComponent<CucuTrigger>();
+            var tagsTransformation = CucuTag.Tags.FindAll(t => t.Key == "transformation");
+
+            var cubeTrigger = tagsTransformation.GetTagsByArgs("type", "cube").First().GetComponent<CucuTrigger>();
 
             cubeTrigger.RegisterComponent<CucuTag>(CucuTrigger.TriggerState.Enter)
                 .AddListener(t =>
                 {
                     var cucuTag = t as CucuTag;
                     if (!cucuTag.Key.Equals("cube")) return;
-                    cucuTag.gameObject.GetComponentInChildren<Renderer>().material
-                        .SetColor("_EmissionColor", _color);
+                    cucuTag.gameObject.GetComponentInChildren<Renderer>()
+                        .SetEmissionColorUsePropertyBlock(_colorTransformation);
                 });
 
             cubeTrigger.RegisterComponent<CucuTag>(CucuTrigger.TriggerState.Exit)
@@ -119,18 +142,18 @@ namespace Examples.Scripts
                 {
                     var cucuTag = t as CucuTag;
                     if (!cucuTag.Key.Equals("cube")) return;
-                    Transformation(cucuTag.transform, _cucuCube);
+                    TransformationObject(cucuTag.transform, _cubeTransformation);
                 });
 
-            var sphereTrigger = _spheranationZone.GetComponent<CucuTrigger>();
+            var sphereTrigger = tagsTransformation.GetTagsByArgs("type", "sphere").First().GetComponent<CucuTrigger>();
 
             sphereTrigger.RegisterComponent<CucuTag>(CucuTrigger.TriggerState.Enter)
                 .AddListener(t =>
                 {
                     var cucuTag = t as CucuTag;
                     if (!cucuTag.Key.Equals("sphere")) return;
-                    cucuTag.gameObject.GetComponentInChildren<Renderer>().material
-                        .SetColor("_EmissionColor", _color);
+                    cucuTag.gameObject.GetComponentInChildren<Renderer>()
+                        .SetEmissionColorUsePropertyBlock(_colorTransformation);
                 });
 
             sphereTrigger.RegisterComponent<CucuTag>(CucuTrigger.TriggerState.Exit)
@@ -138,58 +161,58 @@ namespace Examples.Scripts
                 {
                     var cucuTag = t as CucuTag;
                     if (!cucuTag.Key.Equals("sphere")) return;
-                    Transformation(cucuTag.transform, _cucuSphere);
+                    TransformationObject(cucuTag.transform, _sphereTransformation);
                 });
         }
 
-        private void CreateCucumber()
+        private void CreateObject()
         {
-            var obj = Instantiate(_cucuMember,
-                _cucuRoot.position + Random.onUnitSphere * 2, Random.rotation,
-                _cucuRoot);
+            var obj = Instantiate(_objectGeneration,
+                _centerGeneration.position + Random.onUnitSphere * _radiusGeneration.Value, Random.rotation,
+                _centerGeneration);
 
             obj.transform.localScale *= (Random.value - 0.5f) * 0.333f + 2f;
-            obj.name = $"{_cucus.Count}_{obj.name}";
+            obj.name = $"{_objects.Count}_{obj.name}";
 
             obj.GetComponent<Rigidbody>().AddTorque(Random.onUnitSphere * 1000);
-            obj.GetComponent<CucuTag>().SetKey(Random.value < 0.5f ? "cube" : "sphere");
+            obj.AddCucuTag(Random.value < 0.5f ? "cube" : "sphere");
 
-            _cucus.Add(obj.transform);
+            _objects.Add(obj.transform);
 
-            ClearCucumbers();
+            ClearObjects();
 
-            _countCurr = _cucus.Count;
+            _countObjects = _objects.Count;
         }
 
-        private void ClearCucumbers()
+        private void ClearObjects()
         {
-            while (_cucus.Count > _countMax)
-                DeleteCucumber();
+            while (_objects.Count > _countMaxObjects)
+                DeleteObject();
         }
 
-        private void DeleteCucumber()
+        private void DeleteObject()
         {
-            if (_cucus.Count > 0)
+            if (_objects.Count > 0)
             {
-                var cucu = _cucus[0];
-                _cucus.RemoveAt(0);
+                var cucu = _objects[0];
+                _objects.RemoveAt(0);
                 if (cucu != null)
                     Destroy(cucu.gameObject);
             }
         }
 
-        private void Transformation(Transform origin, GameObject target)
+        private void TransformationObject(Transform origin, GameObject target)
         {
-            var index = _cucus.IndexOf(origin);
+            var index = _objects.IndexOf(origin);
 
-            if (!(0 <= index && index < _cucus.Count))
+            if (!(0 <= index && index < _objects.Count))
             {
                 Destroy(origin.gameObject);
                 return;
             }
 
             var obj = Instantiate(target, origin.position, origin.rotation);
-            _cucus[index] = obj.transform;
+            _objects[index] = obj.transform;
 
             obj.transform.parent = origin.parent;
 
@@ -203,20 +226,37 @@ namespace Examples.Scripts
 
             var timer = CucuTimerFactory.Create();
 
-            var mat = obj.gameObject.GetComponent<Renderer>().material;
+            var rend = obj.gameObject.GetComponent<Renderer>();
 
             timer
-                .SetDuration(1f)
-                .SetTick(5)
+                .SetDuration(_durationTransformation)
+                .SetTick(1f/24)
+                .OnStart(() => rend.SetEmissionColorUsePropertyBlock(_colorTransformation))
                 .OnTick(() =>
                 {
                     var t = Mathf.Clamp01(timer.TimeLocal / timer.Duration);
-                    var colorInit = _color.LerpTo(Color.black, t);
-                    mat?.SetColor("_EmissionColor", colorInit);
+                    var colorInit = _colorTransformation.LerpTo(Color.black, t);
+                    rend.SetEmissionColorUsePropertyBlock(colorInit);
                 })
-                .OnStop(() => mat?.SetColor("_EmissionColor", Color.black))
+                .OnStop(() => rend.SetEmissionColorUsePropertyBlock(Color.black))
                 .DestroyAfterStop()
                 .StartTimer();
+        }
+
+        private void UpdateColor()
+        {
+            var t = Mathf.Clamp01(_timerColorChanger.Duration > 0 ? _timerColorChanger.TimeLocal / _timerColorChanger.Duration : 0f);
+
+            t = 2 * (t < 0.5f ? t : (1 - t));
+
+            blendColor.SetBlend(t);
+
+            _colorTransformation = blendColor.Color;
+        }
+
+        private void UpdateGradient()
+        {
+            blendColor.SetGradient(CucuColor.PaletteMaps[_colorMapTransformation].ToGradient());
         }
     }
 }

@@ -47,6 +47,7 @@ namespace CucuTools.Timer
 
         public CucuTimer SetTick(int count)
         {
+            count = count < 0 ? 0 : count;
             var tick = Duration / (count + 1);
             return SetTick(tick);
         }
