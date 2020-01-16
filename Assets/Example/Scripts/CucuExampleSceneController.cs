@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using CucuTools.Blend.Impl;
 using CucuTools.Colors;
 using CucuTools.Common;
@@ -33,11 +31,9 @@ namespace Examples.Scripts
 
         [SerializeField] private ColorMap _colorMap;
 
-        [FormerlySerializedAs("_increaseZone")] [SerializeField]
-        private GameObject _cubanationZone;
+        [SerializeField] private GameObject _cubanationZone;
 
-        [FormerlySerializedAs("_discreaseZone")] [SerializeField]
-        private GameObject _spheranationZone;
+        [SerializeField] private GameObject _spheranationZone;
 
         [SerializeField] private GameObject _cucuMember;
         [SerializeField] private GameObject _cucuCube;
@@ -46,20 +42,25 @@ namespace Examples.Scripts
 
         [SerializeField, Range(1, 2000)] private int _countMax = 500;
         [SerializeField, Range(0, 2000)] private int _countCurr = 0;
-        private List<Transform> _cucus = new List<Transform>();
-        [SerializeField] private Color _color;
 
-        [SerializeField] private CucuBlendColorGradient _cucuBlendColor;
-        
+        private CucuBlendColorGradient cucuBlendColor =>
+            _cucuBlendColorHash ?? (_cucuBlendColorHash = GetComponent<CucuBlendColorGradient>());
+
+        private CucuBlendColorGradient _cucuBlendColorHash;
+        private List<Transform> _cucus = new List<Transform>();
+        private Color _color;
         private CucuTimer _timer;
+
+        [SerializeField] private CucuRangeFloat rangeFloat;
+        [SerializeField] private CucuRangeInt rangeInt;
 
         private void Awake()
         {
-            Cucu.Log("Welcome to "+"CUCU WORLD".ToColoredString("3caa3c")+"!", "cucurbitacine");
-            
+            Cucu.Log("Welcome to " + "CUCU WORLD".ToColoredString("3caa3c") + "!", "cucurbitacine");
+
             InitTriggers();
-            
-            _cucuBlendColor.SetGradient(CucuColor.Palettes.Rainbow.ToGradient());
+
+            cucuBlendColor.SetGradient(CucuColor.Palettes.Jet.ToGradient());
         }
 
         private void Start()
@@ -80,6 +81,8 @@ namespace Examples.Scripts
         private void OnValidate()
         {
             UpdateGradient();
+            rangeFloat.Validate();
+            rangeInt.Validate();
         }
 
         private void UpdateColor()
@@ -88,16 +91,16 @@ namespace Examples.Scripts
 
             t = 2 * (t < 0.5f ? t : (1 - t));
 
-            _cucuBlendColor.SetBlend(t);
-            
-            _color = _cucuBlendColor.Color;
+            cucuBlendColor.SetBlend(t);
+
+            _color = cucuBlendColor.Color;
         }
 
         private void UpdateGradient()
         {
-            _cucuBlendColor.SetGradient(_colorPaletteMap[_colorMap].ToGradient());
+            cucuBlendColor.SetGradient(_colorPaletteMap[_colorMap].ToGradient());
         }
-        
+
         private void InitTriggers()
         {
             var cubeTrigger = _cubanationZone.GetComponent<CucuTrigger>();

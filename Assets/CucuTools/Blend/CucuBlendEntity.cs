@@ -42,7 +42,7 @@ namespace CucuTools.Blend
         /// </summary>
         protected abstract void UpdateEntity();
 
-        protected void OnValidate()
+        protected virtual void OnValidate()
         {
             UpdateEntity();
         }

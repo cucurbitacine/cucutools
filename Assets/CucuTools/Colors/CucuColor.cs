@@ -21,7 +21,7 @@ namespace CucuTools.Colors
                     Color.green,
                     Color.cyan,
                     Color.blue,
-                    "CC00FF".ToColor(), 
+                    "CC00FF".ToColor(),
                 });
 
             public static readonly CucuColorPalette Jet = new CucuColorPalette("Jet",
@@ -116,7 +116,7 @@ namespace CucuTools.Colors
 
             return result;
         }
-        
+
         public static Color ToColor(this string hex)
         {
             if (hex == null || hex.Length != 6)

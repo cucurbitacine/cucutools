@@ -50,7 +50,7 @@ namespace CucuTools.Blend.Impl
                 : (_hashPins = new List<IBlendPin<Transform>>(_pins));
         }
 
-        protected void OnValidate()
+        protected override void OnValidate()
         {
             base.OnValidate();
 

@@ -5,7 +5,7 @@ namespace CucuTools.Blend.Impl
     /// <inheritdoc />
     public class CucuBlendColorGradient : CucuBlendEntity
     {
-        public override string Key => "Color gradient  blend";
+        public override string Key => "Color gradient blend";
         
         public Color Color => _color;
 
@@ -20,9 +20,9 @@ namespace CucuTools.Blend.Impl
             _color = _gradient.Evaluate(Blend);
         }
 
-        public void SetGradient(Gradient gradien)
+        public void SetGradient(Gradient gradient)
         {
-            _gradient = gradien;
+            _gradient = gradient;
             UpdateEntity();
         }
     }

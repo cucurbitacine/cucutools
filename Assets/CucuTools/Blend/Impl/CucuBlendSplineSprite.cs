@@ -16,7 +16,7 @@ namespace CucuTools.Blend.Impl
         [SerializeField] private List<CucuBlendPinSprite> _pins;
 
         private List<IBlendPin<Sprite>> _hashPins;
-        private bool _useHash;
+        private bool _useHash = false;
 
         private CucuBlendPinSprite _value;
 
@@ -48,7 +48,7 @@ namespace CucuTools.Blend.Impl
             private Guid? _guid;
         }
 
-        protected void OnValidate()
+        protected override void OnValidate()
         {
             base.OnValidate();
 

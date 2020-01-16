@@ -50,7 +50,7 @@ namespace CucuTools.Blend.Impl
                     new List<IBlendPin<TimeSpan>>(_pins.Select(p => new CucuBlendPinTimeSpan(p.Value, p.Pin.GetSpan()))));
         }
 
-        protected void OnValidate()
+        protected override void OnValidate()
         {
             base.OnValidate();
 

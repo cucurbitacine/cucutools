@@ -65,9 +65,9 @@ namespace CucuTools.Blend.Spline
                 : 0.0f;
         }
 
-        protected void OnValidate()
+        public void SetAnimationCurve(AnimationCurve curve)
         {
-            base.OnValidate();
+            _curve = curve;
         }
     }
 }

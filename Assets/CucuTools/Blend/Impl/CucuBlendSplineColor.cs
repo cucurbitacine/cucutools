@@ -51,7 +51,7 @@ namespace CucuTools.Blend.Impl
                 : (_hashPins = new List<IBlendPin<Color>>(_pins));
         }
         
-        protected void OnValidate()
+        protected override void OnValidate()
         {
             base.OnValidate();
             

@@ -51,7 +51,7 @@ namespace CucuTools.Blend.Impl
         {
         }
 
-        protected void OnValidate()
+        protected override void OnValidate()
         {
             base.OnValidate();
 
