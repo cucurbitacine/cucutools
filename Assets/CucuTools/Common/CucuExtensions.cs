@@ -12,17 +12,38 @@ namespace CucuTools.Common
             return array[Random.Range(0, array.Length)];
         }
 
-        public static void SetColorUsePropertyBlock(this Renderer renderer, Color color, string propertyName = "_Color")
+        public static Color GetColorUsePropertyBlock(this Renderer renderer, string propertyName)
         {
+            if (renderer == null) return Color.black;
+            var matPropBlock = new MaterialPropertyBlock();
+            renderer.GetPropertyBlock(matPropBlock);
+            return matPropBlock.GetColor(propertyName);
+        }
+        
+        public static void SetColorUsePropertyBlock(this Renderer renderer, string propertyName, Color color)
+        {
+            if (renderer == null) return;
             var matPropBlock = new MaterialPropertyBlock();
             renderer.GetPropertyBlock(matPropBlock);
             matPropBlock.SetColor(propertyName, color);
             renderer.SetPropertyBlock(matPropBlock);
         }
         
-        public static void SetEmissionColorUsePropertyBlock(this Renderer renderer, Color color)
+        public static float GetFloatUsePropertyBlock(this Renderer renderer, string propertyName)
         {
-            renderer.SetColorUsePropertyBlock(color, "_EmissionColor");
+            if (renderer == null) return 0.0f;
+            var matPropBlock = new MaterialPropertyBlock();
+            renderer.GetPropertyBlock(matPropBlock);
+            return matPropBlock.GetFloat(propertyName);
+        }
+
+        public static void SetFloatUsePropertyBlock(this Renderer renderer, string propertyName, float value)
+        {
+            if (renderer == null) return;
+            var matPropBlock = new MaterialPropertyBlock();
+            renderer.GetPropertyBlock(matPropBlock);
+            matPropBlock.SetFloat(propertyName, value);
+            renderer.SetPropertyBlock(matPropBlock);
         }
     }
 }

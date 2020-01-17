@@ -70,26 +70,22 @@ namespace Examples.Scripts
         private CucuTimer _timerColorChanger;
         private CucuTimer _timerCameraRotation;
 
+        private readonly string _COLOR = "_Color";
+        private readonly string _EMISSIONCOLOR = "_EmissionColor";
+        private readonly string _OUTLINECOLOR = "_OutlineColor";
+        
         private void Awake()
         {
             Cucu.Log("Welcome to " + "CUCU WORLD".ToColoredString("3caa3c") + "!", "cucurbitacine");
 
-            InitTriggers();
+            
         }
 
         private void Start()
         {
-            _timerColorChanger = CucuTimerFactory.Create("colorValue");
-            _timerColorChanger
-                .SetDuration(_periodChangeColor)
-                .OnStop(() => _timerColorChanger.StartTimer())
-                .StartTimer();
-            
-            _timerCameraRotation = CucuTimerFactory.Create("cameraRotation");
-            _timerCameraRotation
-                .SetDuration(60f)
-                .OnStop(() => _timerCameraRotation.StartTimer())
-                .StartTimer();
+            InitTriggers();
+
+            InitTimers();
         }
 
         private void Update()
@@ -122,9 +118,26 @@ namespace Examples.Scripts
             Gizmos.DrawSphere(_centerGeneration.position, _radiusGeneration.Value);
         }
 
+        private void InitTimers()
+        {
+            _timerColorChanger = CucuTimerFactory.Create("colorValue");
+            _timerColorChanger
+                .SetDuration(_periodChangeColor)
+                .OnStop(() => _timerColorChanger.StartTimer())
+                .StartTimer();
+            
+            _timerCameraRotation = CucuTimerFactory.Create("cameraRotation");
+            _timerCameraRotation
+                .SetDuration(60f)
+                .OnStop(() => _timerCameraRotation.StartTimer())
+                .StartTimer();
+        }
+        
         private void InitTriggers()
         {
-            var tagsTransformation = CucuTag.Tags.FindAll(t => t.Key == "transformation");
+            var tags = CucuTag.Tags;
+            
+            var tagsTransformation = tags.FindAll(t => t.Key == "transformation");
 
             var cubeTrigger = tagsTransformation.GetTagsByArgs("type", "cube").First().GetComponent<CucuTrigger>();
 
@@ -132,36 +145,80 @@ namespace Examples.Scripts
                 .AddListener(t =>
                 {
                     var cucuTag = t as CucuTag;
-                    if (!cucuTag.Key.Equals("cube")) return;
-                    cucuTag.gameObject.GetComponentInChildren<Renderer>()
-                        .SetEmissionColorUsePropertyBlock(_colorTransformation);
+                    cucuTag.GetComponentInChildren<Renderer>()
+                        .SetColorUsePropertyBlock(cucuTag.Key.Equals("cube") ? _EMISSIONCOLOR : _OUTLINECOLOR,
+                            _colorTransformation);
                 });
 
             cubeTrigger.RegisterComponent<CucuTag>(CucuTrigger.TriggerState.Exit)
                 .AddListener(t =>
                 {
                     var cucuTag = t as CucuTag;
-                    if (!cucuTag.Key.Equals("cube")) return;
-                    TransformationObject(cucuTag.transform, _cubeTransformation);
+                    if (cucuTag.Key.Equals("cube"))
+                    {
+                        TransformationObject(cucuTag.transform, _cubeTransformation);
+                    }
+                    else
+                    {
+                        var rend = cucuTag.GetComponentInChildren<Renderer>();
+                        var colorTarget = Color.black.SetColorAlpha(0f);
+                        var timer = CucuTimerFactory.Create();
+                        timer
+                            .SetDuration(_durationTransformation)
+                            .SetTick(1f / 24)
+                            .OnTick(() =>
+                            {
+                                var colorInit = _colorTransformation.LerpTo(colorTarget,
+                                    Mathf.Clamp01(timer.TimeLocal / timer.Duration));
+                                rend.SetColorUsePropertyBlock(_OUTLINECOLOR, colorInit);
+                            })
+                            .OnStop(() => rend.SetColorUsePropertyBlock(_OUTLINECOLOR, colorTarget))
+                            .DestroyAfterStop()
+                            .StartTimer();
+                    }
                 });
 
-            var sphereTrigger = tagsTransformation.GetTagsByArgs("type", "sphere").First().GetComponent<CucuTrigger>();
+            var sphereTrigger = tagsTransformation
+                .GetTagsByArgs("type", "sphere")
+                .FirstOrDefault()
+                ?.GetComponent<CucuTrigger>();
 
             sphereTrigger.RegisterComponent<CucuTag>(CucuTrigger.TriggerState.Enter)
                 .AddListener(t =>
                 {
                     var cucuTag = t as CucuTag;
-                    if (!cucuTag.Key.Equals("sphere")) return;
-                    cucuTag.gameObject.GetComponentInChildren<Renderer>()
-                        .SetEmissionColorUsePropertyBlock(_colorTransformation);
+                    cucuTag.GetComponentInChildren<Renderer>()
+                        .SetColorUsePropertyBlock(cucuTag.Key.Equals("sphere") ? _EMISSIONCOLOR : _OUTLINECOLOR,
+                            _colorTransformation);
                 });
 
             sphereTrigger.RegisterComponent<CucuTag>(CucuTrigger.TriggerState.Exit)
                 .AddListener(t =>
                 {
                     var cucuTag = t as CucuTag;
-                    if (!cucuTag.Key.Equals("sphere")) return;
-                    TransformationObject(cucuTag.transform, _sphereTransformation);
+
+                    if (cucuTag.Key.Equals("sphere"))
+                    {
+                        TransformationObject(cucuTag.transform, _sphereTransformation);
+                    }
+                    else
+                    {
+                        var rend = cucuTag.GetComponentInChildren<Renderer>();
+                        var colorTarget = Color.black.SetColorAlpha(0f);
+                        var timer = CucuTimerFactory.Create();
+                        timer
+                            .SetDuration(_durationTransformation)
+                            .SetTick(1f / 24)
+                            .OnTick(() =>
+                            {
+                                var colorInit = _colorTransformation.LerpTo(colorTarget,
+                                    Mathf.Clamp01(timer.TimeLocal / timer.Duration));
+                                rend.SetColorUsePropertyBlock(_OUTLINECOLOR, colorInit);
+                            })
+                            .OnStop(() => rend.SetColorUsePropertyBlock(_OUTLINECOLOR, colorTarget))
+                            .DestroyAfterStop()
+                            .StartTimer();
+                    }
                 });
         }
 
@@ -219,9 +276,12 @@ namespace Examples.Scripts
             var rigOrigin = origin.gameObject.GetComponent<Rigidbody>();
             var rigTarget = obj.GetComponent<Rigidbody>();
 
-            rigTarget.velocity = rigOrigin.velocity;
-            rigTarget.angularVelocity = rigOrigin.angularVelocity;
-
+            if (rigOrigin != null && rigTarget != null)
+            {
+                rigTarget.velocity = rigOrigin.velocity;
+                rigTarget.angularVelocity = rigOrigin.angularVelocity;
+            }
+            
             Destroy(origin.gameObject);
 
             var timer = CucuTimerFactory.Create();
@@ -231,14 +291,14 @@ namespace Examples.Scripts
             timer
                 .SetDuration(_durationTransformation)
                 .SetTick(1f/24)
-                .OnStart(() => rend.SetEmissionColorUsePropertyBlock(_colorTransformation))
+                .OnStart(() => rend.SetColorUsePropertyBlock(_EMISSIONCOLOR, _colorTransformation))
                 .OnTick(() =>
                 {
                     var t = Mathf.Clamp01(timer.TimeLocal / timer.Duration);
                     var colorInit = _colorTransformation.LerpTo(Color.black, t);
-                    rend.SetEmissionColorUsePropertyBlock(colorInit);
+                    rend.SetColorUsePropertyBlock(_EMISSIONCOLOR, colorInit);
                 })
-                .OnStop(() => rend.SetEmissionColorUsePropertyBlock(Color.black))
+                .OnStop(() => rend.SetColorUsePropertyBlock(_EMISSIONCOLOR, Color.black))
                 .DestroyAfterStop()
                 .StartTimer();
         }
