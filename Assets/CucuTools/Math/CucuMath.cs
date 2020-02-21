@@ -63,7 +63,7 @@ namespace CucuTools.Math
             };
         }
 
-        public static void GetBorderIndex<Targ>(float arg, IEnumerable<Targ> args, out int iLeft, out int iRight)
+        public static void GetBorderIndex<Targ>(Targ arg, IEnumerable<Targ> args, out int iLeft, out int iRight)
             where Targ : IComparable
         {
             iLeft = -1;
