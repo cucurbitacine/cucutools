@@ -27,7 +27,7 @@ namespace CucuTools.Editor
             
             EditorGUI.LabelField(
                 new Rect(pos.x + 0, pos.y, pos.width / 6, pos.height), 
-                "  Key : ");
+                " Key : ");
             
             EditorGUI.PropertyField(
                 new Rect(pos.x + pos.width / 6, pos.y, pos.width / 3, pos.height),
@@ -36,7 +36,7 @@ namespace CucuTools.Editor
             
             EditorGUI.LabelField(
                 new Rect(pos.x + pos.width / 2, pos.y, pos.width / 6, pos.height), 
-                "  Value : ");
+                " Arg : ");
             
             EditorGUI.PropertyField(
                 new Rect(pos.x + 2*pos.width / 3, pos.y, pos.width / 3, pos.height),

@@ -11,10 +11,12 @@ namespace CucuTools.Editor
         private SerializedProperty p_key;
         private SerializedProperty p_gizmos;
         private SerializedProperty p_args;
-
-        private string prev;
-        private bool edit;
         
+        private readonly List<int> deleteListIndex = new List<int>();
+        private string currKeyValue;
+        private string prevKeyValue;
+        private bool isEditMode;
+
         private void OnEnable()
         {
             p_key = serializedObject.FindProperty("_key");
@@ -25,78 +27,115 @@ namespace CucuTools.Editor
         public override void OnInspectorGUI()
         {
             serializedObject.Update();
-            
+
             GUILayout.BeginHorizontal();
 
-            if (!edit)
-                EditorGUILayout.LabelField(p_key.stringValue, new GUIStyle(){alignment = TextAnchor.MiddleCenter});
-
-            if (edit)
+            if (isEditMode)
             {
-                EditorGUILayout.PropertyField(p_key, new GUIContent(""));
-                if (GUILayout.Button(new GUIContent("Save")))
-                {
-                    edit = false;
-                }
-                if (GUILayout.Button(new GUIContent("Undo")))
-                {
-                    p_key.stringValue = prev;
-                    edit = false;
-                }
+                DrawFieldKey();
+                DrawButtonSaveKey();
+                DrawButtonCancelKey();
             }
             else
             {
-                if (GUILayout.Button(new GUIContent("Edit")))
-                {
-                    prev = p_key.stringValue;
-                    edit = true;
-                }
+                DrawLabelKey();
+                DrawButtonEditKey();
             }
-            
+
             GUILayout.EndHorizontal();
 
             GUILayout.Space(10f);
-            
-            var styleGizmos = new GUIStyle(GUI.skin.button);
-            styleGizmos.normal.textColor = (p_gizmos.boolValue ? Color.green : Color.red).SetColorIntensity(0.5f);
-            
-            if (GUILayout.Button($"Draw gizmos mode : {(p_gizmos.boolValue ? "on" : "off")}", styleGizmos))
-                p_gizmos.boolValue = !p_gizmos.boolValue;
-            
+
+            DrawButtonGizmos();
+
             GUILayout.Space(10f);
-            
-            if (GUILayout.Button("+"))
-            {
-                p_args.InsertArrayElementAtIndex(p_args.arraySize);
-            }
-            
+
+            DrawButtonCreateArg();
+
             GUILayout.Space(5f);
-            
-            del.Clear();
-            for (var i = 0; i < p_args.arraySize; i++)
-            {
-                GUILayout.BeginHorizontal();
 
-                EditorGUILayout.LabelField($"[{i}]", GUILayout.MaxWidth(25f));
-                EditorGUILayout.PropertyField(p_args.GetArrayElementAtIndex(i));
-                
-                var style = new GUIStyle(GUI.skin.button);
-                style.normal.textColor = Color.red;
-                
-                if (GUILayout.Button("X", style))
-                    del.Add(i);
-                
-                GUILayout.EndHorizontal();
-            }
+            DrawListArgs();
 
-            for (var i = del.Count - 1; i >= 0; i--)
-            {
-                p_args.DeleteArrayElementAtIndex(del[i]);
-            }
-            
             serializedObject.ApplyModifiedProperties();
         }
 
-        private List<int> del = new List<int>();
+        private void DrawLabelKey()
+        {
+            EditorGUILayout.LabelField(p_key.stringValue, new GUIStyle() {alignment = TextAnchor.MiddleCenter});
+        }
+
+        private void DrawFieldKey()
+        {
+            currKeyValue = GUILayout.TextField(currKeyValue, 255);
+        }
+
+        private void DrawButtonEditKey()
+        {
+            if (CucuGUI.Button("Edit", Color.blue))
+            {
+                currKeyValue = p_key.stringValue;
+                prevKeyValue = currKeyValue;
+                isEditMode = true;
+            }
+        }
+
+        private void DrawButtonSaveKey()
+        {
+            if (CucuGUI.Button("Save", Color.blue, GUILayout.MaxWidth(70)))
+            {
+                isEditMode = false;
+                p_key.stringValue = currKeyValue;
+            }
+        }
+
+        private void DrawButtonCancelKey()
+        {
+            if (CucuGUI.Button("Cancel", Color.red, GUILayout.MaxWidth(60)))
+            {
+                p_key.stringValue = prevKeyValue;
+                isEditMode = false;
+            }
+        }
+
+        private void DrawButtonCreateArg()
+        {
+            if (CucuGUI.Button("Create argument", Color.yellow))
+                p_args.InsertArrayElementAtIndex(p_args.arraySize);
+        }
+
+        private void DrawElementArg(int i)
+        {
+            GUILayout.BeginHorizontal();
+
+            EditorGUILayout.PropertyField(p_args.GetArrayElementAtIndex(i));
+
+            DrawButtonDeleteArg(i);
+
+            GUILayout.EndHorizontal();
+        }
+
+        private void DrawButtonDeleteArg(int i)
+        {
+            if (CucuGUI.Button("Delete", Color.red, GUILayout.MaxWidth(60)))
+                deleteListIndex.Add(i);
+        }
+
+        private void DrawListArgs()
+        {
+            deleteListIndex.Clear();
+
+            for (var i = 0; i < p_args.arraySize; i++)
+                DrawElementArg(i);
+
+            for (var i = deleteListIndex.Count - 1; i >= 0; i--)
+                p_args.DeleteArrayElementAtIndex(deleteListIndex[i]);
+        }
+
+        private void DrawButtonGizmos()
+        {
+            if (CucuGUI.Button($"Draw gizmos mode : {(p_gizmos.boolValue ? "on" : "off")}",
+                p_gizmos.boolValue ? Color.green : Color.red))
+                p_gizmos.boolValue = !p_gizmos.boolValue;
+        }
     }
 }
