@@ -1,8 +1,6 @@
 {
     "name": "CucuTools",
-    "references": [
-        "GUID:a5da3484cfc15b148b3dde2890591d63"
-    ],
+    "references": [],
     "includePlatforms": [],
     "excludePlatforms": [],
     "allowUnsafeCode": false,

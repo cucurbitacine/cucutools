@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -81,19 +81,6 @@ namespace CucuTools
             Gizmos.DrawSphere(transform.position, 0.1f);
         }
 #endif
-    }
-
-    [Serializable]
-    public struct CucuTagArg
-    {
-        public string key;
-        public string value;
-
-        public override bool Equals(object obj)
-        {
-            if (!(obj is CucuTagArg arg)) return false;
-            return arg.key.Equals(key) && arg.value.Equals(value);
-        }
     }
 
     public static class CucuTagExt
