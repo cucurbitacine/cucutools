@@ -1,8 +1,7 @@
-using CucuTools.Blend.Interfaces;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace CucuTools.Blend
+namespace CucuTools
 {
     /// <inheritdoc />
     public abstract class CucuBlendEntity : MonoBehaviour, IBlendable

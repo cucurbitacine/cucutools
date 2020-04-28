@@ -2,11 +2,9 @@
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using CucuTools.Common;
-using CucuTools.Math;
 using UnityEngine;
 
-namespace CucuTools.Colors
+namespace CucuTools
 {
     public static class CucuColor
     {

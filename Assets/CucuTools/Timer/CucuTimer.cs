@@ -1,7 +1,7 @@
 using System;
 using UnityEngine;
 
-namespace CucuTools.Timer
+namespace CucuTools
 {
     /// <summary>
     /// Timer

@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace CucuTools.Tag
+namespace CucuTools
 {
     public class CucuTag : MonoBehaviour
     {

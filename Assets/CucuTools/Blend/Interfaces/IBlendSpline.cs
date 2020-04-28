@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace CucuTools.Blend.Interfaces
+namespace CucuTools
 {
     /// <summary>
     /// Blending spline between pins

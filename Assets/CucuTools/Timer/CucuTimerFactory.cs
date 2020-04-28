@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using CucuTools.Events;
 using UnityEngine;
 
-namespace CucuTools.Timer
+namespace CucuTools
 {
     /// <summary>
     /// Timer factory and holder

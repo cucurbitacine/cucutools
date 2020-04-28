@@ -1,9 +1,8 @@
 ﻿using System;
-using CucuTools.Tag;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace CucuTools.Events
+namespace CucuTools
 {
     /// <inheritdoc />
     [Serializable]

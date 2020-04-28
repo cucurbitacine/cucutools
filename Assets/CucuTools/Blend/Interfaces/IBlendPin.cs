@@ -1,4 +1,4 @@
-namespace CucuTools.Blend.Interfaces
+namespace CucuTools
 {
     /// <summary>
     /// Pin object with value for blend spline

@@ -1,8 +1,8 @@
 using System;
-using CucuTools.Blend.Interfaces;
+using CucuTools;
 using UnityEngine;
 
-namespace CucuTools.Blend.Spline
+namespace CucuTools
 {
     /// <inheritdoc />
     [Serializable]

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
 
-namespace CucuTools.Blend.Impl
+namespace CucuTools
 {
     /// <inheritdoc />
     public class CucuBlendCollection : CucuBlendCollectionEntity

@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using CucuTools.Events;
 using UnityEngine;
 
-namespace CucuTools.Trigger
+namespace CucuTools
 {
     public class CucuTrigger : MonoBehaviour
     {

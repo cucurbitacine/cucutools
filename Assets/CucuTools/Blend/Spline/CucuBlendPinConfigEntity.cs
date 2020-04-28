@@ -1,8 +1,8 @@
 using System.Collections.Generic;
-using CucuTools.Blend.Interfaces;
+using CucuTools;
 using UnityEngine;
 
-namespace CucuTools.Blend.Spline
+namespace CucuTools
 {
     /// <inheritdoc />
     public abstract class CucuBlendPinConfigEntity<TBlendPin> : ScriptableObject, IBlendPinConfig<TBlendPin>

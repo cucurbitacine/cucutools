@@ -1,9 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Linq;
 using UnityEngine;
 
-namespace CucuTools.Logger
+namespace CucuTools
 {
     /// <summary>
     ///   A console to display Unity's debug logs in-game.
@@ -113,7 +114,19 @@ namespace CucuTools.Logger
 
                 GUI.contentColor = new Color(0.8f, 0.1f, 0.1f, 1f);
                 var stackTrace = log.StackTrace.Split(new[] {"\n"}, StringSplitOptions.RemoveEmptyEntries);
-                for (var index = stackTrace.Length - 1; index >= 0; index--)
+
+                if (true)
+                {
+                    stackTrace = stackTrace
+                        .Where(s => 
+                            !s.Contains("CucuTools.Cucu:Log") &&
+                            !s.Contains("CucuTools.CucuLogger:") &&
+                            !s.Contains("UnityEngine.Logger"))
+                        .ToArray();
+                }
+                
+                //for (var index = stackTrace.Length - 1; index >= 0; index--)
+                for (var index = 0; index < stackTrace.Length; index++)
                     GUILayout.Label($"\t[{stackTrace.Length - 1 - index}] {stackTrace[index]}");
             }
 

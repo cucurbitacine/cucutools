@@ -1,9 +1,8 @@
-﻿using CucuTools.Logger;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace CucuTools.Common
+namespace CucuTools
 {
-    internal class Cucu
+    public class Cucu
     {
         public static readonly CucuLogger Logger;
         

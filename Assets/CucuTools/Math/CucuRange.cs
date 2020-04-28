@@ -1,9 +1,7 @@
 using System;
-using System.Linq;
-using System.Reflection;
 using UnityEngine;
 
-namespace CucuTools.Math
+namespace CucuTools
 {
     public class CucuRange<T>
         where T : IComparable

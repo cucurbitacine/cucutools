@@ -2,7 +2,7 @@
 using System.Linq;
 using UnityEngine;
 
-namespace CucuTools.Common
+namespace CucuTools
 {
     public static class CucuExtensions
     {

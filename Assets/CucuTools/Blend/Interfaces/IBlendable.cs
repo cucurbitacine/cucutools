@@ -1,4 +1,4 @@
-namespace CucuTools.Blend.Interfaces
+namespace CucuTools
 {
     /// <summary>
     /// Blendable entity

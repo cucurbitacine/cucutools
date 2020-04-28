@@ -1,11 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using CucuTools.Blend.Interfaces;
-using CucuTools.Blend.Spline;
 using UnityEngine;
 
-namespace CucuTools.Blend.Impl
+namespace CucuTools
 {
     /// <inheritdoc />
     public class CucuBlendSplineColor : CucuBlendSplineEntity<Color>

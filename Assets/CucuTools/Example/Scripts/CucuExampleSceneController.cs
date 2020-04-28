@@ -1,17 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Linq;
-using CucuTools.Blend.Impl;
-using CucuTools.Colors;
-using CucuTools.Common;
-using CucuTools.Math;
-using CucuTools.Tag;
-using CucuTools.Timer;
-using CucuTools.Trigger;
 using UnityEngine;
 using Random = UnityEngine.Random;
 
-namespace Examples.Scripts
+namespace CucuTools.Example
 {
     public class CucuExampleSceneController : MonoBehaviour
     {
@@ -125,7 +117,7 @@ namespace Examples.Scripts
                 .SetDuration(_periodChangeColor)
                 .OnStop(() => _timerColorChanger.StartTimer())
                 .StartTimer();
-            
+
             _timerCameraRotation = CucuTimerFactory.Create("cameraRotation");
             _timerCameraRotation
                 .SetDuration(60f)

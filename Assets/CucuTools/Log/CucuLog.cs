@@ -1,7 +1,6 @@
-﻿using CucuTools.Colors;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace CucuTools.Logger
+namespace CucuTools
 {
     public enum LogArea
     {

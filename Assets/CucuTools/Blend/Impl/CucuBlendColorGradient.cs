@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace CucuTools.Blend.Impl
+namespace CucuTools
 {
     /// <inheritdoc />
     public class CucuBlendColorGradient : CucuBlendEntity

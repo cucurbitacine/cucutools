@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace CucuTools.Math
+namespace CucuTools
 {
     public static class CucuMath
     {
