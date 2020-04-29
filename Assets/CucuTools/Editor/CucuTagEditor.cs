@@ -61,7 +61,15 @@ namespace CucuTools.Editor
 
         private void DrawLabelKey()
         {
-            EditorGUILayout.LabelField(p_key.stringValue, new GUIStyle() {alignment = TextAnchor.MiddleCenter});
+            var tag = p_key?.stringValue;
+            var isValid= !string.IsNullOrWhiteSpace(tag);
+            tag = isValid ? p_key.stringValue : "<empty>";
+
+            EditorGUILayout.LabelField(tag, new GUIStyle()
+            {
+                alignment = TextAnchor.MiddleCenter,
+                fontStyle = isValid ? FontStyle.Bold : FontStyle.Italic
+            });
         }
 
         private void DrawFieldKey()
