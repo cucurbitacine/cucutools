@@ -8,10 +8,30 @@ namespace CucuTools
         public string key;
         public string value;
 
+        public CucuTagArg(string key, string value)
+        {
+            this.key = key;
+            this.value = value;
+        }
+        
+        public static bool operator ==(CucuTagArg arg1, CucuTagArg arg2)
+        {
+            return arg1.key.Equals(arg2.key) && arg1.value.Equals(arg2.value);
+        }
+
+        public static bool operator !=(CucuTagArg arg1, CucuTagArg arg2)
+        {
+            return !(arg1 == arg2);
+        }
+
         public override bool Equals(object obj)
         {
-            if (!(obj is CucuTagArg arg)) return false;
-            return arg.key.Equals(key) && arg.value.Equals(value);
+            return obj is CucuTagArg arg && this == arg;
+        }
+
+        public override int GetHashCode()
+        {
+            return base.GetHashCode();
         }
     }
 }

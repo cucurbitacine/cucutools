@@ -8,9 +8,8 @@ namespace CucuTools
     public class CucuTag : MonoBehaviour
     {
         public readonly static List<CucuTag> Tags = new List<CucuTag>();
-
         public string Key => _key;
-        public IList<CucuTagArg> Args => args;
+        public List<CucuTagArg> Args => args ?? (args = new List<CucuTagArg>());
         public Guid Guid => (Guid) (_guid ?? (_guid = Guid.NewGuid()));
 
         [SerializeField] private string _key;
@@ -19,9 +18,10 @@ namespace CucuTools
 
         [SerializeField] private bool _drawGizmos;
 
-        public void SetKey(string key)
+        public CucuTag SetKey(string key)
         {
             _key = key ?? "";
+            return this;
         }
 
         private void OnEnable()
@@ -39,29 +39,31 @@ namespace CucuTools
             Tags.Remove(this);
         }
 
-        public static IEnumerable<CucuTag> GetTags(string key)
+        public static IEnumerable<CucuTag> WithKeys(params string[] keys)
         {
-            return Tags.Where(t => t.Key.Equals(key)).ToList();
+            return Tags.SelectWithKeys(keys);
         }
 
-        public static IEnumerable<CucuTag> GetTagsByArgs(string key, string value, IEnumerable<CucuTag> tags = null)
+        public static IEnumerable<CucuTag> WithArgKeys(params string[] keys)
         {
-            return GetTagsByArgs(new CucuTagArg {key = key, value = value}, tags);
+            return Tags.SelectWithArgKeys(keys);
+        }
+        
+        public static IEnumerable<CucuTag> WithArg(string key, string value)
+        {
+            return Tags.SelectWithArg(key, value);
         }
 
-        public static IEnumerable<CucuTag> GetTagsByArgs(CucuTagArg arg, IEnumerable<CucuTag> tags = null)
+        public static IEnumerable<CucuTag> WithArg(CucuTagArg arg)
         {
-            return GetTagsByArgs(new[] {arg}, tags);
+            return Tags.SelectWithArg(arg);
         }
 
-        public static IEnumerable<CucuTag> GetTagsByArgs(IEnumerable<CucuTagArg> args, IEnumerable<CucuTag> tags = null)
+        public static IEnumerable<CucuTag> WithArgs(IEnumerable<CucuTagArg> args)
         {
-            if (tags == null) tags = Tags;
-
-            var tagArgs = args as CucuTagArg[] ?? args.ToArray();
-
-            return from cucuTag in tags let t = cucuTag where tagArgs.All(a => t.Args.Contains(a)) select cucuTag;
+            return Tags.SelectWithArgs(args);
         }
+        
 #if UNITY_EDITOR
         private void OnDrawGizmos()
         {
@@ -85,26 +87,61 @@ namespace CucuTools
 
     public static class CucuTagExt
     {
+        #region Base Ext
+
         public static CucuTag AddCucuTag(this GameObject gameObject, string tag)
         {
-            var cucuTag = gameObject.AddComponent<CucuTag>();
-            cucuTag.SetKey(tag);
-            return cucuTag;
+            return gameObject.AddComponent<CucuTag>().SetKey(tag);
+        }
+        
+        public static CucuTag AddArgs(this CucuTag tag, params CucuTagArg[] args)
+        {
+            tag.Args.AddRange(args);
+            return tag;
+        }
+        
+        public static IEnumerable<CucuTag> SelectWithKeys(this IEnumerable<CucuTag> tags, params string[] keys)
+        {
+            return tags.Where(t => keys.Any(a => a == t.Key));
+        }
+        
+        public static IEnumerable<CucuTag> SelectWithArgKeys(this IEnumerable<CucuTag> tags, params string[] keys)
+        {
+            return tags.Where(t => t.Args.Any(a => keys.All(k => k == a.key)));
+        }
+        
+        public static IEnumerable<CucuTag> SelectWithArgs(this IEnumerable<CucuTag> tags, IEnumerable<CucuTagArg> args)
+        {
+            return from tag in tags
+                let t = tag
+                where (args as CucuTagArg[] ?? args.ToArray()).All(a => t.Args.Contains(a))
+                select tag;
         }
 
-        public static IEnumerable<CucuTag> GetTagsByArgs(this IEnumerable<CucuTag> tags, IEnumerable<CucuTagArg> args)
+        #endregion
+
+        #region Additional Ext
+
+        public static CucuTag AddArgs(this CucuTag tag, string key, string value)
         {
-            return CucuTag.GetTagsByArgs(args, tags);
+            return tag.AddArgs(new CucuTagArg(key, value));
+        }
+        
+        public static CucuTag AddCucuTag(this Transform transform, string tag)
+        {
+            return transform.gameObject.AddCucuTag(tag);
+        }
+        
+        public static IEnumerable<CucuTag> SelectWithArg(this IEnumerable<CucuTag> tags, CucuTagArg arg)
+        {
+            return tags.SelectWithArgs(new[] {arg});
         }
 
-        public static IEnumerable<CucuTag> GetTagsByArgs(this IEnumerable<CucuTag> tags, CucuTagArg arg)
+        public static IEnumerable<CucuTag> SelectWithArg(this IEnumerable<CucuTag> tags, string key, string value)
         {
-            return CucuTag.GetTagsByArgs(arg, tags);
+            return tags.SelectWithArg(new CucuTagArg(key, value));
         }
 
-        public static IEnumerable<CucuTag> GetTagsByArgs(this IEnumerable<CucuTag> tags, string key, string value)
-        {
-            return CucuTag.GetTagsByArgs(key, value, tags);
-        }
+        #endregion
     }
 }
