@@ -6,7 +6,7 @@ namespace CucuTools.Editor
 {
     [CustomEditor(typeof(CucuTag))]
     [CanEditMultipleObjects]
-    public class CucuTagEditor : UnityEditor.Editor
+    internal class CucuTagEditor : UnityEditor.Editor
     {
         private SerializedProperty p_key;
         private SerializedProperty p_gizmos;

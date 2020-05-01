@@ -4,48 +4,27 @@ using UnityEngine;
 
 namespace CucuTools.Editor
 {
-    public abstract class CucuRangeDrawerBase : PropertyDrawer
+    internal abstract class CucuRangeDrawerBase : PropertyDrawer
     {
         protected SerializedProperty limitFirst;
         protected SerializedProperty limitSecond;
         protected SerializedProperty value;
         
-        protected class _Rect
-        {
-            public Rect rect
-            {
-                get => _rect;
-                set
-                {
-                    _rect = value;
-                    if (_rect.width < minWidth)
-                        _rect.width = minWidth;
-                }
-            }
+       
 
-            private Rect _rect;
-            public float weight;
-            public float minWidth;
+        protected readonly DrawUnit rectPrefix = new DrawUnit {weight = 10, minWidth = 25};
 
-            public static implicit operator Rect(_Rect _rect)
-            {
-                return _rect.rect;
-            }
-        }
+        protected readonly DrawUnit rectLabelMin = new DrawUnit {weight = 5, minWidth = 25};
+        protected readonly DrawUnit rectLabelMax = new DrawUnit {weight = 5, minWidth = 25};
+        protected readonly DrawUnit rectLabelVal = new DrawUnit {weight = 5, minWidth = 25};
 
-        protected readonly _Rect rectPrefix = new _Rect {rect = new Rect(), weight = 10, minWidth = 25};
-
-        protected readonly _Rect rectLabelMin = new _Rect {rect = new Rect(), weight = 5, minWidth = 25};
-        protected readonly _Rect rectLabelMax = new _Rect {rect = new Rect(), weight = 5, minWidth = 25};
-        protected readonly _Rect rectLabelVal = new _Rect {rect = new Rect(), weight = 5, minWidth = 25};
-
-        protected readonly _Rect rectMin = new _Rect {rect = new Rect(), weight = 15, minWidth = 50};
-        protected readonly _Rect rectMax = new _Rect {rect = new Rect(), weight = 15, minWidth = 50};
-        protected readonly _Rect rectVal = new _Rect {rect = new Rect(), weight = 45, minWidth = 10};
+        protected readonly DrawUnit rectMin = new DrawUnit {weight = 15, minWidth = 50};
+        protected readonly DrawUnit rectMax = new DrawUnit {weight = 15, minWidth = 50};
+        protected readonly DrawUnit rectVal = new DrawUnit {weight = 45, minWidth = 10};
 
         private void UpdateRect(Rect root)
         {
-            _Rect[] queue =
+            DrawUnit[] queue =
             {
                 rectPrefix,
 
@@ -93,7 +72,7 @@ namespace CucuTools.Editor
     }
 
     [CustomPropertyDrawer(typeof(CucuRangeFloat))]
-    public class CucuRangeFloatDrawer : CucuRangeDrawerBase
+    internal class CucuRangeFloatDrawer : CucuRangeDrawerBase
     {
         protected override void DrawFields()
         {
@@ -104,7 +83,7 @@ namespace CucuTools.Editor
     }
     
     [CustomPropertyDrawer(typeof(CucuRangeInt))]
-    public class CucuRangeIntDrawer : CucuRangeDrawerBase
+    internal class CucuRangeIntDrawer : CucuRangeDrawerBase
     {
         protected override void DrawFields()
         {

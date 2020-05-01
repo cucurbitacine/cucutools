@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace CucuTools
 {
@@ -11,6 +12,7 @@ namespace CucuTools
         Nowhere
     }
 
+    [Serializable]
     public class CucuLogger
     {
         private CucuLogger()
@@ -20,12 +22,34 @@ namespace CucuTools
             LogArea = LogArea.Application;
         }
 
-        public string Tag { get; private set; }
-        public Color TagColor { get; private set; }
+        public string Tag
+        {
+            get => _tag;
+            private set => _tag = value;
+        }
 
-        public LogType Type { get; private set; }
-        public LogArea LogArea { get; private set; }
+        public Color TagColor
+        {
+            get => _tagColor;
+            private set => _tagColor = value;
+        }
 
+        public LogType Type
+        {
+            get => _type;
+            private set => _type = value;
+        }
+
+        public LogArea LogArea
+        {
+            get => _logArea;
+            private set => _logArea = value;
+        }
+
+        [SerializeField] private string _tag;
+        [SerializeField] private Color _tagColor;
+        [SerializeField] private LogType _type;
+        [SerializeField] private LogArea _logArea;
 
         public static CucuLogger Create()
         {
