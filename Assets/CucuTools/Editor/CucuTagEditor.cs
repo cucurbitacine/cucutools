@@ -74,12 +74,15 @@ namespace CucuTools.Editor
 
         private void DrawFieldKey()
         {
-            currKeyValue = GUILayout.TextField(currKeyValue, 255);
+            var style = new GUIStyle(GUI.skin.textField);
+            style.alignment = TextAnchor.MiddleCenter;
+            
+            currKeyValue = GUILayout.TextField(currKeyValue, 255, style);
         }
 
         private void DrawButtonEditKey()
         {
-            if (CucuGUI.Button("Edit", Color.blue))
+            if (CucuGUI.Button("Edit", Color.blue, GUILayout.MaxWidth(120)))
             {
                 currKeyValue = p_key.stringValue;
                 prevKeyValue = currKeyValue;
@@ -89,7 +92,7 @@ namespace CucuTools.Editor
 
         private void DrawButtonSaveKey()
         {
-            if (CucuGUI.Button("Save", Color.blue, GUILayout.MaxWidth(70)))
+            if (CucuGUI.Button("Save", Color.blue, GUILayout.MaxWidth(60)))
             {
                 isEditMode = false;
                 p_key.stringValue = currKeyValue;

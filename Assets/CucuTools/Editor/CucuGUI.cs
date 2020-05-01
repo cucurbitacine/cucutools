@@ -1,10 +1,38 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace CucuTools.Editor
 {
     internal static class CucuGUI
     {
+        public static Rect[] GetSizedRect(this Rect root,  params float[] values)
+        {
+            return GetRect(root, values);
+        }
+        
+        public static Rect[] GetSizedRect(this IEnumerable<float> values, Rect root)
+        {
+            return GetRect(root, values.ToArray());
+        }
+        
+        public static Rect[] GetRect(Rect root, params float[] values)
+        {
+            var weights = values.Divide(values.Sum()).ToArray();
+            
+            var result = new Rect[weights.Length];
+            var shift = 0f; 
+            for (var i = 0; i < result.Length; i++)
+            {
+                result[i] = new Rect(root);
+                result[i].x += shift;
+                result[i].width *= weights[i];
+                shift += result[i].width;
+            }
+            
+            return result;
+        }
+        
         private static readonly Dictionary<Color, GUIStyle> styleButtonFromColorMap = new Dictionary<Color, GUIStyle>();
         
         public static bool Button(string text, Color? color = null, params GUILayoutOption[] options)

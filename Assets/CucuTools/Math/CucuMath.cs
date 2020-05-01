@@ -94,4 +94,30 @@ namespace CucuTools
                 .First(x => arg.CompareTo(x.t) <= 0f).i;
         }
     }
+
+    public static class CucuMathExt
+    {
+        public static IEnumerable<float> Add(this IEnumerable<float> array, float value)
+        {
+            return array.Select(a => a + value);
+        }
+        
+        public static IEnumerable<float> Multi(this IEnumerable<float> array, float value)
+        {
+            return array.Select(a => a * value);
+        }
+        
+        public static IEnumerable<float> Divide(this IEnumerable<float> array, float value)
+        {
+            if (!(Mathf.Abs(value) <= float.Epsilon)) return array.Multi(1 / value);
+            
+            Debug.Log("Divide by zero");
+            return array;
+        }
+        
+        public static IEnumerable<float> Sub(this IEnumerable<float> array, float value)
+        {
+            return array.Add(-value);
+        }
+    }
 }

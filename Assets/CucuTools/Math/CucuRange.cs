@@ -3,58 +3,108 @@ using UnityEngine;
 
 namespace CucuTools
 {
-    public class CucuRange<T>
+    [Serializable]
+    public class CucuRange<T> : IComparable
         where T : IComparable
     {
         public T Value
         {
             get
             {
-                Validate();
-                return _value;
+                UpdateValue();
+                return value;
             }
 
             set
             {
-                _value = value;
-                Validate();
+                this.value = value;
+                UpdateValue();
             }
         }
 
-        public T MinValue => _minValue;
-        public T MaxValue => _maxValue;
+        public T Max => limitFirst.CompareTo(limitSecond) >= 0 ? limitFirst : limitSecond;
+        public T Min => limitFirst.CompareTo(limitSecond) < 0 ? limitFirst : limitSecond;
 
-        [Header("Value")] [SerializeField] private T _value;
+        [Header("Value")] [SerializeField] private T value;
+        [Space] [SerializeField] private T limitFirst;
+        [SerializeField] private T limitSecond;
 
-        [Space] [SerializeField] private T _minValue;
-
-        [SerializeField] private T _maxValue;
-
-        public void SetMinValue(T value)
+        public CucuRange<T> SetBorder(T first, T second)
         {
-            _maxValue = value.CompareTo(_maxValue) < 0 ? value : _maxValue;
-            Validate();
+            limitFirst = first;
+            limitSecond = second;
+            return this;
         }
 
-        public void SetMaxValue(T value)
+        public CucuRange<T> SetMax(T max)
         {
-            _maxValue = value.CompareTo(_minValue) > 0 ? value : _minValue;
-            Validate();
+            var newMax = max;
+
+            if (max.CompareTo(Min) < 0)
+            {
+                Debug.LogWarning($"New max {max} must be more then min {Min}");
+
+                newMax = limitFirst.CompareTo(limitSecond) >= 0 ? limitSecond : limitFirst;
+            }
+
+            if (limitFirst.CompareTo(limitSecond) >= 0)
+                limitFirst = newMax;
+            else
+                limitSecond = newMax;
+
+            UpdateValue();
+
+            return this;
         }
 
-        public bool InRange(T value, bool includeMin = true, bool includeMax = true)
+        public CucuRange<T> SetMin(T min)
         {
-            var isGreaterMin = includeMin ? value.CompareTo(_minValue) >= 0 : value.CompareTo(_minValue) > 0;
-            var isLessMax = includeMax ? value.CompareTo(_maxValue) <= 0 : value.CompareTo(_maxValue) < 0;
+            var newMin = min;
+
+            if (min.CompareTo(Max) > 0)
+            {
+                Debug.LogWarning($"New min {min} must be more then max {Max}");
+
+                newMin = limitFirst.CompareTo(limitSecond) < 0 ? limitSecond : limitFirst;
+            }
+
+            if (limitFirst.CompareTo(limitSecond) < 0)
+                limitFirst = newMin;
+            else
+                limitSecond = newMin;
+
+            UpdateValue();
+
+            return this;
+        }
+
+        public bool IsValid(T value, bool includeMin = true, bool includeMax = true)
+        {
+            var isGreaterMin = includeMin ? value.CompareTo(Min) >= 0 : value.CompareTo(Min) > 0;
+            var isLessMax = includeMax ? value.CompareTo(Max) <= 0 : value.CompareTo(Max) < 0;
             return isGreaterMin && isLessMax;
         }
 
-        public void Validate()
+        public void UpdateValue()
         {
-            if (_minValue.CompareTo(_maxValue) > 0) _maxValue = _minValue;
+            if (value.CompareTo(Min) < 0) value = Min;
+            if (value.CompareTo(Max) > 0) value = Max;
+        }
 
-            if (_value.CompareTo(_minValue) < 0) _value = _minValue;
-            if (_value.CompareTo(_maxValue) > 0) _value = _maxValue;
+        public static implicit operator T(CucuRange<T> range)
+        {
+            return range.Value;
+        }
+
+        public int CompareTo(object obj)
+        {
+            if (obj is CucuRange<T> range)
+            {
+                return Value.CompareTo(range.value);
+            }
+
+            throw new InvalidCastException(
+                $"Cannot convert {obj.GetType().FullName} to CucuRange<{typeof(T).FullName}>");
         }
     }
 
@@ -71,9 +121,78 @@ namespace CucuTools
 
         public CucuRangeFloat(float min, float max, float value)
         {
-            SetMinValue(min);
-            SetMaxValue(max);
+            SetBorder(min, max);
             Value = value;
+        }
+
+        public static float operator +(CucuRangeFloat left, CucuRangeFloat right)
+        {
+            return left.Value + right.Value;
+        }
+
+        public static float operator -(CucuRangeFloat left, CucuRangeFloat right)
+        {
+            return left.Value - right.Value;
+        }
+
+        public static float operator *(CucuRangeFloat left, CucuRangeFloat right)
+        {
+            return left.Value * right.Value;
+        }
+
+        public static float operator /(CucuRangeFloat left, CucuRangeFloat right)
+        {
+            return left.Value / right.Value;
+        }
+
+        public static float operator +(CucuRangeFloat range, float value)
+        {
+            return new CucuRangeFloat(range.Min, range.Max, range.Value + value);
+        }
+
+        public static float operator +(float value, CucuRangeFloat range)
+        {
+            return range + value;
+        }
+
+        public static float operator -(CucuRangeFloat range, float value)
+        {
+            return range + -value;
+        }
+
+        public static float operator -(float value, CucuRangeFloat range)
+        {
+            return value + -1 * range;
+        }
+        
+        public static float operator *(CucuRangeFloat range, float value)
+        {
+            return range.Value * value;
+        }
+
+        public static float operator *(float value, CucuRangeFloat range)
+        {
+            return range * value;
+        }
+
+        public static float operator /(CucuRangeFloat range, float value)
+        {
+            return range * (1 / value);
+        }
+
+        public static float operator /(float value, CucuRangeFloat range)
+        {
+            return value / range.Value;
+        }
+        
+        public static bool operator ==(CucuRangeFloat left, CucuRangeFloat right)
+        {
+            return Mathf.Abs(left.Value - right.Value) <= float.Epsilon;
+        }
+
+        public static bool operator !=(CucuRangeFloat left, CucuRangeFloat right)
+        {
+            return !(left == right);
         }
     }
 
@@ -91,9 +210,78 @@ namespace CucuTools
 
         public CucuRangeInt(int min, int max, int value)
         {
-            SetMinValue(min);
-            SetMaxValue(max);
+            SetBorder(min, max);
             Value = value;
+        }
+
+        public static int operator +(CucuRangeInt left, CucuRangeInt right)
+        {
+            return left.Value + right.Value;
+        }
+
+        public static int operator -(CucuRangeInt left, CucuRangeInt right)
+        {
+            return left.Value - right.Value;
+        }
+
+        public static int operator *(CucuRangeInt left, CucuRangeInt right)
+        {
+            return left.Value * right.Value;
+        }
+
+        public static int operator /(CucuRangeInt left, CucuRangeInt right)
+        {
+            return left.Value / right.Value;
+        }
+
+        public static int operator +(CucuRangeInt range, int value)
+        {
+            return range.Value + value;
+        }
+
+        public static int operator +(int value, CucuRangeInt range)
+        {
+            return range + value;
+        }
+
+        public static int operator -(CucuRangeInt range, int value)
+        {
+            return range + -value;
+        }
+
+        public static int operator -(int value, CucuRangeInt range)
+        {
+            return value + -1 * range;
+        }
+
+        public static int operator *(CucuRangeInt range, int value)
+        {
+            return range.Value * value;
+        }
+
+        public static int operator *(int value, CucuRangeInt range)
+        {
+            return range * value;
+        }
+
+        public static int operator /(CucuRangeInt range, int value)
+        {
+            return range * (1 / value);
+        }
+
+        public static int operator /(int value, CucuRangeInt range)
+        {
+            return value / range.Value;
+        }
+        
+        public static bool operator ==(CucuRangeInt left, CucuRangeInt right)
+        {
+            return left.Value == right.Value;
+        }
+
+        public static bool operator !=(CucuRangeInt left, CucuRangeInt right)
+        {
+            return !(left == right);
         }
     }
 }
