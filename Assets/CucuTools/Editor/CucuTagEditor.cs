@@ -117,7 +117,7 @@ namespace CucuTools.Editor
         private void DrawElementArg(int i)
         {
             GUILayout.BeginHorizontal();
-
+            
             EditorGUILayout.PropertyField(p_args.GetArrayElementAtIndex(i));
 
             DrawButtonDeleteArg(i);

@@ -8,15 +8,14 @@ namespace CucuTools.Editor
     {
         public override void OnGUI(Rect pos, SerializedProperty pro, GUIContent label)
         {
-            var rects = pos.GetSizedRect(10, 10, 35, 10, 35);
+            var root = EditorGUI.PrefixLabel(pos, label);
+            EditorGUI.indentLevel = 0;
+            var rects = root.GetSizedRect(15, 35, 15, 35);
 
-            var rectPre = rects[0];
-            var rectLKe = rects[1];
-            var rectKey = rects[2];
-            var rectLVa = rects[3];
-            var rectVal = rects[4];
-
-            EditorGUI.LabelField(rectPre, label);
+            var rectLKe = rects[0];
+            var rectKey = rects[1];
+            var rectLVa = rects[2];
+            var rectVal = rects[3];
 
             EditorGUI.LabelField(
                 rectLKe,

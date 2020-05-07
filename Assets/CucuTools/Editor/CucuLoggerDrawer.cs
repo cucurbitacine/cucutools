@@ -8,7 +8,6 @@ namespace CucuTools.Editor
     [CustomPropertyDrawer(typeof(CucuLogger))]
     internal class CucuLoggerDrawer : PropertyDrawer
     {
-        private readonly DrawUnit u_prefix = new DrawUnit(10);
         private readonly DrawUnit u_tag = new DrawUnit(30);
         private readonly DrawUnit u_color = new DrawUnit(20);
         private readonly DrawUnit u_type = new DrawUnit(20);
@@ -23,7 +22,6 @@ namespace CucuTools.Editor
             
             var queue = new[]
             {
-                u_prefix,
                 u_tag,
                 u_color,
                 u_type,
@@ -37,13 +35,14 @@ namespace CucuTools.Editor
         
         public override void OnGUI(Rect pos, SerializedProperty prop, GUIContent label)
         {
-            UpdateUnits(pos, prop);
+            var root = EditorGUI.PrefixLabel(pos, label);
+            
+            UpdateUnits(root, prop);
 
-            EditorGUI.PrefixLabel(u_prefix, label);
-            u_tag.prop.stringValue = EditorGUI.TextField(u_tag, u_tag.prop.stringValue);
-            u_color.prop.colorValue = EditorGUI.ColorField(u_color, u_color.prop.colorValue);
-            u_type.prop.enumValueIndex = (int) (LogType)EditorGUI.EnumPopup(u_type, (LogType) u_type.prop.enumValueIndex);
-            u_area.prop.enumValueIndex = (int) (LogArea)EditorGUI.EnumPopup(u_area, (LogArea) u_area.prop.enumValueIndex);
+            EditorGUI.LabelField(u_tag, u_tag.prop.stringValue);
+            EditorGUI.ColorField(u_color, u_color.prop.colorValue);
+            EditorGUI.EnumPopup(u_type, (LogType) u_type.prop.enumValueIndex);
+            EditorGUI.EnumPopup(u_area, (LogArea) u_area.prop.enumValueIndex);
         }
     }
 }

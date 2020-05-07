@@ -9,33 +9,27 @@ namespace CucuTools.Editor
         protected SerializedProperty limitFirst;
         protected SerializedProperty limitSecond;
         protected SerializedProperty value;
-        
-       
 
-        protected readonly DrawUnit rectPrefix = new DrawUnit {weight = 10, minWidth = 25};
+        protected readonly DrawUnit rectLabelMin = new DrawUnit {weight = 1, minWidth = 0};
+        protected readonly DrawUnit rectLabelMax = new DrawUnit {weight = 1, minWidth = 0};
+        protected readonly DrawUnit rectLabelVal = new DrawUnit {weight = 1, minWidth = 0};
 
-        protected readonly DrawUnit rectLabelMin = new DrawUnit {weight = 5, minWidth = 25};
-        protected readonly DrawUnit rectLabelMax = new DrawUnit {weight = 5, minWidth = 25};
-        protected readonly DrawUnit rectLabelVal = new DrawUnit {weight = 5, minWidth = 25};
-
-        protected readonly DrawUnit rectMin = new DrawUnit {weight = 15, minWidth = 50};
-        protected readonly DrawUnit rectMax = new DrawUnit {weight = 15, minWidth = 50};
-        protected readonly DrawUnit rectVal = new DrawUnit {weight = 45, minWidth = 10};
+        protected readonly DrawUnit rectMin = new DrawUnit {weight = 10, minWidth = 0};
+        protected readonly DrawUnit rectMax = new DrawUnit {weight = 10, minWidth = 0};
+        protected readonly DrawUnit rectVal = new DrawUnit {weight = 73, minWidth = 0};
 
         private void UpdateRect(Rect root)
         {
             DrawUnit[] queue =
             {
-                rectPrefix,
-
                 rectLabelMin,
                 rectMin,
-
-                rectLabelVal,
-                rectVal,
-
+                
                 rectLabelMax,
                 rectMax,
+                
+                rectLabelVal,
+                rectVal,
             };
 
             var rects = root.GetSizedRect(queue.Select(q => q.weight).ToArray());
@@ -48,17 +42,19 @@ namespace CucuTools.Editor
             limitFirst = pro.FindPropertyRelative("limitFirst");
             value = pro.FindPropertyRelative("value");
             limitSecond = pro.FindPropertyRelative("limitSecond");
-
-            UpdateRect(pos);
-
-            DrawPrefix(label);
+            
+            var root = EditorGUI.PrefixLabel(pos, label);
+            EditorGUI.indentLevel = 0;
+            
+            UpdateRect(root);
+            
             DrawLabels();
             DrawFields();
         }
 
         private void DrawPrefix(GUIContent content)
         {
-            EditorGUI.PrefixLabel(rectPrefix, content);
+            
         }
         
         protected virtual void DrawLabels()
