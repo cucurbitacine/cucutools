@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace CucuTools
 {
-    public class CucuServiceProvider
+    public class CucuServiceProvider : ICucuServiceProvider
     {
         public static CucuServiceProvider Global { get; }
 
@@ -53,6 +53,51 @@ namespace CucuTools
 
             Internal_InvokeAllActions<T>(service);
 
+            return true;
+        }
+
+        public bool Unregister<T>(T service) where T : class
+        {
+            if (!_services.TryGetValue(typeof(T), out var ser))
+            {
+                _logger.Log($"\"{typeof(T).FullName}\" wasn't found when try unregistering", logType: LogType.Warning);
+                return false;
+            }
+            
+            if (ser != service)
+            {
+                _logger.Log($"You can't unregistering \"{typeof(T).FullName}\", because services don't match",
+                    logType: LogType.Warning);
+                return false;
+            }
+
+            if (!_services.TryRemove(typeof(T), out var _s))
+            {
+                _logger.Log($"Unregistering \"{typeof(T).FullName}\" failed. Service : \"{_s.GetType().FullName}\"",
+                    logType: LogType.Error);
+                return false;
+            }
+
+            _logger.Log($"Unregistering \"{typeof(T).FullName}\" successful.");
+            return true;
+        }
+
+        public bool UnregisterForced<T>() where T : class
+        {
+            if (!_services.TryGetValue(typeof(T), out var service))
+            {
+                _logger.Log($"\"{typeof(T).FullName}\" wasn't found when try unregistering", logType: LogType.Warning);
+                return false;
+            }
+            
+            if (!_services.TryRemove(typeof(T), out var _s))
+            {
+                _logger.Log($"Unregistering forced \"{typeof(T).FullName}\" failed. Service : \"{_s.GetType().FullName}\"",
+                    logType: LogType.Error);
+                return false;
+            }
+
+            _logger.Log($"Unregistering forced \"{typeof(T).FullName}\" as \"{service.GetType().FullName}\" successful.");
             return true;
         }
 
@@ -107,5 +152,17 @@ namespace CucuTools
                 _logger.Log($"{e.Message}", logType: LogType.Error);
             }
         }
+    }
+
+    public interface ICucuServiceProvider
+    {
+        Guid guid { get; }
+        string name { get; }
+
+        bool Register<T>(T service) where T : class;
+        bool Unregister<T>(T service) where T : class;
+        bool UnregisterForced<T>() where T : class;
+        bool TryResolve<T>(out T service) where T : class;
+        void Wait<T>(Action<T> action) where T : class;
     }
 }
