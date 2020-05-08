@@ -39,6 +39,11 @@ namespace CucuTools
             Tags.Remove(this);
         }
 
+        public static CucuTag WithKey(string key)
+        {
+            return WithKeys(key).Single();
+        }
+        
         public static IEnumerable<CucuTag> WithKeys(params string[] keys)
         {
             return Tags.SelectWithKeys(keys);

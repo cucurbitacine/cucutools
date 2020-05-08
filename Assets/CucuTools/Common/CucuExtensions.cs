@@ -6,6 +6,33 @@ namespace CucuTools
 {
     public static class CucuExtensions
     {
+        public static bool IsInterface<T>(this Component component) where T : class
+        {
+            return component?.GetType().GetInterfaces().Contains(typeof(T)) ?? false;
+        }
+
+        public static bool TryGetInterface<T>(this Component component, out T result) where T : class
+        {
+            result = null;
+            if (!component.IsInterface<T>()) return false;
+            result = component as T;
+            return true;
+        }
+
+        public static bool TryGetInterface<T>(this GameObject gameObject, out T result) where T : class
+        {
+            result = gameObject
+                .GetComponents<Component>()
+                .FirstOrDefault(c => c.IsInterface<T>()) as T;
+
+            return result != null;
+        }
+
+        public static bool TryGetInterface<T>(this Transform transform, out T result) where T : class
+        {
+            return transform.gameObject.TryGetInterface(out result);
+        }
+        
         public static T GetRandom<T>(this IEnumerable<T> enumerable)
         {
             var array = enumerable.ToArray();

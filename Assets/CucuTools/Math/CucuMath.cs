@@ -97,6 +97,46 @@ namespace CucuTools
 
     public static class CucuMathExt
     {
+        public static Vector2 XY(this Vector3 a)
+        {
+            return new Vector2(a.x, a.y);
+        }
+        
+        public static Vector2 ZY(this Vector3 a)
+        {
+            return new Vector2(a.z, a.y);
+        }
+        
+        public static Vector2 XZ(this Vector3 a)
+        {
+            return new Vector2(a.x, a.z);
+        }
+
+        public static Vector3 Abs(this Vector3 a)
+        {
+            return new Vector3(Mathf.Abs(a.x), Mathf.Abs(a.y), Mathf.Abs(a.z));
+        }
+        
+        public static Vector3 IgnoreX(this Vector3 vector)
+        {
+            return new Vector3(0f, vector.y, vector.z);
+        }
+        
+        public static Vector3 IgnoreY(this Vector3 vector)
+        {
+            return new Vector3(vector.x, 0f, vector.z);
+        }
+        
+        public static Vector3 IgnoreZ(this Vector3 vector)
+        {
+            return new Vector3(vector.x, vector.y, 0f);
+        }
+        
+        public static float Mean(this Vector3 a)
+        {
+            return (a.x + a.y + a.z) / 3f;
+        }
+        
         public static IEnumerable<float> Add(this IEnumerable<float> array, float value)
         {
             return array.Select(a => a + value);
