@@ -8,10 +8,10 @@ namespace CucuTools.Editor
     [CustomPropertyDrawer(typeof(CucuLogger))]
     internal class CucuLoggerDrawer : PropertyDrawer
     {
-        private readonly DrawUnit u_tag = new DrawUnit(30);
-        private readonly DrawUnit u_color = new DrawUnit(20);
-        private readonly DrawUnit u_type = new DrawUnit(20);
-        private readonly DrawUnit u_area = new DrawUnit(20);
+        private readonly DrawUnit u_tag = new DrawUnit(0.382f);
+        private readonly DrawUnit u_color = new DrawUnit(0);
+        private readonly DrawUnit u_type = new DrawUnit(0.618f/2f);
+        private readonly DrawUnit u_area = new DrawUnit(0.618f/2f);
 
         private void UpdateUnits(Rect root, SerializedProperty prop)
         {
@@ -23,7 +23,6 @@ namespace CucuTools.Editor
             var queue = new[]
             {
                 u_tag,
-                u_color,
                 u_type,
                 u_area
             };
@@ -39,10 +38,80 @@ namespace CucuTools.Editor
             
             UpdateUnits(root, prop);
 
-            EditorGUI.LabelField(u_tag, u_tag.prop.stringValue);
-            EditorGUI.ColorField(u_color, u_color.prop.colorValue);
-            EditorGUI.EnumPopup(u_type, (LogType) u_type.prop.enumValueIndex);
-            EditorGUI.EnumPopup(u_area, (LogArea) u_area.prop.enumValueIndex);
+            var name = string.IsNullOrWhiteSpace(u_tag.prop.stringValue) ? "<empty>" : $"[{u_tag.prop.stringValue}]";
+            var type = (LogType) u_type.prop.enumValueIndex;
+            var area = (LogArea) u_area.prop.enumValueIndex;
+            
+            EditorGUI.LabelField(u_tag, name, GetStyleLabel(u_color.prop.colorValue));
+            EditorGUI.LabelField(u_type, type.ToString(), GetStyleLogType(type));
+            EditorGUI.LabelField(u_area, area.ToString(), GetStyleLogArea(area));
+        }
+
+        private GUIStyle GetStyleLabel(Color color)
+        {
+            var style = CucuGUI.GetStyleLabel();
+            style.normal.textColor = color;
+            return style;
+        }
+        
+        private GUIStyle GetStyleLogType(LogType type)
+        {
+            var style = CucuGUI.GetStyleLabel();
+            style.alignment = TextAnchor.MiddleCenter;
+            style.fontStyle = FontStyle.Italic;
+            
+            var color = Color.black;
+
+            switch (type)
+            {
+                case LogType.Exception:
+                case LogType.Error:
+                case LogType.Assert:
+                    color = Color.red.LerpTo(Color.black);
+                    break;
+                case LogType.Warning:
+                    color = Color.yellow.LerpTo(Color.black);
+                    break;
+                default:
+                    color = Color.black;
+                    break;
+            }
+
+            style.normal.textColor = color;
+            
+            return style;
+        }
+        
+        private GUIStyle GetStyleLogArea(LogArea area)
+        {
+            var style = CucuGUI.GetStyleLabel();
+            style.alignment = TextAnchor.MiddleRight;
+            style.fontStyle = FontStyle.Italic;
+            
+            var color = Color.black;
+
+            switch (area)
+            {
+                case LogArea.Editor:
+                    color = Color.green.LerpTo(Color.black);
+                    break;
+                case LogArea.Build:
+                    color = Color.gray;
+                    break;
+                case LogArea.File:
+                    color = Color.red.LerpTo(Color.black);
+                    break;
+                case LogArea.Nowhere:
+                    color = Color.white;
+                    break;
+                default:
+                    color = Color.black;
+                    break;
+            }
+
+            style.normal.textColor = color;
+            
+            return style;
         }
     }
 }

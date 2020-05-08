@@ -6,18 +6,24 @@ using UnityEngine;
 
 namespace CucuTools
 {
+    [Serializable]
     public class CucuServiceProvider : ICucuServiceProvider
     {
         public static CucuServiceProvider Global { get; }
 
-        public Guid guid { get; }
-        public string name { get; }
-
+        public Guid guid => _guid;
+        public string name => _name;
         private CucuLogger _logger;
 
         private readonly ConcurrentDictionary<Type, object> _services;
         private readonly ConcurrentDictionary<Type, List<Action<object>>> _actions;
 
+        private string _name;
+        private Guid _guid;
+
+        public string guidString;
+        public string nameString;
+        
         static CucuServiceProvider()
         {
             Global = new CucuServiceProvider("Global");
@@ -25,9 +31,12 @@ namespace CucuTools
 
         public CucuServiceProvider(string name)
         {
-            this.guid = Guid.NewGuid();
-            this.name = name;
+            this._guid = Guid.NewGuid();
+            this._name = name;
 
+            this.nameString = this._name.ToString();
+            this.guidString = this._guid.ToString();
+            
             this._services = new ConcurrentDictionary<Type, object>();
             this._actions = new ConcurrentDictionary<Type, List<Action<object>>>();
 

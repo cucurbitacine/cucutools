@@ -7,6 +7,16 @@ namespace CucuTools.Editor
 {
     internal static class CucuGUI
     {
+        public static GUIStyle GetStyleLabel()
+        {
+            return new GUIStyle(GUI.skin.label);
+        }
+        
+        public static GUIStyle GetStyleButton()
+        {
+            return new GUIStyle(GUI.skin.button);
+        }
+        
         public static Rect[] GetSizedRect(this Rect root, params float[] values)
         {
             return GetRect(root, values);
@@ -79,12 +89,10 @@ namespace CucuTools.Editor
         {
             if (styleButtonFromColorMap.TryGetValue(color, out var style)) return style;
 
-            style = new GUIStyle(GUI.skin.button)
-            {
-                normal = {textColor = Color.black},
-                hover = {textColor = color.SetColorIntensity(0.25f)},
-                active = {textColor = color}
-            };
+            style = GetStyleButton();
+            style.normal.textColor = Color.black;
+            style.hover.textColor = color.SetColorIntensity(0.25f);
+            style.active.textColor = color;
 
             styleButtonFromColorMap.Add(color, style);
 
