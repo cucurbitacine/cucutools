@@ -26,5 +26,10 @@ namespace CucuTools
         {
             Logger.Log(message, tag, tagColor, logType, logArea);
         }
+        
+        public static bool IsValidLayer(LayerMask layerMask, int value)
+        {
+            return (layerMask.value & (1 << value)) > 0;
+        }
     }
 }

@@ -103,6 +103,18 @@ namespace CucuTools
     public class CucuObjectEvent : CucuEventBase<object>
     {
     }
+    
+    /// <inheritdoc />
+    [Serializable]
+    public class CucuColliderEvent : CucuEventBase<Collider>
+    {
+    }
+    
+    /// <inheritdoc />
+    [Serializable]
+    public class CucuCollisionEvent : CucuEventBase<Collision>
+    {
+    }
 
     public interface ICucuEvent<TAction>
     {

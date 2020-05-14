@@ -72,5 +72,25 @@ namespace CucuTools
             matPropBlock.SetFloat(propertyName, value);
             renderer.SetPropertyBlock(matPropBlock);
         }
+
+        public static bool IsValidLayer(this int value, LayerMask layerMask)
+        {
+            return Cucu.IsValidLayer(layerMask, value);
+        }
+
+        public static bool IsValidLayer(this GameObject gameObject, LayerMask layerMask)
+        {
+            return gameObject.layer.IsValidLayer(layerMask);
+        }
+        
+        public static bool IsValidLayer(this Transform transform, LayerMask layerMask)
+        {
+            return transform.gameObject.IsValidLayer(layerMask);
+        }
+        
+        public static bool IsValidLayer(this Component component, LayerMask layerMask)
+        {
+            return component.transform.IsValidLayer(layerMask);
+        }
     }
 }
