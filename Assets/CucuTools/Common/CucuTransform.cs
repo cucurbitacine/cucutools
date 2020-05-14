@@ -66,7 +66,6 @@ namespace CucuTools
     {
         public static Transform Set(this Transform transform, CucuTransform cucu)
         {
-            //return CucuTransform.Set(ref transform, cucu);
             return transform.SetPosition(cucu).SetRotation(cucu).SetScale(cucu);
         }
 

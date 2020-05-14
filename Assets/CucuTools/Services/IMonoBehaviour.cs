@@ -2,14 +2,27 @@
 
 namespace CucuTools
 {
-    public interface IMonoBehaviour
+    public interface IMonoBehaviour : ITransform, IGameObject, IComponentGetter
     {
         string tag { get; set; }
         string name { get; set; }
-        
-        Transform transform { get; }
-        GameObject gameObject { get; }
+        int GetInstanceID();
+        int GetHashCode();
+        string ToString();
+    }
 
+    public interface ITransform
+    {
+        Transform transform { get; }
+    }
+    
+    public interface IGameObject
+    {
+        GameObject gameObject { get; }
+    }
+
+    public interface IComponentGetter
+    {
         bool TryGetComponent(System.Type type, out Component component);
         bool TryGetComponent<T>(out T component);
         
@@ -35,9 +48,5 @@ namespace CucuTools
         T[] GetComponentsInChildren<T>();
         T[] GetComponentsInParent<T>(bool includeInactive);
         T[] GetComponentsInParent<T>();
-
-        int GetInstanceID();
-        int GetHashCode();
-        string ToString();
     }
 }
