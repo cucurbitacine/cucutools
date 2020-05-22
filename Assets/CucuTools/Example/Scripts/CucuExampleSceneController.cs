@@ -7,6 +7,8 @@ namespace CucuTools.Example
 {
     public class CucuExampleSceneController : MonoBehaviour
     {
+#pragma warning disable 0649
+
         [Space] [Header("Camera")] [SerializeField]
         Camera _camera;
 
@@ -34,6 +36,8 @@ namespace CucuTools.Example
         [Space] [Header("Info")] [SerializeField, Range(0, 2000)]
         private int _countObjects = 0;
 
+
+
         private CucuBlendColorGradient blendColor
         {
             get
@@ -57,11 +61,14 @@ namespace CucuTools.Example
         private Color _colorTransformation;
         private CucuTimer _timerColorChanger;
         private CucuTimer _timerCameraRotation;
-
+#pragma warning disable 0414
         private readonly string _COLOR = "_Color";
+#pragma warning restore 0414
         private readonly string _EMISSIONCOLOR = "_EmissionColor";
         private readonly string _OUTLINECOLOR = "_OutlineColor";
 
+#pragma warning restore 0649
+        
         private void Awake()
         {
             Cucu.Log("Welcome to " + "CUCU WORLD".ToColoredString("3caa3c") + "!", "cucurbitacine");

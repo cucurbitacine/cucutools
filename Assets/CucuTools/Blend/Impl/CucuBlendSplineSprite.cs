@@ -34,6 +34,8 @@ namespace CucuTools
 
         public override List<IBlendPin<Sprite>> GetPins()
         {
+            if (_pins == null) _pins = new List<CucuBlendPinSprite>();
+            
             return _useHash
                 ? _hashPins ?? (_hashPins = new List<IBlendPin<Sprite>>(_pins))
                 : (_hashPins = new List<IBlendPin<Sprite>>(_pins));

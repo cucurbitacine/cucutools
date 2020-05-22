@@ -23,6 +23,7 @@ namespace CucuTools
         
         protected override void UpdateEntity()
         {
+            if (_curve == null) _curve = AnimationCurve.Linear(0, 0, 1, 1);
             _value = _valueDefault + _curve.Evaluate(Blend) * _modifier;
         }
     }

@@ -42,6 +42,8 @@ namespace CucuTools
         /// <inheritdoc />
         public override List<IBlendPin<Transform>> GetPins()
         {
+            if (_pins == null) _pins = new List<CucuBlendPinTransform>();
+            
             return _useHash
                 ? _hashPins ?? (_hashPins = new List<IBlendPin<Transform>>(_pins))
                 : (_hashPins = new List<IBlendPin<Transform>>(_pins));

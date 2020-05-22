@@ -6,6 +6,8 @@ namespace CucuTools
 {
     public class CucuTracker : MonoBehaviour, ITracker
     {
+#pragma warning disable 0649
+        
         public Vector3 position =>
             smoothAll && smoothPos && prevPosSmooth.Count > 0
                 ? (prevPosSmooth.Aggregate((res, curr) => res + curr) /
@@ -64,6 +66,8 @@ namespace CucuTools
 
             return new Vector3(x, y, z);
         }
+        
+#pragma warning restore 0649
         
         private void Awake()
         {

@@ -8,10 +8,18 @@ namespace CucuTools
     public abstract class CucuBlendPinConfigEntity<TBlendPin> : ScriptableObject, IBlendPinConfig<TBlendPin>
     {
         /// <inheritdoc />
-        public string Key => _key;
+        public string Key
+        {
+            get => _key;
+            private set => _key = value;
+        }
 
         /// <inheritdoc />
-        public List<TBlendPin> Pins => _pins;
+        public List<TBlendPin> Pins
+        {
+            get => _pins;
+            private set => _pins = value;
+        }
 
         [Header("Key of config")]
         [SerializeField] private string _key;

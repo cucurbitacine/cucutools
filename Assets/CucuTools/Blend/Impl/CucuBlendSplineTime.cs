@@ -40,6 +40,8 @@ namespace CucuTools
 
         public override List<IBlendPin<TimeSpan>> GetPins()
         {
+            if (_pins == null) _pins = new List<CucuBlendPinTime>();
+            
             return _useHash
                 ? _hashPins ??
                   (_hashPins =

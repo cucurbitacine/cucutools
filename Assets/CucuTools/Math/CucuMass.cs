@@ -1,24 +1,34 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 
 namespace CucuTools
 {
     [RequireComponent(typeof(Rigidbody))]
     public class CucuMass : MonoBehaviour, IMass
     {
-        public Rigidbody rigidbody => _rigidbody;
-        
+        public new Rigidbody rigidbody
+        {
+            get => _rigidbody;
+            private set => _rigidbody = value ?? throw new ArgumentNullException("rigidbody");
+        }
+
         public float mass
         {
-            get => rigidbody.mass;
-            set => rigidbody.mass = value;
+            get => rigidbody?.mass ?? throw new ArgumentNullException("rigidbody");
+            set
+            {
+                if (rigidbody == null) throw new ArgumentNullException("rigidbody");
+                rigidbody.mass = value;
+            }
         }
-        
-        [SerializeField] private Rigidbody _rigidbody;
+
+        [SerializeField]
+        private Rigidbody _rigidbody;
 
         private void Awake()
         {
-            if (_rigidbody == null) 
-                _rigidbody = GetComponent<Rigidbody>();
+            if (rigidbody == null)
+                rigidbody = GetComponent<Rigidbody>();
         }
     }
 

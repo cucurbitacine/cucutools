@@ -44,6 +44,8 @@ namespace CucuTools
         /// <inheritdoc />
         public override List<IBlendPin<Color>> GetPins()
         {
+            if (_pins == null) _pins = new List<CucuBlendPinColor>();
+            
             return _useHash
                 ? _hashPins ?? (_hashPins = new List<IBlendPin<Color>>(_pins))
                 : (_hashPins = new List<IBlendPin<Color>>(_pins));

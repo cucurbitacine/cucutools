@@ -34,21 +34,21 @@ namespace CucuTools
 
         #region From editor
 
-        [Header("Active state")] [SerializeField]
-        private bool _active = true;
+        [Header("Active state")] 
+        [SerializeField] private bool _active = true;
 
-        [Space] [Header("Layer mask")] [SerializeField]
-        private LayerMask _layerMask = new LayerMask {value = -1};
+        [Space]
+        [Header("Layer mask")]
+        [SerializeField] private LayerMask _layerMask = new LayerMask {value = -1};
 
-        [Space] [Header("List of registered types from editor")] [SerializeField]
-        private RegCompUnit[] _registeredComponentsOnEnter;
-
+        [Space] [Header("List of registered types from editor")]
+        [SerializeField] private RegCompUnit[] _registeredComponentsOnEnter;
         [SerializeField] private RegCompUnit[] _registeredComponentsOnStay;
         [SerializeField] private RegCompUnit[] _registeredComponentsOnExit;
 
-        [Space] [Header("List of ALL registered types")] [SerializeField]
-        private RegTypeUnit[] _registeredTypesOnEnter;
-
+        [Space]
+        [Header("List of ALL registered types")]
+        [SerializeField] private RegTypeUnit[] _registeredTypesOnEnter;
         [SerializeField] private RegTypeUnit[] _registeredTypesOnStay;
         [SerializeField] private RegTypeUnit[] _registeredTypesOnExit;
 
@@ -203,17 +203,26 @@ namespace CucuTools
 
         private void RegisterComponentsFromEditor()
         {
+            if (_registeredComponentsOnEnter == null) _registeredComponentsOnEnter = new RegCompUnit[0];
+            if (_registeredComponentsOnStay == null) _registeredComponentsOnStay = new RegCompUnit[0];
+            if (_registeredComponentsOnExit == null) _registeredComponentsOnExit = new RegCompUnit[0];
+            
             foreach (var component in _registeredComponentsOnEnter)
                 if (component.Component != null)
-                    RegisterType(component.Component.GetType(), TriggerState.Enter).AddListener(component.Event.Invoke);
+                    RegisterType(component.Component.GetType(), TriggerState.Enter)
+                        .AddListener(component.Event.Invoke);
+
 
             foreach (var component in _registeredComponentsOnStay)
                 if (component.Component != null)
-                    RegisterType(component.Component.GetType(), TriggerState.Stay).AddListener(component.Event.Invoke);
+                    RegisterType(component.Component.GetType(), TriggerState.Stay)
+                        .AddListener(component.Event.Invoke);
+
 
             foreach (var component in _registeredComponentsOnExit)
                 if (component.Component != null)
-                    RegisterType(component.Component.GetType(), TriggerState.Exit).AddListener(component.Event.Invoke);
+                    RegisterType(component.Component.GetType(), TriggerState.Exit)
+                        .AddListener(component.Event.Invoke);
         }
 
         #endregion

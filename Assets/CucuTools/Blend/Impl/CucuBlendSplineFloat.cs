@@ -20,8 +20,7 @@ namespace CucuTools
         private bool _useHash = true;
         
         [Header("Float pins")]
-        [SerializeField]
-        private List<CucuBlendPinFloat> _pins;
+        [SerializeField] private List<CucuBlendPinFloat> _pins;
 
         private List<IBlendPin<float>> _hashPins;
         
@@ -39,6 +38,7 @@ namespace CucuTools
 
         public override List<IBlendPin<float>> GetPins()
         {
+            if (_pins == null) _pins = new List<CucuBlendPinFloat>();
             return _useHash
                 ? _hashPins ?? (_hashPins = new List<IBlendPin<float>>(_pins))
                 : (_hashPins = new List<IBlendPin<float>>(_pins));

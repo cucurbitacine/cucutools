@@ -16,7 +16,7 @@ namespace CucuTools
         [SerializeField] private List<CucuTagArg> args;
         private Guid? _guid;
 
-        [SerializeField] private bool _drawGizmos;
+        [SerializeField] private bool _drawGizmos = false;
 
         public CucuTag SetKey(string key)
         {

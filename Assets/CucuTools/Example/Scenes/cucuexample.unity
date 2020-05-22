@@ -122,6 +122,54 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!1 &1023129241
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1023129243}
+  - component: {fileID: 1023129242}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1023129242
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1023129241}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4af6e337b338741ba9166f0f7fd50af4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  range:
+    value: 85.1
+    limitFirst: 100
+    limitSecond: 2.5
+  t: 85.1
+--- !u!4 &1023129243
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1023129241}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: -1.442425, y: 1.3479128, z: -0.058692396}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 7
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1367409843
 GameObject:
   m_ObjectHideFlags: 0
@@ -184,20 +232,20 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   _camera: {fileID: 2099423052}
   _radiusRotation:
-    _value: 5
-    _minValue: 0
-    _maxValue: 10
+    value: 5
+    limitFirst: 0
+    limitSecond: 10
   _periodRotation:
-    _value: 60
-    _minValue: 0
-    _maxValue: 120
+    value: 60
+    limitFirst: 0
+    limitSecond: 120
   _centerGeneration: {fileID: 1367409844}
   _objectGeneration: {fileID: 3381199169371549134, guid: 41bfda77b8413464c90ae50c2ec53d37,
     type: 3}
   _radiusGeneration:
-    _value: 1
-    _minValue: 0
-    _maxValue: 2
+    value: 1
+    limitFirst: 0
+    limitSecond: 2
   _cubeTransformation: {fileID: 6302064192884141267, guid: 2b7c102631b39d74a87d36021f146a86,
     type: 3}
   _sphereTransformation: {fileID: 1655750518258903856, guid: b0598a5c81ada924aad9ec5f2752f337,
