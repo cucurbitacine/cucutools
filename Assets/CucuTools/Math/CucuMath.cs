@@ -97,6 +97,11 @@ namespace CucuTools
 
     public static class CucuMathExt
     {
+        public static Vector3 Sum(this IEnumerable<Vector3> vectors)
+        {
+            return vectors.Aggregate(Vector3.zero, (current, vector) => current + vector);
+        }
+        
         public static Vector2 XY(this Vector3 a)
         {
             return new Vector2(a.x, a.y);

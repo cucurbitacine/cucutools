@@ -1,11 +1,40 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 namespace CucuTools
 {
     public static class CucuExtensions
     {
+        public static bool IsInterface(this Component component, Type type)
+        {
+            return component?.GetType().GetInterfaces().Contains(type) ?? false;
+        }
+
+        public static bool TryGetInterface(this Component component, Type type, out object result)
+        {
+            result = null;
+            if (!component.IsInterface(type)) return false;
+            result = component;
+            return true;
+        }
+
+        public static bool TryGetInterface(this GameObject gameObject, Type type, out object result)
+        {
+            result = gameObject
+                .GetComponents<Component>()
+                .FirstOrDefault(c => c.IsInterface(type));
+
+            return result != null;
+        }
+
+        public static bool TryGetInterface(this Transform transform, Type type, out object result)
+        {
+            return transform.gameObject.TryGetInterface(type, out result);
+        }
+
         public static bool IsInterface<T>(this Component component) where T : class
         {
             return component?.GetType().GetInterfaces().Contains(typeof(T)) ?? false;
@@ -32,7 +61,7 @@ namespace CucuTools
         {
             return transform.gameObject.TryGetInterface(out result);
         }
-        
+
         public static T GetRandom<T>(this IEnumerable<T> enumerable)
         {
             var array = enumerable.ToArray();
@@ -46,7 +75,7 @@ namespace CucuTools
             renderer.GetPropertyBlock(matPropBlock);
             return matPropBlock.GetColor(propertyName);
         }
-        
+
         public static void SetColorUsePropertyBlock(this Renderer renderer, string propertyName, Color color)
         {
             if (renderer == null) return;
@@ -55,7 +84,7 @@ namespace CucuTools
             matPropBlock.SetColor(propertyName, color);
             renderer.SetPropertyBlock(matPropBlock);
         }
-        
+
         public static float GetFloatUsePropertyBlock(this Renderer renderer, string propertyName)
         {
             if (renderer == null) return 0.0f;
@@ -82,12 +111,12 @@ namespace CucuTools
         {
             return gameObject.layer.IsValidLayer(layerMask);
         }
-        
+
         public static bool IsValidLayer(this Transform transform, LayerMask layerMask)
         {
             return transform.gameObject.IsValidLayer(layerMask);
         }
-        
+
         public static bool IsValidLayer(this Component component, LayerMask layerMask)
         {
             return component.transform.IsValidLayer(layerMask);
