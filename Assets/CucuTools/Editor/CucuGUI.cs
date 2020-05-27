@@ -7,6 +7,10 @@ namespace CucuTools.Editor
 {
     public static class CucuGUI
     {
+        public const string CUCU = "Window/Cucu/";
+        
+
+        
         public static GUIStyle GetStyleLabel()
         {
             return new GUIStyle(GUI.skin.label);
@@ -77,7 +81,7 @@ namespace CucuTools.Editor
 
             var prevColor = GUI.backgroundColor;
             GUI.backgroundColor = backgroundColor.Value;
-
+            
             var result = GUILayout.Button(content, style, options);
 
             GUI.backgroundColor = prevColor;

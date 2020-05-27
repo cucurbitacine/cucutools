@@ -22,14 +22,14 @@ namespace CucuTools.Editor
         private float tW => position.width * 0.40f;
         private float gW => position.width * 0.50f;
 
-        [MenuItem("Window/Cucu/Tags")]
+        private Vector2 scroll;
+
+        [MenuItem(CucuGUI.CUCU + "Tags")]
         public static void ShowWindow()
         {
             GetWindow<CucuTagManagerWindow>("CucuTags");
         }
-
-        private Vector2 scroll;
-
+        
         private void OnGUI()
         {
             if (CucuGUI.Button(_isActive ? "Stop" : "Start", _isActive ? Color.red : Color.green))
