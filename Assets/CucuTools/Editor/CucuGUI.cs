@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace CucuTools.Editor
 {
-    internal static class CucuGUI
+    public static class CucuGUI
     {
         public static GUIStyle GetStyleLabel()
         {
