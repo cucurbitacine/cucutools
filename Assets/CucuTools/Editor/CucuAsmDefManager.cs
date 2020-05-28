@@ -1,8 +1,8 @@
-﻿using System.Collections.Concurrent;
+﻿using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEditor;
-using UnityEditor.AnimatedValues;
 using UnityEditor.Compilation;
 using UnityEngine;
 
@@ -17,26 +17,31 @@ namespace CucuTools.Editor
         private Vector2 scroll;
 
         private float timer = 0.0f;
-        private float duration = 1.0f;
-
-        [MenuItem(CucuGUI.CUCU + "AsmDef")]
+        private string searchField;
+        private int searchType;
+        
+        private static float updateTime = 1f;
+        
+        [MenuItem(CucuGUI.CUCU + "Assembly definitions")]
         public static void ShowWindow()
         {
             GetWindow<CucuAsmDefManager>("Assembly definitions");
         }
 
-        private string searchField;
-
-        private int searchType;
-        
         private void OnGUI()
         {
             UpdateAssemblies();
 
             GUILayout.Space(10);
 
+            ShowUpdateTimeSlider();
+            
+            GUILayout.Space(20);
+
             ShowSearchField();
 
+            if (!(assembliesFiltered?.Any() ?? false)) return;
+            
             GUILayout.Space(10);
 
             ShowHeader();
@@ -90,7 +95,8 @@ namespace CucuTools.Editor
                 return;
             }
 
-            timer = duration;
+            if (updateTime < 1f) updateTime = 1f;
+            timer = updateTime;
 
             assemblies =
                 CompilationPipeline.GetAssemblies(AssembliesType.Player)
@@ -120,6 +126,12 @@ namespace CucuTools.Editor
             }
         }
 
+        private void ShowUpdateTimeSlider()
+        {
+            GUILayout.Label($"Update time : {Math.Round(updateTime, 2)} sec");
+            updateTime = GUILayout.HorizontalSlider(updateTime, 1f, 10f);
+        }
+        
         private void ShowSearchField()
         {
             GUILayout.BeginHorizontal();
@@ -135,9 +147,9 @@ namespace CucuTools.Editor
         private void ShowHeader()
         {
             GUILayout.BeginHorizontal();
-            GUILayout.Label("references By", new GUIStyle() {alignment = TextAnchor.MiddleCenter},
+            GUILayout.Label("References to me", new GUIStyle() {alignment = TextAnchor.MiddleCenter},
                 GUILayout.Width(position.width / 2));
-            GUILayout.Label("references To", new GUIStyle() {alignment = TextAnchor.MiddleCenter},
+            GUILayout.Label("My references to", new GUIStyle() {alignment = TextAnchor.MiddleCenter},
                 GUILayout.Width(position.width / 2));
             GUILayout.EndHorizontal();
         }

@@ -7,9 +7,7 @@ namespace CucuTools.Editor
 {
     public static class CucuGUI
     {
-        public const string CUCU = "Window/Cucu/";
-        
-
+        public const string CUCU = "CucuTools/";
         
         public static GUIStyle GetStyleLabel()
         {
