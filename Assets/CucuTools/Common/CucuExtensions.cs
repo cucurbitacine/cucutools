@@ -121,5 +121,10 @@ namespace CucuTools
         {
             return component.transform.IsValidLayer(layerMask);
         }
+
+        public static bool TryGetLayerName(this int value, out string layerName)
+        {
+            return Cucu.TryGetLayerName(value, out layerName);
+        }
     }
 }

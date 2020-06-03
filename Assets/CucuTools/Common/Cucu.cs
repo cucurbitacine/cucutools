@@ -31,5 +31,22 @@ namespace CucuTools
         {
             return (layerMask.value & (1 << value)) > 0;
         }
+        
+        
+        public static bool TryGetLayerName(int index, out string name)
+        {
+            name = null;
+
+            try
+            {
+                name = LayerMask.LayerToName(index);
+            }
+            catch
+            {
+                return false;
+            }
+
+            return !string.IsNullOrWhiteSpace(name);
+        }
     }
 }

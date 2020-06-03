@@ -18,7 +18,8 @@ namespace CucuTools.Editor
         private DateTime lastUpdate;
         private readonly TimeSpan maxWait = new TimeSpan(0,0,0,2);
         
-        [MenuItem(CucuGUI.CUCU + "Providers manager")]
+        private float waiting;
+        [MenuItem(CucuGUI.CUCU + "Service providers viewer", priority = 1)]
         public static void ShowWindow()
         {
             GetWindow<CucuProviderManager>("Service providers");
@@ -31,6 +32,17 @@ namespace CucuTools.Editor
 
         private void OnGUI()
         {
+            try
+            {
+                OnGUIInternal();
+            }
+            catch
+            {
+            }
+        }
+
+        private void OnGUIInternal()
+        {
             EditorGUILayout.Knob(new Vector2(20f, 20f),
                 waiting, 0f, 1f, "update",
                 Color.green.SetColorIntensity(0.2f), Color.green,
@@ -41,8 +53,6 @@ namespace CucuTools.Editor
             
             ShowProviders(providers, CucuColor.Palettes.Rainbow);
         }
-
-        private float waiting;
         
         private void UpdateProviders()
         {

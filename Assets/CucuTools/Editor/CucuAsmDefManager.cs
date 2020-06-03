@@ -16,7 +16,6 @@ namespace CucuTools.Editor
 
         private Vector2 scroll;
 
-        private float timer = 0.0f;
         private string searchField;
         
         private int searchIdToolbar = 1;
@@ -42,13 +41,24 @@ namespace CucuTools.Editor
         private DateTime lastUpdate;
         private readonly TimeSpan maxWait = new TimeSpan(0,0,0,2);
         
-        [MenuItem(CucuGUI.CUCU + "Assembly definitions")]
+        [MenuItem(CucuGUI.CUCU + "Assembly definitions viewer", priority = 1)]
         public static void ShowWindow()
         {
             GetWindow<CucuAsmDefManager>("Assembly definitions");
         }
 
         private void OnGUI()
+        {
+            try
+            {
+                OnGUIInternal();
+            }
+            catch
+            {
+            }
+        }
+
+        private void OnGUIInternal()
         {
             EditorGUILayout.Knob(new Vector2(20f, 20f),
                 waiting, 0f, 1f, "update",
@@ -78,7 +88,7 @@ namespace CucuTools.Editor
             
             GUILayout.EndScrollView();
         }
-
+        
         private void UpdateAssemblies(CucuColorPalette palette = null)
         {
             if (string.IsNullOrWhiteSpace(searchField))

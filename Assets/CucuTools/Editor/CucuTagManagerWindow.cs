@@ -24,13 +24,24 @@ namespace CucuTools.Editor
 
         private Vector2 scroll;
 
-        [MenuItem(CucuGUI.CUCU + "Tags observer")]
+        [MenuItem(CucuGUI.CUCU + "Cucu tags viewer", priority = 0)]
         public static void ShowWindow()
         {
-            GetWindow<CucuTagManagerWindow>("CucuTags");
+            GetWindow<CucuTagManagerWindow>("Cucu Tags");
         }
         
         private void OnGUI()
+        {
+            try
+            {
+                OnGUIInternal();
+            }
+            catch
+            {
+            }
+        }
+
+        private void OnGUIInternal()
         {
             if (CucuGUI.Button(_isActive ? "Stop" : "Start", _isActive ? Color.red : Color.green))
             {
@@ -44,7 +55,7 @@ namespace CucuTools.Editor
                 ShowTags();
             }
         }
-
+        
         private void ShowHeaderTags()
         {
             GUILayout.Space(20);
