@@ -39,6 +39,26 @@ namespace CucuTools
             return providers.TryGetValue(key, out provider);
         }
 
+        public static bool TryGetProviders(out IEnumerable<CucuServiceProvider> result)
+        {
+            result = null;
+
+            if (providers == null) return false;
+
+            result = providers.Select(s => s.Value);
+            return true;
+        }
+
+        public bool TryGetServices(out Dictionary<Type, object> result)
+        {
+            result = null;
+
+            if (_services == null) return false;
+
+            result = _services.ToDictionary(d => d.Key, d => d.Value);
+            return true;
+        }
+        
         public CucuServiceProvider(string name)
         {
             this._guid = Guid.NewGuid();

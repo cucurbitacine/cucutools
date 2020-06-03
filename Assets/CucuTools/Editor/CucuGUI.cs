@@ -8,17 +8,22 @@ namespace CucuTools.Editor
     public static class CucuGUI
     {
         public const string CUCU = "CucuTools/";
-        
+
         public static GUIStyle GetStyleLabel()
         {
             return new GUIStyle(GUI.skin.label);
         }
-        
+
         public static GUIStyle GetStyleButton()
         {
             return new GUIStyle(GUI.skin.button);
         }
         
+        public static GUIStyle GetStyleBox()
+        {
+            return new GUIStyle(GUI.skin.box);
+        }
+
         public static Rect[] GetSizedRect(this Rect root, params float[] values)
         {
             return GetRect(root, values);
@@ -45,9 +50,12 @@ namespace CucuTools.Editor
 
             return result;
         }
+        
+
+        #region BUTTONS
 
         private static readonly Dictionary<Color, GUIStyle> styleButtonFromColorMap = new Dictionary<Color, GUIStyle>();
-
+        
         public static bool Button(string text, Color? color = null, params GUILayoutOption[] options)
         {
             if (color == null) color = Color.black;
@@ -79,7 +87,7 @@ namespace CucuTools.Editor
 
             var prevColor = GUI.backgroundColor;
             GUI.backgroundColor = backgroundColor.Value;
-            
+
             var result = GUILayout.Button(content, style, options);
 
             GUI.backgroundColor = prevColor;
@@ -100,6 +108,70 @@ namespace CucuTools.Editor
 
             return style;
         }
+
+        #endregion
+
+        #region BOXES
+
+        private static readonly Dictionary<Color, GUIStyle> styleBoxFromColorMap = new Dictionary<Color, GUIStyle>();
+        
+        public static void Box(string text, Color? color = null, params GUILayoutOption[] options)
+        {
+            if (color == null) color = Color.black;
+            BoxColored(new GUIContent(text), GetStyleBoxByColor(color.Value), color.Value, options);
+        }
+
+        public static void Box(string text = "Box", params GUILayoutOption[] options)
+        {
+            Box(text, null, options);
+        }
+
+        public static void Box(GUIContent content, Color? color = null, params GUILayoutOption[] options)
+        {
+            if (color == null) color = Color.black;
+            BoxColored(content, GetStyleBoxByColor(color.Value), color.Value, options);
+        }
+
+        public static void Box(GUIContent content, params GUILayoutOption[] options)
+        {
+            Box(content, null, options);
+        }
+
+        private static void BoxColored(GUIContent content, GUIStyle style, Color? backgroundColor = null,
+            params GUILayoutOption[] options)
+        {
+            if (backgroundColor == null) backgroundColor = GUI.backgroundColor;
+
+            var prevColor = GUI.backgroundColor;
+            GUI.backgroundColor = backgroundColor.Value;
+
+            GUILayout.Box(content, style, options);
+
+            GUI.backgroundColor = prevColor;
+        }
+        
+        private static GUIStyle GetStyleBoxByColor(Color color)
+        {
+            if (styleBoxFromColorMap.TryGetValue(color, out var style)) return style;
+
+            style = GetStyleBox();
+
+            var gray = 0.299f * color.r + 0.587f * color.g + 0.114 * color.b;
+            
+            if (gray < 0.75f)
+                style.normal.textColor = Color.white.LerpTo(color,0.1f);
+            else 
+                style.normal.textColor = Color.black.LerpTo(color,0.1f);
+            
+            style.hover.textColor = color.SetColorIntensity(0.25f);
+            style.active.textColor = color;
+
+            styleBoxFromColorMap.Add(color, style);
+
+            return style;
+        }
+
+        #endregion
     }
 
     internal class DrawUnit

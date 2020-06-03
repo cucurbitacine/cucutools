@@ -18,9 +18,29 @@ namespace CucuTools.Editor
 
         private float timer = 0.0f;
         private string searchField;
-        private int searchType;
         
-        private static float updateTime = 1f;
+        private int searchIdToolbar = 1;
+        private SearchType searchType
+        {
+            get
+            {
+                switch (searchIdToolbar)
+                {
+                    case 0:
+                        return SearchType.OnlyRefsOn;
+                    case 1:
+                        return SearchType.OnlyName;
+                    case 2:
+                        return SearchType.OnlyRefsTo;
+                    default:
+                        throw new Exception("Oops");
+                }
+            }
+        }
+
+        private float waiting;
+        private DateTime lastUpdate;
+        private readonly TimeSpan maxWait = new TimeSpan(0,0,0,2);
         
         [MenuItem(CucuGUI.CUCU + "Assembly definitions")]
         public static void ShowWindow()
@@ -30,20 +50,20 @@ namespace CucuTools.Editor
 
         private void OnGUI()
         {
-            UpdateAssemblies();
-
-            GUILayout.Space(10);
-
-            ShowUpdateTimeSlider();
+            EditorGUILayout.Knob(new Vector2(20f, 20f),
+                waiting, 0f, 1f, "update",
+                Color.green.SetColorIntensity(0.2f), Color.green,
+                false);
+            EditorGUILayout.Separator();
             
-            GUILayout.Space(20);
+            UpdateAssemblies(CucuColor.Palettes.Rainbow);
 
             ShowSearchField();
 
             if (!(assembliesFiltered?.Any() ?? false)) return;
             
             GUILayout.Space(10);
-
+            
             ShowHeader();
 
             GUILayout.Space(10);
@@ -55,33 +75,30 @@ namespace CucuTools.Editor
                 ShowAsmDefMain(assembly);
                 GUILayout.Space(5);
             }
-
-
+            
             GUILayout.EndScrollView();
         }
 
-        private void UpdateAssemblies()
+        private void UpdateAssemblies(CucuColorPalette palette = null)
         {
             if (string.IsNullOrWhiteSpace(searchField))
                 assembliesFiltered = assemblies;
             else
             {
                 assembliesFiltered = assemblies;
-                if (searchType == 0)
+                if (searchType == SearchType.OnlyName)
                 {
                     assembliesFiltered = assembliesFiltered.FindAll(f =>
-                        f.name.ToLower().Contains(searchField.ToLower()) ||
-                        f.refToMe.Any(r => r.name.ToLower().Contains(searchField.ToLower())) ||
-                        f.refTo.Any(r => r.name.ToLower().Contains(searchField.ToLower())));
+                        f.name.ToLower().Contains(searchField.ToLower()));
                 }
                 
-                if (searchType == 1)
+                if (searchType == SearchType.OnlyRefsOn)
                 {
                     assembliesFiltered = assembliesFiltered.FindAll(f =>
                         f.refToMe.Any(r => r.name.ToLower().Contains(searchField.ToLower())));
                 }
                 
-                if (searchType == 2)
+                if (searchType == SearchType.OnlyRefsTo)
                 {
                     assembliesFiltered = assembliesFiltered.FindAll(f =>
                         f.refTo.Any(r => r.name.ToLower().Contains(searchField.ToLower())));
@@ -89,14 +106,16 @@ namespace CucuTools.Editor
                 
             }
 
-            if (timer > 0)
-            {
-                timer -= Time.deltaTime;
-                return;
-            }
+            var now = DateTime.Now;
 
-            if (updateTime < 1f) updateTime = 1f;
-            timer = updateTime;
+            var wait = now.Subtract(lastUpdate);
+
+            waiting = 1f * wait.Ticks / maxWait.Ticks;
+            
+            if (lastUpdate != null && wait.CompareTo(maxWait) < 0)
+                return;
+            
+            lastUpdate = now;
 
             assemblies =
                 CompilationPipeline.GetAssemblies(AssembliesType.Player)
@@ -120,37 +139,50 @@ namespace CucuTools.Editor
                         .Where(notMe => notMe.assembly.assemblyReferences.Contains(asmLinks.assembly)));
             }
 
+            if (palette == null)
+                palette = CucuColor.Palettes.Rainbow;
+            
             for (var i = 0; i < assemblies.Count; i++)
             {
-                assemblies[i].SetColor(CucuColor.Palettes.Rainbow.Get((float) i / (assemblies.Count - 1)));
+                assemblies[i].SetColor(palette.Get((float) i / (assemblies.Count - 1)));
             }
         }
 
-        private void ShowUpdateTimeSlider()
-        {
-            GUILayout.Label($"Update time : {Math.Round(updateTime, 2)} sec");
-            updateTime = GUILayout.HorizontalSlider(updateTime, 1f, 10f);
-        }
-        
         private void ShowSearchField()
         {
-            GUILayout.BeginHorizontal();
-            
-            searchType = GUILayout.Toolbar(searchType, new[] {"All", "To me", "To"}, GUILayout.Width(position.width *0.3f));
+            GUILayout.BeginVertical();
+            {
+                GUILayout.BeginHorizontal();
+                {
+                    GUILayout.Label("", GUILayout.Width(position.width * 0.15f));
+                    GUILayout.Label("Search : ", new GUIStyle() {alignment = TextAnchor.MiddleRight},
+                        GUILayout.Width(position.width * 0.1f));
+                    searchField = GUILayout.TextArea(searchField, GUILayout.Width(position.width * 0.5f));
+                }
+                GUILayout.EndHorizontal();
 
-            GUILayout.Label("Search : ", new GUIStyle() {alignment = TextAnchor.MiddleRight},
-                GUILayout.Width(position.width * 0.1f));
-            searchField = GUILayout.TextArea(searchField, GUILayout.Width(position.width * 0.5f));
-            GUILayout.EndHorizontal();
+                GUILayout.Space(20f);
+
+                searchIdToolbar = GUILayout.Toolbar(searchIdToolbar, new[] {"Dependents", "Name", "Dependencies"});
+            }
+            GUILayout.EndVertical();
         }
 
         private void ShowHeader()
         {
             GUILayout.BeginHorizontal();
-            GUILayout.Label("References to me", new GUIStyle() {alignment = TextAnchor.MiddleCenter},
-                GUILayout.Width(position.width / 2));
-            GUILayout.Label("My references to", new GUIStyle() {alignment = TextAnchor.MiddleCenter},
-                GUILayout.Width(position.width / 2));
+            {
+                var style = new GUIStyle()
+                    {alignment = TextAnchor.MiddleCenter};
+                
+                style.fontStyle = searchType == SearchType.OnlyRefsOn ? FontStyle.Bold : FontStyle.Italic;
+                style.normal.textColor = searchType == SearchType.OnlyRefsOn ? Color.black : Color.gray;
+                GUILayout.Label("Dependents", style, GUILayout.Width(position.width / 2));
+
+                style.fontStyle = searchType == SearchType.OnlyRefsTo ? FontStyle.Bold : FontStyle.Italic;
+                style.normal.textColor = searchType == SearchType.OnlyRefsTo ? Color.black : Color.gray;
+                GUILayout.Label("Dependencies", style, GUILayout.Width(position.width / 2));
+            }
             GUILayout.EndHorizontal();
         }
 
@@ -161,7 +193,6 @@ namespace CucuTools.Editor
 
             if (CucuGUI.Button(asmdef.name, asmdef.color,  GUILayout.Height(20)))
             {
-                //Debug.Log(asmdef.assembly.outputPath);
                 showRefs[asmdef.name] = !show;
             }
 
@@ -177,29 +208,36 @@ namespace CucuTools.Editor
         private void ShowAsmDefRefs(AsmDefLinks assembly)
         {
             GUILayout.BeginHorizontal();
+            {
+                GUILayout.BeginVertical();
+                {
+                    if (assembly.refToMe.Count == 0) GUILayout.Label("", GUILayout.Width(position.width / 2));
+                    foreach (var asmdef in assembly.refToMe)
+                        ShowAsmDefSimple(asmdef);
+                }
+                GUILayout.EndVertical();
 
-            GUILayout.BeginVertical();
-            if (assembly.refToMe.Count == 0)
-                CucuGUI.Button("<empty>", Color.gray, GUILayout.Width(position.width / 2));
-            foreach (var asmdef in assembly.refToMe)
-                ShowAsmDefSimple(asmdef);
-
-            GUILayout.EndVertical();
-
-            GUILayout.BeginVertical();
-            if (assembly.refTo.Count == 0) CucuGUI.Button("<empty>", Color.gray, GUILayout.Width(position.width / 2));
-            foreach (var asmdef in assembly.refTo)
-                ShowAsmDefSimple(asmdef);
-            GUILayout.EndVertical();
+                GUILayout.BeginVertical();
+                {
+                    if (assembly.refTo.Count == 0) GUILayout.Label("", GUILayout.Width(position.width / 2));
+                    foreach (var asmdef in assembly.refTo)
+                        ShowAsmDefSimple(asmdef);
+                }
+                GUILayout.EndVertical();
+            }
             GUILayout.EndHorizontal();
         }
 
         private void ShowAsmDefSimple(AsmDefLinks asmdef)
         {
-            if (CucuGUI.Button(asmdef.name, asmdef.color, GUILayout.Width(position.width / 2)))
-            {
-                //Debug.Log(asmdef.assembly.outputPath);
-            }
+            CucuGUI.Button(asmdef.name, asmdef.color, GUILayout.Width(position.width / 2));
+        }
+
+        private enum SearchType
+        {
+            OnlyName,
+            OnlyRefsOn,
+            OnlyRefsTo,
         }
     }
 
