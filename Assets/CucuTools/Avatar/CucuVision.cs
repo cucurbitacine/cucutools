@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 
@@ -6,6 +7,8 @@ namespace CucuTools
 {
     public class CucuVision : MonoBehaviour
     {
+        public static CucuVision Instance { get; private set; }
+        
         public bool SeeAnything => target.transform != null;
         
         public bool Active
@@ -38,8 +41,9 @@ namespace CucuTools
         
         [Space]
         [SerializeField] private bool active = true;
-        
+
         [Header("Settings")]
+        [SerializeField] private bool isSingleton = true;
         [SerializeField] [Range(0.001f, 1000f)] private float maxDistance = 100f;
         [SerializeField] private LayerMask layerMaskVision;
 
@@ -53,18 +57,12 @@ namespace CucuTools
 
         private void Awake()
         {
-            if (Root == null) Root = transform;
-
-#if UNITY_EDITOR
-            OnTargetChanged.AddListener((prev, curr) =>
+            if (isSingleton)
             {
-                var prevName = "<empty>";
-                var currName = prevName;
-                if (prev != null) prevName = prev.name;
-                if (curr != null) currName = curr.name;
-                Debug.Log($"OnTargetChanged : {prevName} / {currName}");
-            });
-#endif
+                if (Instance == null) Instance = this;
+            }
+            
+            if (Root == null) Root = transform;
         }
 
         private void Update()
@@ -150,6 +148,11 @@ namespace CucuTools
         public Vector3 normal;
         public Transform transform;
 
+        public bool IsThisIt<T>(T component) where T : Component
+        {
+            return transform != null && transform.GetComponents<T>().Any(a => a == component);
+        }
+        
         public static bool operator ==(VisionInfo a, VisionInfo b)
         {
             return a.Equals(b);
