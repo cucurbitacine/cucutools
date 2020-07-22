@@ -45,9 +45,10 @@ namespace CucuTools
         #region Private
 
         private float Gravity => Physics.gravity.y;
-
-        [Header("Settings")]
+        [Space]
         [SerializeField] private bool active = true;
+        
+        [Header("Settings")]
         [SerializeField] private bool canWalk = true;
         [SerializeField] private bool canJump = true;
         [SerializeField] private bool useGravity = true;

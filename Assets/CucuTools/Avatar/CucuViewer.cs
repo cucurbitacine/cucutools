@@ -11,22 +11,20 @@ namespace CucuTools
         public float SensitivityVertical => sensitivityVertical;
 
         #region Serialized fields
-
-        [Header("Settings")] [SerializeField]
-        private bool isActive = true;
-
+        
+        [Space]
+        [SerializeField] private bool active = true;
+        [Header("Settings")]
         [SerializeField] [Range(SENSITIVITY_MIN, SENSITIVITY_MAX)]
         private float sensitivityHorizontal = 2;
-
         [SerializeField] [Range(SENSITIVITY_MIN, SENSITIVITY_MAX)]
         private float sensitivityVertical = 2;
-
         [SerializeField] [Range(0f, 90f)] private float yFieldViewMax = 90f;
         [SerializeField] [Range(-90f, 0f)] private float yFieldViewMin = -90f;
 
-        [Header("References")] [SerializeField] [Tooltip("If is null, get self transform")]
+        [Header("References")]
+        [SerializeField] [Tooltip("If is null, get self transform")]
         private Transform horizontalTransform;
-
         [SerializeField] [Tooltip("If is null, try get child camera or self transform")]
         private Transform verticalTransform;
 
@@ -77,7 +75,7 @@ namespace CucuTools
 
         public void SetActive(bool value)
         {
-            isActive = value;
+            active = value;
         }
 
         private void SetupStartRotation()
@@ -129,7 +127,7 @@ namespace CucuTools
 
         public bool Active
         {
-            get => isActive;
+            get => active;
             set => SetActive(value);
         }
 
