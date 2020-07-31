@@ -35,6 +35,7 @@ namespace CucuTools
         ///   The hotkey to show and hide the console window.
         /// </summary>
         [Header("Ctrl + ")] [SerializeField] private KeyCode _toggleKey = KeyCode.BackQuote;
+        [Header("Try clear Cucu useless log")] [SerializeField] private bool _clearCucuUselessLog = true;
 
         private bool _collapse;
         private Vector2 _scrollPosition;
@@ -115,7 +116,7 @@ namespace CucuTools
                 GUI.contentColor = new Color(0.8f, 0.1f, 0.1f, 1f);
                 var stackTrace = log.StackTrace.Split(new[] {"\n"}, StringSplitOptions.RemoveEmptyEntries);
 
-                if (true)
+                if (_clearCucuUselessLog)
                 {
                     stackTrace = stackTrace
                         .Where(s => 

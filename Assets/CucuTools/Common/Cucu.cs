@@ -4,27 +4,23 @@ namespace CucuTools
 {
     public class Cucu
     {
-        public static readonly CucuLogger Logger;
-        
-        static Cucu()
-        {
-            Logger = CucuLogger.Create()
-                .SetTag(null)
-                .SetType(LogType.Log)
-                .SetArea(LogArea.Application);
-        }
-
         private Cucu()
         {
         }
 
-        public static void Log(object message,
-            string tag = null,
-            Color? tagColor = null,
-            LogType? logType = null,
-            LogArea? logArea = null)
+        public static void Log(object message)
         {
-            Logger.Log(message, tag, tagColor, logType, logArea);
+            CucuLogger.Global.Log(message);
+        }
+        
+        public static void LogWarning(object message)
+        {
+            CucuLogger.Global.LogWarning(message);
+        }
+        
+        public static void LogError(object message)
+        {
+            CucuLogger.Global.LogError(message);
         }
         
         public static bool IsValidLayer(LayerMask layerMask, int value)

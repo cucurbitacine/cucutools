@@ -2,7 +2,6 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 namespace CucuTools
 {
@@ -20,6 +19,7 @@ namespace CucuTools
 
         private readonly ConcurrentDictionary<Type, object> _services =
             new ConcurrentDictionary<Type, object>();
+
         private readonly ConcurrentDictionary<Type, List<Action<object>>> _actions =
             new ConcurrentDictionary<Type, List<Action<object>>>();
 
@@ -58,7 +58,7 @@ namespace CucuTools
             result = _services.ToDictionary(d => d.Key, d => d.Value);
             return true;
         }
-        
+
         public CucuServiceProvider(string name)
         {
             this._guid = Guid.NewGuid();
@@ -82,7 +82,7 @@ namespace CucuTools
         {
             if (_services.ContainsKey(typeof(T)))
             {
-                _logger.Log($"\"{typeof(T).FullName}\" already registered", logType: LogType.Warning);
+                _logger.LogWarning($"\"{typeof(T).FullName}\" already registered");
                 return false;
             }
 
@@ -98,21 +98,20 @@ namespace CucuTools
         {
             if (!_services.TryGetValue(typeof(T), out var ser))
             {
-                _logger.Log($"\"{typeof(T).FullName}\" wasn't found when try unregistering", logType: LogType.Warning);
+                _logger.LogWarning($"\"{typeof(T).FullName}\" wasn't found when try unregistering");
                 return false;
             }
 
             if (ser != service)
             {
-                _logger.Log($"You can't unregistering \"{typeof(T).FullName}\", because services don't match",
-                    logType: LogType.Warning);
+                _logger.LogWarning($"You can't unregistering \"{typeof(T).FullName}\", because services don't match");
                 return false;
             }
 
             if (!_services.TryRemove(typeof(T), out var _s))
             {
-                _logger.Log($"Unregistering \"{typeof(T).FullName}\" failed. Service : \"{_s.GetType().FullName}\"",
-                    logType: LogType.Error);
+                _logger.LogWarning(
+                    $"Unregistering \"{typeof(T).FullName}\" failed. Service : \"{_s.GetType().FullName}\"");
                 return false;
             }
 
@@ -124,15 +123,14 @@ namespace CucuTools
         {
             if (!_services.TryGetValue(typeof(T), out var service))
             {
-                _logger.Log($"\"{typeof(T).FullName}\" wasn't found when try unregistering", logType: LogType.Warning);
+                _logger.LogWarning($"\"{typeof(T).FullName}\" wasn't found when try unregistering");
                 return false;
             }
 
             if (!_services.TryRemove(typeof(T), out var _s))
             {
-                _logger.Log(
-                    $"Unregistering forced \"{typeof(T).FullName}\" failed. Service : \"{_s.GetType().FullName}\"",
-                    logType: LogType.Error);
+                _logger.LogError(
+                    $"Unregistering forced \"{typeof(T).FullName}\" failed. Service : \"{_s.GetType().FullName}\"");
                 return false;
             }
 
@@ -189,7 +187,7 @@ namespace CucuTools
             }
             catch (Exception e)
             {
-                _logger.Log($"{e.Message}", logType: LogType.Error);
+                _logger.LogError($"{e.Message}");
             }
         }
     }

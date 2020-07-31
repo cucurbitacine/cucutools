@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace CucuTools.Editor
 {
-    [CustomPropertyDrawer(typeof(CucuLogger))]
+    //[CustomPropertyDrawer(typeof(CucuLogger))]
     internal class CucuLoggerDrawer : PropertyDrawer
     {
         private readonly DrawUnit u_tag = new DrawUnit(0.382f);

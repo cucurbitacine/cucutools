@@ -76,7 +76,7 @@ namespace CucuTools
         {
             if (hex == null || hex.Length != 6)
             {
-                Cucu.Log($"Not valid hex value \"{hex}\"", "CucuColor", logType: LogType.Warning);
+                CucuLogger.Global.LogWarning($"Not valid hex value \"{hex}\"", "CucuColor");
                 return Color.black;
             }
 
@@ -96,7 +96,7 @@ namespace CucuTools
             }
             catch (Exception e)
             {
-                Cucu.Log($"Exception of parsing hex color : \"{e.Message}\"", "CucuColor", logType: LogType.Warning);
+                CucuLogger.Global.LogWarning($"Exception of parsing hex color : \"{e.Message}\"", "CucuColor");
                 return Color.black;
             }
 

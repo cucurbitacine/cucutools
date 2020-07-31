@@ -105,8 +105,12 @@ namespace CucuTools
 
         private void UpdateInput()
         {
-            horizontalInput = Input.GetAxis("Horizontal");
-            verticalInput = Input.GetAxis("Vertical");
+            horizontalInput = Input.GetKey(KeyCode.A) ? -1f : 0f;
+            horizontalInput += Input.GetKey(KeyCode.D) ? 1f : 0f;
+            verticalInput = Input.GetKey(KeyCode.S) ? -1f : 0f;
+            verticalInput += Input.GetKey(KeyCode.W) ? 1f : 0f;
+            //horizontalInput = Input.GetAxis("Horizontal");
+            //verticalInput = Input.GetAxis("Vertical");
             jumpInput = Input.GetButtonDown("Jump");
         }
 

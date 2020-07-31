@@ -5,22 +5,47 @@ namespace CucuTools
 {
     public enum LogArea
     {
-        Application,
-        Editor,
-        Build,
-        File, // TODO write to file and make binary enum
-        Nowhere
+        Nowhere        = 0x000, // Why am i existing?
+        Editor         = 0x001, // Log only in Editor
+        Build          = 0x010, // Log only in Build
+        File           = 0x100, // Log only in File
+      //EditorAndBuild = 0x011, // Log in Editor & Build
+      //EditorAndFile  = 0x101, // Log in Editor & File
+      //BuildAndFile   = 0x110, // Log in Build  & File
+        Anywhere       = 0x111, // Log anywhere
     }
 
     [Serializable]
     public class CucuLogger
     {
+        #region Static
+
+        public static CucuLogger Global { get; }
+
+        static CucuLogger()
+        {
+            Global = Create();
+        }
+        
+        public static CucuLogger Create()
+        {
+            return new CucuLogger();
+        }
+
+        #endregion
+
+        public Guid Guid { get; }
+        
         private CucuLogger()
         {
-            TagColor = Color.black;
-            Type = LogType.Log;
-            LogArea = LogArea.Application;
+            Guid = Guid.NewGuid();
+            
+            Tag = null;
+            SelectedType = LogType.Log;
+            SelectedArea = LogArea.Editor | LogArea.Build;
         }
+
+        #region Properties
 
         public string Tag
         {
@@ -28,114 +53,131 @@ namespace CucuTools
             private set => _tag = value;
         }
 
-        public Color TagColor
+        public LogType SelectedType
         {
-            get => _tagColor;
-            private set => _tagColor = value;
+            get => _selectedType;
+            private set => _selectedType = value;
         }
 
-        public LogType Type
+        public LogArea SelectedArea
         {
-            get => _type;
-            private set => _type = value;
+            get => _selectedArea;
+            private set => _selectedArea = value;
         }
 
-        public LogArea LogArea
-        {
-            get => _logArea;
-            private set => _logArea = value;
-        }
+        #endregion
+
+        #region SerializeField
 
         [SerializeField] private string _tag;
-        [SerializeField] private Color _tagColor;
-        [SerializeField] private LogType _type;
-        [SerializeField] private LogArea _logArea;
+        [SerializeField] private LogType _selectedType;
+        [SerializeField] private LogArea _selectedArea;
 
-        public static CucuLogger Create()
-        {
-            return new CucuLogger();
-        }
-
-        private static void LogInternal(
+        #endregion
+        
+        public void Log(
             object message,
             string tag,
-            Color tagColor,
             LogType type,
             LogArea logArea)
         {
-            switch (logArea)
-            {
-                case LogArea.Application:
-                    LogInternalLocated(message, tag, tagColor, type);
-                    break;
-                case LogArea.Editor:
 #if UNITY_EDITOR
-                    LogInternalLocated(message, tag, tagColor, type);
+            if ((logArea & LogArea.Editor) != 0)
+                if (!string.IsNullOrWhiteSpace(tag)) Debug.unityLogger.Log(type, tag, message);
+                else Debug.unityLogger.Log(type, message);
 #endif
-                    break;
-                case LogArea.Build:
+
 #if !UNITY_EDITOR
-                    LogInternalLocated(message, tag, tagColor, type);
+            if ((logArea & LogArea.OnlyBuild) != 0)
+                if (!string.IsNullOrWhiteSpace(tag)) Debug.unityLogger.Log(type, tag, message);
+                else Debug.unityLogger.Log(type, message);
 #endif
-                    break;
-                case LogArea.Nowhere:
-                default:
-                    break;
-            }
-
-            void LogInternalLocated(
-                object messageInternal,
-                string tagInternal,
-                Color tagColorInternal,
-                LogType typeInternal)
+            if ((logArea & LogArea.File) != 0)
             {
-                Debug.unityLogger.Log(typeInternal, BuildMessage(messageInternal, tagInternal, tagColorInternal));
+                // TODO log in file
             }
         }
 
-        public CucuLogger SetTag(Color tagColor, string tag = null)
+        #region Log
+
+        public void Log(object message)
         {
-            TagColor = tagColor;
-            if (tag != null) Tag = tag;
-            return this;
+            Log(message, Tag, SelectedType, SelectedArea);
         }
+        
+        public void Log(object message, string tag)
+        {
+            Log(message, tag, SelectedType, SelectedArea);
+        }
+
+        #endregion
+
+        #region LogWarning
+
+        public void LogWarning(object message)
+        {
+            Log(message, Tag, LogType.Warning, SelectedArea);
+        }
+        
+        public void LogWarning(object message, string tag)
+        {
+            Log(message, tag, LogType.Warning, SelectedArea);
+        }
+
+        #endregion
+
+        #region LogError
+
+        public void LogError(object message)
+        {
+            Log(message, Tag, LogType.Error, SelectedArea);
+        }
+        
+        public void LogError(object message, string tag)
+        {
+            Log(message, tag, LogType.Error, SelectedArea);
+        }
+
+        #endregion
+
+        #region Setter
 
         public CucuLogger SetTag(string tag)
         {
+            if (Guid == Global.Guid)
+            {
+                Global.LogWarning("You try change Global CucuLogger");
+                return this;
+            }
+            
             if (tag != null) Tag = tag;
             return this;
         }
 
         public CucuLogger SetType(LogType type)
         {
-            Type = type;
+            if (Guid == Global.Guid)
+            {
+                Global.LogWarning("You try change Global CucuLogger");
+                return this;
+            }
+            
+            SelectedType = type;
             return this;
         }
 
         public CucuLogger SetArea(LogArea logArea)
         {
-            LogArea = logArea;
+            if (Guid == Global.Guid)
+            {
+                Global.LogWarning("You try change Global CucuLogger");
+                return this;
+            }
+            
+            SelectedArea = logArea;
             return this;
         }
 
-        public void Log(
-            object message,
-            string tag = null,
-            Color? tagColor = null,
-            LogType? logType = null,
-            LogArea? logArea = null)
-        {
-            LogInternal(message, tag ?? Tag, tagColor ?? TagColor, logType ?? Type, logArea ?? LogArea);
-        }
-
-        private static string BuildMessage(object message, string tag, Color tagColor)
-        {
-            return BuildTag(tag, tagColor) + message;
-        }
-
-        private static string BuildTag(string text, Color color)
-        {
-            return !string.IsNullOrEmpty(text) ? $"[{text.ToColoredString(color)}] : " : "";
-        }
+        #endregion
     }
 }

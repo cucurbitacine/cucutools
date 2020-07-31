@@ -45,8 +45,9 @@ namespace CucuTools
 #if UNITY_EDITOR
             Active = false;
             Cursor.visible = true;
-#endif
-            
+#else
+            if (Active) Cursor.visible = false;
+#endif            
             SetupStartRotation();
         }
 
