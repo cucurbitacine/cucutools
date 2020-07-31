@@ -1,15 +1,16 @@
 {
   "name": "cucurbitacine.unity.cucutools",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "displayName": "Cucu Tools",
-  "description": "This is an test package",
+  "description": "Various tools to simplify your life",
   "unity": "2019.4",
   "keywords": [
     "unity",
-    "tool"
+    "tool",
+    "tools"
   ],
   "author": {
-    "name": "Cucurbitacine",
+    "name": "Monin Evgeny",
     "email": "monin23.23@yandex.ru",
     "url": "https://github.com/cucurbitacine"
   },
