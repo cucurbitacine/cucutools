@@ -1,17 +1,21 @@
 {
   "name": "com.cucurbitacine.cucutools",
   "version": "0.0.1",
-  "displayName": "Package Example",
-  "description": "This is an example package",
+  "displayName": "Cucu Tools",
+  "description": "This is an test package",
   "unity": "2019.4",
-  "unityRelease": "5f1",
   "keywords": [
-    "cucurbitacine",
-    "cucutools"
+    "unity",
+    "tool"
   ],
   "author": {
-    "name": "cucurbitacine",
+    "name": "Cucurbitacine",
     "email": "monin23.23@yandex.ru",
     "url": "https://github.com/cucurbitacine"
+  },
+  "contributors": [],
+  "homepage": "https://github.com/cucurbitacine/cucutools",
+  "bugs": {
+    "url": "https://github.com/cucurbitacine/cucutools/issues"
   }
 }
