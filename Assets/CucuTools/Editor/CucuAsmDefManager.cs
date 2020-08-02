@@ -41,7 +41,7 @@ namespace CucuTools.Editor
         private DateTime lastUpdate;
         private readonly TimeSpan maxWait = new TimeSpan(0,0,0,2);
         
-        [MenuItem(CucuGUI.CUCU + "Assembly definitions viewer", priority = 1)]
+        [MenuItem(CucuGUI.MenuItemRoot + "Assembly definitions viewer", priority = 1)]
         public static void ShowWindow()
         {
             GetWindow<CucuAsmDefManager>("Assembly definitions");
@@ -66,7 +66,7 @@ namespace CucuTools.Editor
                 false);
             EditorGUILayout.Separator();
             
-            UpdateAssemblies(CucuColor.Palettes.Rainbow);
+            UpdateAssemblies(CucuColorPalette.Rainbow);
 
             ShowSearchField();
 
@@ -150,7 +150,7 @@ namespace CucuTools.Editor
             }
 
             if (palette == null)
-                palette = CucuColor.Palettes.Rainbow;
+                palette = CucuColorPalette.Rainbow;
             
             for (var i = 0; i < assemblies.Count; i++)
             {

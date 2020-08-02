@@ -20,10 +20,10 @@ namespace CucuTools.Editor.NodeWindow
         private Vector2 offset;
         private Vector2 drag;
 
-        [MenuItem(CucuGUI.CUCU + " /Node editor example")]
+        [MenuItem(CucuGUI.MenuItemRoot + "Node editor example")]
         private static void OpenWindow()
         {
-            CucuNodeEditor window = GetWindow<CucuNodeEditor>();
+            var window = GetWindow<CucuNodeEditor>();
             window.titleContent = new GUIContent("Node Based Editor");
         }
 

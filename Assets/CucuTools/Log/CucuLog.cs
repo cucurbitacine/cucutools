@@ -5,14 +5,14 @@ namespace CucuTools
 {
     public enum LogArea
     {
-        Nowhere        = 0x000, // Why am i existing?
-        Editor         = 0x001, // Log only in Editor
-        Build          = 0x010, // Log only in Build
-        File           = 0x100, // Log only in File
-      //EditorAndBuild = 0x011, // Log in Editor & Build
-      //EditorAndFile  = 0x101, // Log in Editor & File
-      //BuildAndFile   = 0x110, // Log in Build  & File
-        Anywhere       = 0x111, // Log anywhere
+        Nowhere = 0, // Why am i existing?
+        Editor = 1 << 0, // Log only in Editor
+        Build = 1 << 1, // Log only in Build
+        File = 1 << 2, // Log only in File
+        EditorAndBuild = Editor | Build, // Log in Editor & Build
+        EditorAndFile = Editor | File, // Log in Editor & File
+        BuildAndFile = Build | File, // Log in Build  & File
+        Anywhere = Editor | Build | File, // Log anywhere
     }
 
     [Serializable]
@@ -26,7 +26,7 @@ namespace CucuTools
         {
             Global = Create();
         }
-        
+
         public static CucuLogger Create()
         {
             return new CucuLogger();
@@ -35,11 +35,11 @@ namespace CucuTools
         #endregion
 
         public Guid Guid { get; }
-        
+
         private CucuLogger()
         {
             Guid = Guid.NewGuid();
-            
+
             Tag = null;
             SelectedType = LogType.Log;
             SelectedArea = LogArea.Editor | LogArea.Build;
@@ -74,7 +74,7 @@ namespace CucuTools
         [SerializeField] private LogArea _selectedArea;
 
         #endregion
-        
+
         public void Log(
             object message,
             string tag,
@@ -88,7 +88,7 @@ namespace CucuTools
 #endif
 
 #if !UNITY_EDITOR
-            if ((logArea & LogArea.OnlyBuild) != 0)
+            if ((logArea & LogArea.Build) != 0)
                 if (!string.IsNullOrWhiteSpace(tag)) Debug.unityLogger.Log(type, tag, message);
                 else Debug.unityLogger.Log(type, message);
 #endif
@@ -104,7 +104,7 @@ namespace CucuTools
         {
             Log(message, Tag, SelectedType, SelectedArea);
         }
-        
+
         public void Log(object message, string tag)
         {
             Log(message, tag, SelectedType, SelectedArea);
@@ -118,7 +118,7 @@ namespace CucuTools
         {
             Log(message, Tag, LogType.Warning, SelectedArea);
         }
-        
+
         public void LogWarning(object message, string tag)
         {
             Log(message, tag, LogType.Warning, SelectedArea);
@@ -132,7 +132,7 @@ namespace CucuTools
         {
             Log(message, Tag, LogType.Error, SelectedArea);
         }
-        
+
         public void LogError(object message, string tag)
         {
             Log(message, tag, LogType.Error, SelectedArea);
@@ -149,7 +149,7 @@ namespace CucuTools
                 Global.LogWarning("You try change Global CucuLogger");
                 return this;
             }
-            
+
             if (tag != null) Tag = tag;
             return this;
         }
@@ -161,7 +161,7 @@ namespace CucuTools
                 Global.LogWarning("You try change Global CucuLogger");
                 return this;
             }
-            
+
             SelectedType = type;
             return this;
         }
@@ -173,7 +173,7 @@ namespace CucuTools
                 Global.LogWarning("You try change Global CucuLogger");
                 return this;
             }
-            
+
             SelectedArea = logArea;
             return this;
         }

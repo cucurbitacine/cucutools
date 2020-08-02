@@ -9,9 +9,34 @@ namespace CucuTools
     /// Timer factory and holder
     /// </summary>
     [DisallowMultipleComponent]
-    public class CucuTimerFactory : MonoBehaviour
+    public class CucuTimerManager : MonoBehaviour
     {
-        private static CucuTimerFactory _instance { get; set; }
+        public static CucuTimerManager Instance
+        {
+            get
+            {
+                lock (m_Lock)
+                {
+                    if (_instance == null)
+                    {
+                        _instance = FindObjectOfType<CucuTimerManager>();
+                        
+                        if (_instance == null)
+                        {
+                            var singletonObject = new GameObject();
+                            _instance = singletonObject.AddComponent<CucuTimerManager>();
+                            singletonObject.name = typeof(CucuTimerManager).ToString() + " (Singleton)";
+                            
+                            DontDestroyOnLoad(singletonObject);
+                        }
+                    }
+ 
+                    return _instance;
+                }
+            }
+        }
+        
+        private static CucuTimerManager _instance { get; set; }
 
         private readonly Dictionary<Guid, CucuInfoTimer> _infoTimers = new Dictionary<Guid, CucuInfoTimer>();
 
@@ -19,16 +44,16 @@ namespace CucuTools
         private List<CucuInfoTimer> _internalActiveTimers;
 
         private float _time;
+        private static object m_Lock = new object();
 
-        static CucuTimerFactory()
+        static CucuTimerManager()
         {
-            DontDestroyOnLoad(new GameObject(nameof(CucuTimerFactory), new[] {typeof(CucuTimerFactory)}));
+            DontDestroyOnLoad(new GameObject(nameof(CucuTimerManager), new[] {typeof(CucuTimerManager)}));
         }
 
         private void Awake()
         {
-            if (_instance != null) Destroy(this);
-            else _instance = this;
+            //if (_instance != null) Destroy(this); else _instance = this;
         }
 
         private void Update()
@@ -45,24 +70,19 @@ namespace CucuTools
 
         #region Public static
 
-        public static CucuTimer Create(string key)
+        public static void RegisterTimer(CucuTimer timer)
         {
-            return _instance.InternalCreate(key);
-        }
-
-        public static CucuTimer Create()
-        {
-            return _instance.InternalCreate();
+            Instance.InternalRegisterTimer(timer);
         }
 
         public static float GetTime()
         {
-            return _instance.InternalGetTime();
+            return Instance.InternalGetTime();
         }
 
         public static float GetTime(Guid guid)
         {
-            return _instance.InternalGetTime(guid);
+            return Instance.InternalGetTime(guid);
         }
 
         public static float GetTime(CucuTimer timer)
@@ -72,42 +92,42 @@ namespace CucuTools
 
         public static bool AddListenerOnStart(Guid guid, Action action)
         {
-            return _instance.InternalAddListenerOnStart(guid, action);
+            return Instance.InternalAddListenerOnStart(guid, action);
         }
 
         public static bool AddListenerOnTick(Guid guid, Action action)
         {
-            return _instance.InternalAddListenerOnTick(guid, action);
+            return Instance.InternalAddListenerOnTick(guid, action);
         }
 
         public static bool AddListenerOnStop(Guid guid, Action action)
         {
-            return _instance.InternalAddListenerOnStop(guid, action);
+            return Instance.InternalAddListenerOnStop(guid, action);
         }
 
         public static bool AddListenerOnForceStop(Guid guid, Action action)
         {
-            return _instance.InternalAddListenerOnForceStop(guid, action);
+            return Instance.InternalAddListenerOnForceStop(guid, action);
         }
 
         public static void StartTimer(Guid guid)
         {
-            _instance.InternalStartTimer(guid);
+            Instance.InternalStartTimer(guid);
         }
 
         public static void StopTimer(Guid guid)
         {
-            _instance.InternalStopTimer(guid);
+            Instance.InternalStopTimer(guid);
         }
 
         public static void ForceStopTimer(Guid guid)
         {
-            _instance.InternalForceStopTimer(guid);
+            Instance.InternalForceStopTimer(guid);
         }
 
         public static bool RemoveTimer(Guid guid)
         {
-            return _instance.InternalRemoveTimer(guid);
+            return Instance.InternalRemoveTimer(guid);
         }
 
         public static bool RemoveTimer(CucuTimer timer)
@@ -115,34 +135,25 @@ namespace CucuTools
             return RemoveTimer(timer.Guid);
         }
 
-        public static void DestroyAfterStop(Guid guid, bool value)
-        {
-            _instance.InternalDestroyAfterStop(guid, value);
-        }
-
         public static void RemoveAllListeners(Guid guid)
         {
-            _instance.InternalRemoveAllListeners(guid);
+            Instance.InternalRemoveAllListeners(guid);
         }
 
         public static void RemoveAllListeners()
         {
-            _instance.InternalRemoveAllListeners();
+            Instance.InternalRemoveAllListeners();
         }
 
         #endregion
 
         #region Private instance
 
-        private CucuTimer InternalCreate(string key = null)
+        private void InternalRegisterTimer(CucuTimer timer)
         {
-            var timer = gameObject.AddComponent<CucuTimer>();
-
             var infoTimer = new CucuInfoTimer(timer);
 
             _infoTimers.Add(infoTimer.Guid, infoTimer);
-
-            return timer.SetKey(key ?? timer.Guid.ToString());
         }
 
         private float InternalGetTime()
@@ -222,11 +233,6 @@ namespace CucuTools
             return _infoTimers.Remove(guid);
         }
 
-        private void InternalDestroyAfterStop(Guid guid, bool value)
-        {
-            if (TryGetTimer(guid, out var timer)) timer.Destroy = value;
-        }
-
         private void InternalRemoveAllListeners(Guid guid)
         {
             if (!TryGetTimer(guid, out var timer)) return;
@@ -267,7 +273,6 @@ namespace CucuTools
                 if (time >= infoTimer.Timer.Duration)
                 {
                     InternalStopTimer(infoTimer.Timer.Guid);
-                    if (infoTimer.Destroy) Destroy(infoTimer.Timer);
                     continue;
                 }
 
@@ -305,7 +310,6 @@ namespace CucuTools
         public float Start;
         public float LastTick;
         public bool Play;
-        public bool Destroy;
 
         private Guid _guid;
         public CucuTimer _timer;

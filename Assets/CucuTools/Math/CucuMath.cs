@@ -7,6 +7,120 @@ namespace CucuTools
 {
     public static class CucuMath
     {
+        #region Simple math
+
+        public static float Sin(this float value)
+        {
+            return Mathf.Sin(value);
+        }
+
+        public static float Cos(this float value)
+        {
+            return Mathf.Cos(value);
+        }
+        
+        public static float Tan(this float value)
+        {
+            return Mathf.Tan(value);
+        }
+        
+        public static float Asin(this float value)
+        {
+            return Mathf.Asin(value);
+        }
+
+        public static float Acos(this float value)
+        {
+            return Mathf.Acos(value);
+        }
+        
+        public static float Atan(this float value)
+        {
+            return Mathf.Atan(value);
+        }
+
+        public static float Clamp01(this float value)
+        {
+            return Mathf.Clamp01(value);
+        }
+        
+        public static float Abs(this float value)
+        {
+            return Mathf.Abs(value);
+        }
+
+        public static float Round(this float value)
+        {
+            return Mathf.Round(value);
+        }
+        
+        public static float Sign(this float value)
+        {
+            return Mathf.Sign(value);
+        }
+        
+        public static float Sqrt(this float value)
+        {
+            return Mathf.Sqrt(value);
+        }
+        
+        public static float Pow(this float value, float power)
+        {
+            return Mathf.Pow(value, power);
+        }
+        
+        public static float Sin(this int value)
+        {
+            return Mathf.Sin(value);
+        }
+
+        public static float Cos(this int value)
+        {
+            return Mathf.Cos(value);
+        }
+        
+        public static float Tan(this int value)
+        {
+            return Mathf.Tan(value);
+        }
+        
+        public static float Asin(this int value)
+        {
+            return Mathf.Asin(value);
+        }
+
+        public static float Acos(this int value)
+        {
+            return Mathf.Acos(value);
+        }
+        
+        public static float Atan(this int value)
+        {
+            return Mathf.Atan(value);
+        }
+
+        public static int Abs(this int value)
+        {
+            return Mathf.Abs(value);
+        }
+
+        public static float Sign(this int value)
+        {
+            return Mathf.Sign(value);
+        }
+        
+        public static float Sqrt(this int value)
+        {
+            return Mathf.Sqrt(value);
+        }
+        
+        public static float Pow(this int value, float power)
+        {
+            return Mathf.Pow(value, power);
+        }
+        
+        #endregion
+        
         public static float[] LinSpace(int count, float origin = 0f, float target = 1f)
         {
             var isForward = count >= 0;
@@ -41,7 +155,7 @@ namespace CucuTools
         {
             return arg =>
             {
-                GetBorderIndex(arg, args, out var iLeftArg, out var iRightArg);
+                GetBorderIndexes(arg, args, out var iLeftArg, out var iRightArg);
 
                 var argsArray = args.ToArray();
                 var leftArg = argsArray[iLeftArg];
@@ -63,8 +177,7 @@ namespace CucuTools
             };
         }
 
-        public static void GetBorderIndex<Targ>(Targ arg, IEnumerable<Targ> args, out int iLeft, out int iRight)
-            where Targ : IComparable
+        public static void GetBorderIndexes<Targ>(Targ arg, IEnumerable<Targ> args, out int iLeft, out int iRight) where Targ : IComparable
         {
             iLeft = -1;
             iRight = -1;

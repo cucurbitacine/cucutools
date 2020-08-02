@@ -19,7 +19,7 @@ namespace CucuTools.Editor
         private readonly TimeSpan maxWait = new TimeSpan(0,0,0,2);
         
         private float waiting;
-        [MenuItem(CucuGUI.CUCU + "Service providers viewer", priority = 1)]
+        [MenuItem(CucuGUI.MenuItemRoot + "Service providers viewer", priority = 1)]
         public static void ShowWindow()
         {
             GetWindow<CucuProviderManager>("Service providers");
@@ -51,7 +51,7 @@ namespace CucuTools.Editor
 
             UpdateProviders();
             
-            ShowProviders(providers, CucuColor.Palettes.Rainbow);
+            ShowProviders(providers, CucuColorPalette.Rainbow);
         }
         
         private void UpdateProviders()

@@ -8,17 +8,6 @@ namespace CucuTools
 {
     public static class CucuColor
     {
-        public enum ColorMap
-        {
-            Rainbow,
-            Jet,
-            Hot,
-            Gray,
-            Yarg,
-        }
-
-        public static readonly ColorMap[] ColorMaps = (ColorMap[]) Enum.GetValues(typeof(ColorMap));
-        
         public static Color SetIntensity(Color color, float intensity)
         {
             intensity = Mathf.Clamp01(intensity);
@@ -57,7 +46,9 @@ namespace CucuTools
 
             return colors.Last();
         }
-
+        
+        #region Extentsions
+        
         public static string ToHex(this Color color)
         {
             var result = "";
@@ -106,137 +97,7 @@ namespace CucuTools
 
             return new Color(r, g, b, 1f);
         }
-
-        public static CucuColorPalette ToColorPalette(this IEnumerable<Color> colors, string name = "")
-        {
-            return new CucuColorPalette(name, colors.ToArray());
-        }
-
-        public static Gradient ToGradient(this CucuColorPalette pallete, GradientMode mode = GradientMode.Blend)
-        {
-            var result = new Gradient {mode = mode};
-
-            var times = CucuMath.LinSpace(8);
-            var colors = times.ToDictionary(t => t, pallete.Get);
-
-            result.colorKeys = times.Select(t => new GradientColorKey(colors[t], t)).ToArray();
-            result.alphaKeys = times.Select(t => new GradientAlphaKey(colors[t].a, t)).ToArray();
-
-            return result;
-        }
-
-        public static Gradient ToGradient(this IEnumerable<Color> colors,
-            string name = "", GradientMode mode = GradientMode.Blend)
-        {
-            return colors.ToColorPalette(name).ToGradient(mode);
-        }
-
-        public static class Palettes
-        {
-            public static readonly CucuColorPalette Rainbow = new CucuColorPalette("Rainbow",
-                new[]
-                {
-                    Color.red,
-                    Color.red.LerpTo(Color.yellow),
-                    Color.yellow,
-                    Color.green,
-                    Color.cyan,
-                    Color.blue,
-                    "CC00FF".ToColor(),
-                });
-
-            public static readonly CucuColorPalette Jet = new CucuColorPalette("Jet",
-                new[]
-                {
-                    new Color(0f, 0f, 0.666f, 1f),
-                    new Color(0f, 0f, 1f, 1f),
-                    new Color(0f, 0.333f, 1f, 1f),
-                    new Color(0f, 0.666f, 1f, 1f),
-                    new Color(0f, 1f, 1f, 1f),
-                    new Color(0.5f, 1f, 0.5f, 1f),
-                    new Color(1f, 1f, 0.0f, 1f),
-                    new Color(1f, 0.666f, 0.0f, 1f),
-                    new Color(1f, 0.333f, 0.0f, 1f),
-                    new Color(1f, 0f, 0.0f, 1f),
-                    new Color(0.666f, 0f, 0.0f, 1f),
-                });
-
-            public static readonly CucuColorPalette Hot = new CucuColorPalette("Hot",
-                new[]
-                {
-                    Color.black,
-                    Color.red,
-                    Color.yellow,
-                    Color.white
-                });
-
-            public static readonly CucuColorPalette Gray = new CucuColorPalette("Gray",
-                new[]
-                {
-                    Color.black,
-                    Color.white,
-                });
-
-            public static readonly CucuColorPalette Yarg = new CucuColorPalette("Yarg",
-                new[]
-                {
-                    Color.white,
-                    Color.black,
-                });
-        }
         
-        public static readonly Dictionary<CucuColor.ColorMap, CucuColorPalette> PaletteMaps =
-            new Dictionary<CucuColor.ColorMap, CucuColorPalette>()
-            {
-                {CucuColor.ColorMap.Rainbow, CucuColor.Palettes.Rainbow},
-                {CucuColor.ColorMap.Jet, CucuColor.Palettes.Jet},
-                {CucuColor.ColorMap.Hot, CucuColor.Palettes.Hot},
-                {CucuColor.ColorMap.Gray, CucuColor.Palettes.Gray},
-                {CucuColor.ColorMap.Yarg, CucuColor.Palettes.Yarg},
-            };
-    }
-
-    public class CucuColorPalette : IColorPalette
-    {
-        public string Name => _name;
-        public Color[] Colors => _colors.ToArray();
-
-        private Color[] _colors;
-        private string _name;
-
-        private readonly Dictionary<float, Color> _bufferedColors = new Dictionary<float, Color>();
-
-        public CucuColorPalette(string name, params Color[] colors)
-        {
-            _name = name;
-            _colors = colors;
-        }
-
-        public CucuColorPalette(params Color[] colors) : this("", colors)
-        {
-        }
-
-        public Color Get(float value)
-        {
-            value = Mathf.Clamp01(value);
-
-            if (_bufferedColors.TryGetValue(value, out var color))
-                return color;
-
-            color = _colors.LerpColor(value);
-            _bufferedColors.Add(value, color);
-
-            return color;
-        }
-    }
-
-    public interface IColorPalette
-    {
-        Color Get(float value);
-    }
-
-    public static class CucuColorExt
-    {
         public static string ToColoredString(this object obj, Color color)
         {
             return $"<color=#{color.ToHex()}>{obj}</color>";
@@ -249,12 +110,12 @@ namespace CucuTools
 
         public static Color LerpTo(this Color color, Color target, float t = 0.5f)
         {
-            return CucuColor.Lerp(color, target, t);
+            return Lerp(color, target, t);
         }
 
         public static Color LerpColor(this float value, params Color[] colors)
         {
-            return CucuColor.Lerp(value, colors);
+            return Lerp(value, colors);
         }
 
         public static Color LerpColor(this IEnumerable<Color> colors, float value)
@@ -264,12 +125,14 @@ namespace CucuTools
 
         public static Color SetColorAlpha(this Color color, float value)
         {
-            return CucuColor.SetAlpha(color, value);
+            return SetAlpha(color, value);
         }
 
         public static Color SetColorIntensity(this Color color, float value)
         {
-            return CucuColor.SetIntensity(color, value);
+            return SetIntensity(color, value);
         }
+
+        #endregion
     }
 }

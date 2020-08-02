@@ -32,7 +32,7 @@ namespace CucuTools.Editor.NodeWindow
             );
 
             if (Handles.Button((inPoint.rect.center + outPoint.rect.center) * 0.5f, Quaternion.identity, 4, 8,
-                Handles.RectangleCap))
+                Handles.RectangleHandleCap))
             {
                 if (OnClickRemoveConnection != null)
                 {

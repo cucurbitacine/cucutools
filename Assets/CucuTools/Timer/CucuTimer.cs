@@ -6,31 +6,32 @@ namespace CucuTools
     /// <summary>
     /// Timer
     /// </summary>
-    public class CucuTimer : MonoBehaviour
+    [Serializable]
+    public class CucuTimer
     {
         public string Key => _key;
 
         public Guid Guid => _guid;
 
-        public static float TimeGlobal => CucuTimerFactory.GetTime();
-        public float TimeLocal => CucuTimerFactory.GetTime(Guid);
+        public static float TimeGlobal => CucuTimerManager.GetTime();
+        public float TimeLocal => CucuTimerManager.GetTime(Guid);
         public float Tick => _tick;
         public float Duration => _duration;
-
-        private float _tick;
-        private float _duration;
-
-        [Header("Key")] [SerializeField] private string _key;
+        
         private Guid _guid;
-
-        private void Awake()
+        
+        [HideInInspector] [SerializeField] private float _tick;
+        [HideInInspector] [SerializeField] private float _duration;
+        
+        [Header("Key")]
+        [SerializeField] private string _key;
+        
+        public CucuTimer(string key = null)
         {
             _guid = Guid.NewGuid();
-        }
-
-        private void OnDestroy()
-        {
-            CucuTimerFactory.RemoveTimer(this);
+            SetKey(key ?? _guid.ToString());
+            
+            CucuTimerManager.RegisterTimer(this);
         }
 
         public CucuTimer SetKey(string key)
@@ -60,68 +61,56 @@ namespace CucuTools
 
         public CucuTimer OnStart(Action action)
         {
-            CucuTimerFactory.AddListenerOnStart(Guid, action);
+            CucuTimerManager.AddListenerOnStart(Guid, action);
 
             return this;
         }
 
         public CucuTimer OnTick(Action action)
         {
-            CucuTimerFactory.AddListenerOnTick(Guid, action);
+            CucuTimerManager.AddListenerOnTick(Guid, action);
 
             return this;
         }
 
         public CucuTimer OnStop(Action action)
         {
-            CucuTimerFactory.AddListenerOnStop(Guid, action);
+            CucuTimerManager.AddListenerOnStop(Guid, action);
 
             return this;
         }
 
         public CucuTimer OnForceStop(Action action)
         {
-            CucuTimerFactory.AddListenerOnForceStop(Guid, action);
+            CucuTimerManager.AddListenerOnForceStop(Guid, action);
 
             return this;
         }
 
         public CucuTimer StartTimer()
         {
-            CucuTimerFactory.StartTimer(Guid);
+            CucuTimerManager.StartTimer(Guid);
 
             return this;
         }
 
         public CucuTimer StopTimer()
         {
-            CucuTimerFactory.StopTimer(Guid);
+            CucuTimerManager.StopTimer(Guid);
 
             return this;
         }
 
         public CucuTimer ForceStopTimer()
         {
-            CucuTimerFactory.ForceStopTimer(Guid);
+            CucuTimerManager.ForceStopTimer(Guid);
 
             return this;
-        }
-
-        public CucuTimer DestroyAfterStop(bool value = true)
-        {
-            CucuTimerFactory.DestroyAfterStop(Guid, value);
-
-            return this;
-        }
-
-        public CucuTimer DontDestroyAfterStop()
-        {
-            return DestroyAfterStop(false);
         }
 
         public CucuTimer RemoveAllListeners()
         {
-            CucuTimerFactory.RemoveAllListeners(Guid);
+            CucuTimerManager.RemoveAllListeners(Guid);
             return this;
         }
     }

@@ -24,7 +24,7 @@ namespace CucuTools.Editor
 
         private Vector2 scroll;
 
-        [MenuItem(CucuGUI.CUCU + "Cucu tags viewer", priority = 0)]
+        [MenuItem(CucuGUI.MenuItemRoot + "Cucu tags viewer", priority = 0)]
         public static void ShowWindow()
         {
             GetWindow<CucuTagManagerWindow>("Cucu Tags");
@@ -81,7 +81,7 @@ namespace CucuTools.Editor
             var countGroup = groupedTags.Count;
             foreach (var groupTags in groupedTags)
             {
-                var color = CucuColor.Palettes.Jet.Get((float) indexGroup / (countGroup - 1));
+                var color = CucuColorPalette.Jet.Get((float) indexGroup / (countGroup - 1));
 
                 if (true || groupTags.Value.Count > 1)
                 {
