@@ -27,22 +27,26 @@ namespace CucuTools
             Global = Create();
         }
 
-        public static CucuLogger Create()
+        public static CucuLogger Create(string tag = null)
         {
-            return new CucuLogger();
+            return new CucuLogger(tag);
         }
-
+        
         #endregion
 
         public Guid Guid { get; }
 
-        private CucuLogger()
+        private CucuLogger(string tag)
         {
             Guid = Guid.NewGuid();
 
-            Tag = null;
+            Tag = tag;
             SelectedType = LogType.Log;
             SelectedArea = LogArea.Editor | LogArea.Build;
+        }
+        
+        private CucuLogger() : this(null)
+        {
         }
 
         #region Properties
