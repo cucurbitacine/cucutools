@@ -7,34 +7,25 @@ using Object = UnityEngine.Object;
 
 namespace CucuTools.Editor
 {
-    [CustomEditor(typeof(Object), true)]
+    [CanEditMultipleObjects]
+    [CustomEditor(typeof(Object), true, isFallback = false)]
     public class CucuInspector : UnityEditor.Editor
     {
         private const string DefaultButtonsGroupName = "Cucu buttons";
-        
-        private IEnumerable<ButtonInfo> buttons;
-        
-        protected virtual void OnEnable()
-        {
-            buttons = GetButtons(target);
-        }
-
-        protected virtual void OnDisable()
-        {
-            buttons = null;
-        }
 
         public override void OnInspectorGUI()
         {
             DrawDefaultInspector();
 
-            DrawButtons();
+            DrawCucuButtons(target);
         }
 
         #region Drawing
 
-        private void DrawButtons()
+        public static void DrawCucuButtons(Object target)
         {
+            var buttons = GetButtons(target);
+            
             if (buttons == null || !buttons.Any()) return;
 
             var grouped = buttons.GroupBy(b => b.attribute.Group).OrderBy(g => g.Min(gr => gr.attribute.Order));
@@ -45,7 +36,7 @@ namespace CucuTools.Editor
                 DrawGroup(target, group, groupName);
             }
         }
-
+        
         private static void DrawGroup(Object target, IEnumerable<ButtonInfo> buttons, string groupName)
         {
             EditorGUILayout.Space();
@@ -118,7 +109,7 @@ namespace CucuTools.Editor
 
         #endregion
         
-        private class ButtonInfo
+        public class ButtonInfo
         {
             public CucuButtonAttribute attribute;
             public MethodInfo method;

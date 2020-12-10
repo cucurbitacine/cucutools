@@ -66,6 +66,20 @@ namespace CucuTools
             get => layerMask;
             set => layerMask = value;
         }
+        
+        /// <inheritdoc />
+        public Transform Origin
+        {
+            get => origin;
+            set => origin = value;
+        }
+
+        /// <inheritdoc />
+        public Transform Forward
+        {
+            get => forward;
+            set => forward = value;
+        }
 
         /// <inheritdoc />
         public virtual bool Raycast(out RaycastHit hit)
@@ -109,17 +123,20 @@ namespace CucuTools
 
                 var color = hasHit ? Color.green : Color.red;
                 Gizmos.color = color;
-                Gizmos.DrawLine(pos, hasHit ? _cachedHitGizmos.point : (pos + forward.forward));
+                Gizmos.DrawLine(pos, hasHit ? _cachedHitGizmos.point : pos + forward.forward * Distance);
 
                 color.a = 0.2f;
                 Gizmos.color = color;
                 Gizmos.DrawSphere(pos, 0.1f);
+                
+                Gizmos.color = Color.yellow;
+                Gizmos.DrawLine(_cachedHitGizmos.point, _cachedHitGizmos.point + _cachedHitGizmos.normal);
             }
             else
             {
                 var color = Color.blue;
                 Gizmos.color = color;
-                Gizmos.DrawLine(pos, pos + forward.forward);
+                Gizmos.DrawLine(pos, pos + forward.forward * Distance);
 
                 color.a = 0.2f;
                 Gizmos.color = color;

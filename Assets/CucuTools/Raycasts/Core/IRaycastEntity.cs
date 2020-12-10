@@ -23,6 +23,16 @@ namespace CucuTools
         LayerMask LayerMask { get; set; }
 
         /// <summary>
+        /// Точка старта луча
+        /// </summary>
+        Transform Origin { get; set; }
+        
+        /// <summary>
+        /// Направление луча (используется forward)
+        /// </summary>
+        Transform Forward { get; set; }
+        
+        /// <summary>
         /// Рейкаст
         /// </summary>
         /// <param name="hit">Информация о "ударе" рейкаста</param>
