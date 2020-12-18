@@ -14,19 +14,23 @@ namespace CucuTools
         
         [Space]
         [SerializeField] private bool active = true;
+        [SerializeField] private bool cursorVisible;
+        
         [Header("Settings")]
-        [SerializeField] [Range(SENSITIVITY_MIN, SENSITIVITY_MAX)]
-        private float sensitivityHorizontal = 2;
-        [SerializeField] [Range(SENSITIVITY_MIN, SENSITIVITY_MAX)]
-        private float sensitivityVertical = 2;
-        [SerializeField] [Range(0f, 90f)] private float yFieldViewMax = 90f;
-        [SerializeField] [Range(-90f, 0f)] private float yFieldViewMin = -90f;
+        [Range(SENSITIVITY_MIN, SENSITIVITY_MAX)]
+        [SerializeField] private float sensitivityHorizontal = 2;
+        [Range(SENSITIVITY_MIN, SENSITIVITY_MAX)]
+        [SerializeField] private float sensitivityVertical = 2;
+        [Range(0f, 90f)]
+        [SerializeField] private float yFieldViewMax = 90f;
+        [Range(-90f, 0f)]
+        [SerializeField] private float yFieldViewMin = -90f;
 
         [Header("References")]
-        [SerializeField] [Tooltip("If is null, get self transform")]
-        private Transform horizontalTransform;
-        [SerializeField] [Tooltip("If is null, try get child camera or self transform")]
-        private Transform verticalTransform;
+        [Tooltip("If is null, get self transform")]
+        [SerializeField] private Transform horizontalTransform;
+        [Tooltip("If is null, try get child camera or self transform")]
+        [SerializeField] private Transform verticalTransform;
 
         #endregion
         
@@ -41,13 +45,9 @@ namespace CucuTools
                 SetHorizontalTransform(transform);
             if (verticalTransform == null)
                 SetVerticalTransform(GetComponentInChildren<Camera>()?.transform ?? transform);
-            
-#if UNITY_EDITOR
-            Active = false;
-            Cursor.visible = true;
-#else
-            if (Active) Cursor.visible = false;
-#endif            
+
+            Cursor.lockState = CursorLockMode.Confined;
+
             SetupStartRotation();
         }
 
@@ -156,6 +156,8 @@ namespace CucuTools
         {
             if (!Active) return;
             
+            Cursor.visible = cursorVisible;
+            
             UpdateRotation(deltaTime);
         }
 
@@ -163,11 +165,6 @@ namespace CucuTools
         {
             mouseXInput = Input.GetAxis("Mouse X");
             mouseYInput = Input.GetAxis("Mouse Y");
-            
-#if UNITY_EDITOR
-            Active = Input.GetButton("Fire2");
-            Cursor.visible = !Active;
-#endif
         }
 
         private void UpdateRotation(float deltaTime)

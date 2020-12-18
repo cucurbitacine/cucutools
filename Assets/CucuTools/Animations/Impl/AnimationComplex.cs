@@ -169,6 +169,11 @@ namespace CucuTools
                 .Where(c => c != this && c.transform.parent == transform).ToArray();
         }
 
+        private void Start()
+        {
+            Default();
+        }
+
         private void Update()
         {
             if (Playing)

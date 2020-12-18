@@ -147,8 +147,6 @@ namespace CucuTools
             Validate();
             
             OnAwake();
-            
-            Default();
         }
 
         private void OnValidate()

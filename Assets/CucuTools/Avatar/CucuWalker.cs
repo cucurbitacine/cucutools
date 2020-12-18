@@ -1,9 +1,10 @@
-﻿using UnityEngine;
+﻿using System;
+using UnityEngine;
 using UnityEngine.Events;
 
 namespace CucuTools
 {
-    [RequireComponent(typeof(CharacterController))]
+    //[RequireComponent(typeof(CharacterController))]
     public class CucuWalker : MonoBehaviour
     {
         #region Public
@@ -70,26 +71,6 @@ namespace CucuTools
 
         #endregion
 
-        #region MonoBehaviour
-
-        private void Awake()
-        {
-            character = GetComponent<CharacterController>();
-        }
-
-        private void Update()
-        {
-            UpdateInput();
-
-            UpdateMovements(Time.deltaTime);
-
-#if UNITY_EDITOR
-            UpdateInfo();
-#endif
-        }
-
-        #endregion
-
         #region Update methods
 
         private void UpdateMovements(float deltaTime)
@@ -114,6 +95,19 @@ namespace CucuTools
             jumpInput = Input.GetButtonDown("Jump");
         }
 
+        [SerializeField] private Transform head;
+        [SerializeField, Range(0f, 3f)] private float headRelativeOffset = 1f;
+        private void UpdateCharacter()
+        {
+            if (character == null) return;
+            character.center = Vector3.up * character.height / 2f;
+
+            if (head == null) return;
+            var lp = head.localPosition;
+            lp.y = character.height * headRelativeOffset;
+            head.localPosition = lp;
+        }
+        
         private void UpdateInfo()
         {
             inputInfo = new Vector2(horizontalInput, verticalInput);
@@ -152,6 +146,33 @@ namespace CucuTools
             }
 
             return Vector3.up * velocityY;
+        }
+
+        #endregion
+        
+        #region MonoBehaviour
+
+        private void Awake()
+        {
+            //character = GetComponent<CharacterController>();
+        }
+
+        private void Update()
+        {
+            UpdateCharacter();
+            
+            UpdateInput();
+
+            UpdateMovements(Time.deltaTime);
+
+#if UNITY_EDITOR
+            UpdateInfo();
+#endif
+        }
+
+        private void OnValidate()
+        {
+            UpdateCharacter();
         }
 
         #endregion
