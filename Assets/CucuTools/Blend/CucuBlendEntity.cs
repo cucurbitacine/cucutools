@@ -16,8 +16,8 @@ namespace CucuTools
         /// <inheritdoc />
         public float Blend
         {
-            get => _blend;
-            private set => _blend = value;
+            get => blend;
+            private set => blend = value;
         }
 
         /// <summary>
@@ -26,10 +26,10 @@ namespace CucuTools
         [Header("Blend value")]
         [Range(0f, 1f)]
         [SerializeField]
-        private float _blend;
+        private float blend;
 
         /// <inheritdoc />
-        public void SetBlend(float blend)
+        public void Lerp(float blend)
         {
             Blend = blend;
             UpdateEntity();

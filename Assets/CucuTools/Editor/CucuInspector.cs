@@ -17,11 +17,11 @@ namespace CucuTools.Editor
         {
             DrawDefaultInspector();
 
-            DrawCucuButtons(target);
+            DrawCucuButtons(targets);
         }
 
         #region Drawing
-
+/*
         public static void DrawCucuButtons(Object target)
         {
             var buttons = GetButtons(target);
@@ -35,18 +35,35 @@ namespace CucuTools.Editor
                 var groupName = string.IsNullOrEmpty(group.Key) ? DefaultButtonsGroupName : group.Key;
                 DrawGroup(target, group, groupName);
             }
-        }
+        }*/
         
-        private static void DrawGroup(Object target, IEnumerable<ButtonInfo> buttons, string groupName)
+
+
+        public static void DrawCucuButtons(params Object[] targets)
+        {
+            var buttons = GetButtons(targets);
+            
+            if (buttons == null || !buttons.Any()) return;
+
+            var grouped = buttons.GroupBy(b => b.attribute.Group).OrderBy(g => g.Min(gr => gr.attribute.Order));
+
+            foreach (var group in grouped)
+            {
+                var groupName = string.IsNullOrEmpty(group.Key) ? DefaultButtonsGroupName : group.Key;
+                DrawGroup(group, groupName, targets);
+            }
+        }
+
+        private static void DrawGroup(IEnumerable<ButtonInfo> buttons, string groupName, params Object[] targets)
         {
             EditorGUILayout.Space();
             EditorGUILayout.LabelField(groupName, GetHeaderGUIStyle());
 
             foreach (var button in buttons.OrderBy(b => b.attribute.Order))
-                DrawButton(target, button);
+                DrawButton(button, targets);
         } 
         
-        private static void DrawButton(Object target, ButtonInfo button)
+        private static void DrawButton(ButtonInfo button, params Object[] targets)
         {
             var attribute = button.attribute;
             var method = button.method;
@@ -62,7 +79,10 @@ namespace CucuTools.Editor
 
                 if (GUILayout.Button(buttonName, GetButtonGUIStyle()))
                 {
-                    method.Invoke(target, null);
+                    foreach (var target in targets)
+                    {
+                        method.Invoke(target, null);                        
+                    }
                 }
             }
             finally
@@ -75,16 +95,16 @@ namespace CucuTools.Editor
 
         #region Getter
 
-        private static IEnumerable<MethodInfo> GetButtonMethods(object target)
+        private static IEnumerable<MethodInfo> GetButtonMethods(params Object[] targets)
         {
-            return target?.GetType()
+            return targets.SelectMany(t => t.GetType()
                 .GetMethods(BindingFlags.Instance | BindingFlags.Static | BindingFlags.NonPublic | BindingFlags.Public)
-                .Where(m => m.GetCustomAttributes(typeof(CucuButtonAttribute), true).Length > 0);
+                .Where(m => m.GetCustomAttributes(typeof(CucuButtonAttribute), true).Length > 0));
         }
         
-        private static IEnumerable<ButtonInfo> GetButtons(object target)
+        private static IEnumerable<ButtonInfo> GetButtons(params Object[] targets)
         {
-            var methods = GetButtonMethods(target)
+            var methods = GetButtonMethods(targets)
                 .Where(m => m.GetParameters().All(p => p.IsOptional));
 
             return methods.Select(m => new ButtonInfo(m)).Where(b => b.attribute != null);

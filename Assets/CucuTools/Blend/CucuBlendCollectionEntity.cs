@@ -30,7 +30,7 @@ namespace CucuTools
 
                 if (Mathf.Abs(cucuBlendEntity.Blend - blend) <= float.Epsilon) return;
                 
-                cucuBlendEntity.SetBlend(blend);
+                cucuBlendEntity.Lerp(blend);
             }
 
             [Serializable]

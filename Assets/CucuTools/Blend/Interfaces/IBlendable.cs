@@ -6,11 +6,6 @@ namespace CucuTools
     public interface IBlendable
     {
         /// <summary>
-        /// Key of blend entity
-        /// </summary>
-        string Key { get; }
-        
-        /// <summary>
         /// Blend value, between 0.0 and 1.0
         /// </summary>
         float Blend { get; }
@@ -18,6 +13,6 @@ namespace CucuTools
         /// <summary>
         /// Set blend value
         /// </summary>
-        void SetBlend(float blend);
+        void Lerp(float blend);
     }
 }
