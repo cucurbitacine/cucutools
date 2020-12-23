@@ -9,7 +9,7 @@ namespace CucuTools
         [SerializeField] private Gradient gradient;
         
         [Header("References")]
-        [SerializeField] private Image target;
+        [SerializeField] private SpriteRenderer target;
 
         protected override void LerpInternal(float t)
         {
@@ -20,7 +20,7 @@ namespace CucuTools
         {
             base.Validate();
             
-            if (target == null) target = GetComponent<Image>();
+            if (target == null) target = GetComponent<SpriteRenderer>();
         }
         
         private Color GetColor(float t)

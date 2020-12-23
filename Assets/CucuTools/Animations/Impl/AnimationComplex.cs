@@ -113,6 +113,11 @@ namespace CucuTools
             }
         }
 
+        protected override void OnStart()
+        {
+            Default();
+        }
+
         protected override void Validate()
         {
             base.Validate();
@@ -168,11 +173,7 @@ namespace CucuTools
             animations = GetComponentsInChildren<CucuAnimationEntity>()
                 .Where(c => c != this && c.transform.parent == transform).ToArray();
         }
-
-        private void Start()
-        {
-            Default();
-        }
+        
 
         private void Update()
         {

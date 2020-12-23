@@ -46,8 +46,9 @@ namespace CucuTools
         [SerializeField] private bool playing;
         [SerializeField, Min(0f)] private float currentTime;
         [SerializeField, Range(0f, 1f)] protected float progressDisplay;
-        
+
         [Header("Settings")]
+        [SerializeField] private bool autoStart;
         [SerializeField, Min(0f)] private float animationTime;
         [SerializeField, Range(0f, 10f)] private float animationTimeScale = 1f;
         
@@ -132,6 +133,11 @@ namespace CucuTools
             
         }
         
+        protected virtual void OnStart()
+        {
+            
+        }
+        
         protected virtual void Validate()
         {
             AnimationTimeScale = AnimationTimeScale;
@@ -149,6 +155,13 @@ namespace CucuTools
             OnAwake();
         }
 
+        private void Start()
+        {
+            OnStart();
+            
+            if (autoStart) StartAnimation();
+        }
+        
         private void OnValidate()
         {
             Validate();
