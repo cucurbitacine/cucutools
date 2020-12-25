@@ -1,4 +1,3 @@
-using System;
 using UnityEngine;
 
 namespace CucuTools
@@ -29,10 +28,10 @@ namespace CucuTools
 
         private void OnDrawGizmosSelected()
         {
-            var localPosition = Application.isPlaying ? _localPosition : target.localPosition;
-
-            var p0 = target.TransformPoint(localPosition + start);
-            var p1 = target.TransformPoint(localPosition + finish);
+            if (Application.isPlaying) return;
+            
+            var p0 = target.position + target.TransformDirection(start) * start.magnitude;
+            var p1 = target.position + target.TransformDirection(finish) * finish.magnitude;
 
             Gizmos.DrawLine(p0, p1);
         }
