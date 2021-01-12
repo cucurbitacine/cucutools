@@ -1,7 +1,7 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
-namespace CucuTools.Editor
+namespace CucuTools.Editor.Drawers
 {
     [CustomPropertyDrawer(typeof(CucuTagArg))]
     internal class CucuTagArgDrawer : PropertyDrawer

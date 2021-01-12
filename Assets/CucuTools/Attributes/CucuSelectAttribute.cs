@@ -2,11 +2,11 @@ using UnityEngine;
 
 namespace CucuTools
 {
-    public class SelectStringAttribute : PropertyAttribute
+    public class CucuSelectAttribute : PropertyAttribute
     {
         protected string[] strings;
         
-        public SelectStringAttribute(params string[] strings)
+        public CucuSelectAttribute(params string[] strings)
         {
             this.strings = strings;
         }

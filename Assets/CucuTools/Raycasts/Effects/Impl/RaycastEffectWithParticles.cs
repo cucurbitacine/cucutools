@@ -94,14 +94,4 @@ namespace CucuTools
         public bool atHitPoint;
         public NormalDirection normalDirection;
     }
-
-    [CanEditMultipleObjects]
-    [CustomEditor(typeof(RaycastEffectWithParticles), true)]
-    public class RaycastEffectWithParticlesEditor : Editor
-    {
-        public override void OnInspectorGUI()
-        {
-            DrawDefaultInspector();
-        }
-    }
 }

@@ -1,7 +1,7 @@
 ﻿using UnityEditor;
 using UnityEngine;
 
-namespace CucuTools.Editor
+namespace CucuTools.Editor.Drawers
 {
     [CustomPropertyDrawer(typeof(CucuServiceProvider))]
     public class CucuProviderDrawer : PropertyDrawer

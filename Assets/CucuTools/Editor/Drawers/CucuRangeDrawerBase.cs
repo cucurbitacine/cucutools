@@ -2,7 +2,7 @@
 using UnityEditor;
 using UnityEngine;
 
-namespace CucuTools.Editor
+namespace CucuTools.Editor.Drawers
 {
     internal abstract class CucuRangeDrawerBase : PropertyDrawer
     {

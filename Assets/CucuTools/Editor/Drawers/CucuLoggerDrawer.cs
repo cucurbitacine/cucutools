@@ -3,7 +3,7 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace CucuTools.Editor
+namespace CucuTools.Editor.Drawers
 {
     [CustomPropertyDrawer(typeof(CucuLogger))]
     internal class CucuLoggerDrawer : PropertyDrawer

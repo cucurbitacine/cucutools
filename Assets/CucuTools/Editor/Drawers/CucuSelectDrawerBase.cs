@@ -4,10 +4,10 @@ using System.Linq;
 using UnityEditor;
 using UnityEngine;
 
-namespace CucuTools.Editor
+namespace CucuTools.Editor.Drawers
 {
-    public abstract class SelectStringDrawerBase<T> : PropertyDrawer
-        where T : SelectStringAttribute
+    public abstract class CucuSelectDrawerBase<T> : PropertyDrawer
+        where T : CucuSelectAttribute
     {
         private Dictionary<string, int> _strings;
 
