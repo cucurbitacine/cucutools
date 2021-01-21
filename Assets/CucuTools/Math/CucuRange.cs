@@ -29,7 +29,7 @@ namespace CucuTools
         [Space] [SerializeField] private T limitFirst;
         [SerializeField] private T limitSecond;
 
-        public CucuRange<T> SetBorder(T first, T second)
+        public CucuRange<T> SetEdges(T first, T second)
         {
             limitFirst = first;
             limitSecond = second;
@@ -121,7 +121,7 @@ namespace CucuTools
 
         public CucuRangeFloat(float min, float max, float value)
         {
-            SetBorder(min, max);
+            SetEdges(min, max);
             Value = value;
         }
 
@@ -220,7 +220,7 @@ namespace CucuTools
 
         public CucuRangeInt(int min, int max, int value)
         {
-            SetBorder(min, max);
+            SetEdges(min, max);
             Value = value;
         }
 
