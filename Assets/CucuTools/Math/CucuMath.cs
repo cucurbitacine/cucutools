@@ -286,6 +286,14 @@ namespace CucuTools
         }
         
         #endregion
+
+        /// <summary>
+        /// If t = a return 0f; if t = b return 1f 
+        /// </summary>
+        public static float GetLerpValue(float t, float a = 0f, float b = 1f)
+        {
+            return a != b ? (t - a) / (b - a) : 0f;
+        }
     }
 
     public static class CucuMathExt

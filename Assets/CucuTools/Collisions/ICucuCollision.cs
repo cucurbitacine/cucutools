@@ -13,7 +13,7 @@ namespace CucuTools
         /// <summary>
         /// Active state
         /// </summary>
-        bool Active { get; set; }
+        bool IsEnabled { get; set; }
         
         /// <summary>
         /// Layer mask of collision
@@ -25,7 +25,7 @@ namespace CucuTools
         /// </summary>
         /// <param name="value">New active state</param>
         /// <returns>Current implementation</returns>
-        TImpl SetActive(bool value);
+        TImpl SetEnable(bool value);
         
         /// <summary>
         /// Set layer mask

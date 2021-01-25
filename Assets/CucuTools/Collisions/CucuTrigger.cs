@@ -8,10 +8,10 @@ namespace CucuTools
     public class CucuTrigger : ICucuCollision<CucuTrigger, Collider>
     {
         /// <inheritdoc />
-        public bool Active
+        public bool IsEnabled
         {
-            get => triggerBehaviour != null && triggerBehaviour.Active;
-            set => SetActive(value);
+            get => triggerBehaviour != null && triggerBehaviour.IsEnabled;
+            set => SetEnable(value);
         }
 
         /// <inheritdoc />
@@ -33,9 +33,9 @@ namespace CucuTools
         }
 
         /// <inheritdoc />
-        public CucuTrigger SetActive(bool value)
+        public CucuTrigger SetEnable(bool value)
         {
-            triggerBehaviour.SetActive(value);
+            triggerBehaviour.SetEnable(value);
             return this;
         }
 

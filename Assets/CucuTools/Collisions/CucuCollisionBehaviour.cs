@@ -11,10 +11,10 @@ namespace CucuTools
         #region Public
         
         /// <inheritdoc />
-        public bool Active
+        public bool IsEnabled
         {
-            get => active;
-            set => SetActive(value);
+            get => isEnabled;
+            set => SetEnable(value);
         }
 
         /// <inheritdoc />
@@ -33,7 +33,7 @@ namespace CucuTools
         #region From editor
 
         [Header("Active state")]
-        [SerializeField] private bool active = true;
+        [SerializeField] private bool isEnabled = true;
 
         [Header("Layer mask")]
         [SerializeField] private LayerMask layerMask = new LayerMask {value = 0};
@@ -59,7 +59,7 @@ namespace CucuTools
 
         private void OnCollisionEnter(Collision other)
         {
-            if (!Active) return; 
+            if (!IsEnabled) return; 
 
             if (!other.gameObject.IsValidLayer(LayerMask)) return;
             
@@ -69,7 +69,7 @@ namespace CucuTools
         
         private void OnCollisionStay(Collision other)
         {
-            if (!Active) return; 
+            if (!IsEnabled) return; 
 
             if (!other.gameObject.IsValidLayer(LayerMask)) return;
             
@@ -79,7 +79,7 @@ namespace CucuTools
         
         private void OnCollisionExit(Collision other)
         {
-            if (!Active) return; 
+            if (!IsEnabled) return; 
 
             if (!other.gameObject.IsValidLayer(LayerMask)) return;
             
@@ -92,9 +92,9 @@ namespace CucuTools
         #region ICucuCollision
 
         /// <inheritdoc />
-        public CucuCollisionBehaviour SetActive(bool value = true)
+        public CucuCollisionBehaviour SetEnable(bool value = true)
         {
-            Active = value;
+            IsEnabled = value;
             return this;
         }
         
