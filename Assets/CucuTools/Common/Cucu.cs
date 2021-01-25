@@ -4,6 +4,8 @@ namespace CucuTools
 {
     public class Cucu
     {
+        public const string MenuRoot = "CucuTools/";
+        
         private Cucu()
         {
         }

@@ -294,6 +294,28 @@ namespace CucuTools
         {
             return a != b ? (t - a) / (b - a) : 0f;
         }
+
+        public static float GetLerpEdges<T>(float lerpValue, out int iLeft, out int iRight, params LerpPoint<T>[] points)
+        {
+            GetEdges(lerpValue, out iLeft, out iRight, points.Select(p => p.T));
+            
+            if (iLeft < 0 && iRight >= 0)
+            {
+                return 0f;
+            }
+            
+            if (iRight < 0 && iLeft >= 0)
+            {
+                return 1f;
+            }
+
+            return GetLerpValue(lerpValue, points[iLeft].T, points[iRight].T);
+        }
+
+        public static float GetLerpEdges<T>(float lerpValue, out int iLeft, out int iRight, IEnumerable<LerpPoint<T>> points)
+        {
+            return GetLerpEdges(lerpValue, out iLeft, out iRight, points.ToArray());
+        }
     }
 
     public static class CucuMathExt
