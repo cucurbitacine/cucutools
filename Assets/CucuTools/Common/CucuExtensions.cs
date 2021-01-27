@@ -8,11 +8,27 @@ namespace CucuTools
 {
     public static class CucuExtensions
     {
+        #region Random
+
+        public static T GetRandom<T>(this IEnumerable<T> enumerable)
+        {
+            return GetRandom(enumerable.ToArray());
+        }
+
+        public static T GetRandom<T>(params T[] array)
+        {
+            return array == null ? default : array[Random.Range(0, array.Length)];
+        }
+
+        #endregion
+        
+        #region Interfaces
+
         public static bool IsInterface(this Component component, Type type)
         {
             return component?.GetType().GetInterfaces().Contains(type) ?? false;
         }
-
+        
         public static bool TryGetInterface(this Component component, Type type, out object result)
         {
             result = null;
@@ -62,11 +78,9 @@ namespace CucuTools
             return transform.gameObject.TryGetInterface(out result);
         }
 
-        public static T GetRandom<T>(this IEnumerable<T> enumerable)
-        {
-            var array = enumerable.ToArray();
-            return array[Random.Range(0, array.Length)];
-        }
+        #endregion
+
+        #region PropertyBlock
 
         public static Color GetColorUsePropertyBlock(this Renderer renderer, string propertyName)
         {
@@ -102,6 +116,10 @@ namespace CucuTools
             renderer.SetPropertyBlock(matPropBlock);
         }
 
+        #endregion
+
+        #region Layers
+
         public static bool IsValidLayer(this int value, LayerMask layerMask)
         {
             return Cucu.IsValidLayer(layerMask, value);
@@ -126,5 +144,7 @@ namespace CucuTools
         {
             return Cucu.TryGetLayerName(value, out layerName);
         }
+
+        #endregion
     }
 }

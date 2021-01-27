@@ -5,26 +5,12 @@ namespace CucuTools
     public class Cucu
     {
         public const string MenuRoot = "CucuTools/";
+        public const string MenuCreateRoot = "GameObject/" + Cucu.MenuRoot + "Create/";
         
         private Cucu()
         {
         }
 
-        public static void Log(object message)
-        {
-            CucuLogger.Global.Log(message);
-        }
-        
-        public static void LogWarning(object message)
-        {
-            CucuLogger.Global.LogWarning(message);
-        }
-        
-        public static void LogError(object message)
-        {
-            CucuLogger.Global.LogError(message);
-        }
-        
         public static bool IsValidLayer(LayerMask layerMask, int value)
         {
             return (layerMask.value & (1 << value)) > 0;
