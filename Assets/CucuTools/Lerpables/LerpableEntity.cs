@@ -5,7 +5,7 @@ using UnityEngine.Events;
 namespace CucuTools
 {
     /// <inheritdoc cref="CucuTools.ILerpable" />
-    public abstract class LerpableEntity : MonoBehaviour, ILerpable
+    public abstract class LerpableEntity : ObserverEntity, ILerpable
     {
         public bool UseTolerance
         {
@@ -54,11 +54,14 @@ namespace CucuTools
             UpdateEntity();
         }
         
+        [ContextMenu(nameof(UpdateEntity))]
         public bool UpdateEntity()
         {
             if (!UpdateEntityInternal()) return false;
             
             OnUpdated.Invoke();
+            UpdateObserver();
+            
             return true;
         }
         

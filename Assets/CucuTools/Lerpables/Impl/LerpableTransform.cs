@@ -6,7 +6,7 @@ using UnityEngine;
 namespace CucuTools
 {
     [AddComponentMenu(LerpMenuRoot + nameof(LerpableTransform))]
-    public class LerpableTransform : LerpableList<Transform, Transform>
+    public class LerpableTransform : LerpableList<Transform>
     {
         public override Transform Result
         {
