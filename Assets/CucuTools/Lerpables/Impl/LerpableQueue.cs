@@ -7,23 +7,23 @@ namespace CucuTools
 {
     /// <inheritdoc />
     [AddComponentMenu(LerpMenuRoot + nameof(LerpableQueue))]
-    public class LerpableQueue : LerpableEntity
+    public class LerpableQueue : LerpableBehavior
     {
         [Header("Lerp points")]
-        [SerializeField] private List<LerpPoint<LerpableEntity>> points;
+        [SerializeField] private List<LerpPoint<LerpableBehavior>> points;
 
-        public void Add(LerpPoint<LerpableEntity> point)
+        public void Add(LerpPoint<LerpableBehavior> point)
         {
-            if (points == null) points = new List<LerpPoint<LerpableEntity>>();
+            if (points == null) points = new List<LerpPoint<LerpableBehavior>>();
             if (point.IsValid() && point.Value != null && point.Value != this) points.Add(point);
         }
         
-        public void Add(float t, LerpableEntity value)
+        public void Add(float t, LerpableBehavior value)
         {
-            Add(new LerpPoint<LerpableEntity>(t, value));
+            Add(new LerpPoint<LerpableBehavior>(t, value));
         }
 
-        public bool Remove(LerpableEntity value)
+        public bool Remove(LerpableBehavior value)
         {
             if (points == null) return false;
 
@@ -39,14 +39,14 @@ namespace CucuTools
             return points.RemoveAll(p => p.T == t) > 0;
         }
 
-        public bool Remove(LerpPoint<LerpableEntity> point)
+        public bool Remove(LerpPoint<LerpableBehavior> point)
         {
             if (points == null) return false;
 
             return points.Remove(point);
         }
 
-        public int RemoveAll(Predicate<LerpPoint<LerpableEntity>> match = null)
+        public int RemoveAll(Predicate<LerpPoint<LerpableBehavior>> match = null)
         {
             if (points == null) return 0;
 
@@ -89,7 +89,7 @@ namespace CucuTools
             return LinearLerp(points.OrderBy(p => p.T).ToArray());
         }
 
-        private bool LinearLerp(params LerpPoint<LerpableEntity>[] points)
+        private bool LinearLerp(params LerpPoint<LerpableBehavior>[] points)
         {
             if (points.Length == 1)
             {

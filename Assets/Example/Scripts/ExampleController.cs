@@ -1,14 +1,24 @@
 using CucuTools;
+using UnityEngine;
 
-public class ExampleController : LerpableEntity
+namespace Example.Scripts
 {
-    public LerpableEntity lerp;
-
-    protected override bool UpdateEntityInternal()
+    public class ExampleController : MonoBehaviour
     {
-        if (lerp == null) return false;
+        [Header("Observer")]
+        public LerpableColor lerpColor;
+
+        [Header("Listeners")]
+        public ListenerEntity<Color> listenerColor;
+        public ListenerEntity listenerVoid;
+        public Color color;
         
-        lerp.Lerp(LerpValue);
-        return true;
+        private void Start()
+        {
+            listenerVoid = new ListenerEntity(() => { color = lerpColor.Value; });
+            listenerColor = new ListenerEntity<Color>(lerpColor);
+
+            lerpColor.Subscribe(listenerVoid, listenerColor);
+        }
     }
 }

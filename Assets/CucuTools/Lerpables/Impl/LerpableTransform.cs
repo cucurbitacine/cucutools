@@ -8,12 +8,12 @@ namespace CucuTools
     [AddComponentMenu(LerpMenuRoot + nameof(LerpableTransform))]
     public class LerpableTransform : LerpableList<Transform>
     {
-        public override Transform Result
+        public override Transform Value
         {
-            get => base.Result;
+            get => base.Value;
             protected set
             {
-                base.Result = value;
+                base.Value = value;
                 UpdateEntity();
             }
         }
@@ -33,17 +33,17 @@ namespace CucuTools
         {
             set
             {
-                if (Result == null) return;
+                if (Value == null) return;
 
                 if (syncParam.SyncAll)
                 {
-                    Result.Set(value);
+                    Value.Set(value);
                     return;
                 }
 
-                if (syncParam.syncPosition) Result.SetPosition(value);
-                if (syncParam.syncRotation) Result.SetRotation(value);
-                if (syncParam.syncScale) Result.SetScale(value);
+                if (syncParam.syncPosition) Value.SetPosition(value);
+                if (syncParam.syncRotation) Value.SetRotation(value);
+                if (syncParam.syncScale) Value.SetScale(value);
             }
         }
         

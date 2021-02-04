@@ -5,7 +5,7 @@ using UnityEngine.Events;
 namespace CucuTools
 {
     /// <inheritdoc cref="CucuTools.ILerpable" />
-    public abstract class LerpableEntity : ObserverEntity, ILerpable
+    public abstract class LerpableBehavior : ObserverBehaviour, ILerpable
     {
         public bool UseTolerance
         {
@@ -137,19 +137,19 @@ namespace CucuTools
     /// <summary>
     /// Lerpable entity with current result
     /// </summary>
-    /// <typeparam name="TResult">Type of result</typeparam>
-    public abstract class LerpableEntity<TResult> : LerpableEntity, IResultable<TResult>
+    /// <typeparam name="TValue">Type of result</typeparam>
+    public abstract class LerpableBehavior<TValue> : LerpableBehavior, IObserverEntity<TValue>
     {
         /// <summary>
         /// Result of lerp
         /// </summary>
-        public virtual TResult Result
+        public virtual TValue Value
         {
-            get => _result;
-            protected set => _result = value;
+            get => value;
+            protected set => this.value = value;
         }
 
         [Header("Result")]
-        [SerializeField] private TResult _result;
+        [SerializeField] private TValue value;
     }
 }

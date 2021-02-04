@@ -1,9 +1,8 @@
-using System.Collections.Concurrent;
-using UnityEngine;
+﻿using System.Collections.Concurrent;
 
 namespace CucuTools
 {
-    public class ObserverEntity : MonoBehaviour, IObserverEntity
+    public class ObserverEntity : IObserverEntity
     {
         private readonly ConcurrentDictionary<IListenerEntity, bool> _listeners =
             new ConcurrentDictionary<IListenerEntity, bool>();
@@ -11,6 +10,20 @@ namespace CucuTools
         public bool IsSubscribed(IListenerEntity listener)
         {
             return _listeners.ContainsKey(listener);
+        }
+
+        public void Subscribe(params IListenerEntity[] listeners)
+        {
+            if (listeners == null) return;
+            foreach (var listener in listeners)
+                Subscribe(listener);
+        }
+
+        public void Unsubscribe(params IListenerEntity[] listeners)
+        {
+            if (listeners == null) return;
+            foreach (var listener in listeners)
+                Unsubscribe(listener);
         }
 
         public virtual void Subscribe(IListenerEntity listener)
@@ -30,6 +43,20 @@ namespace CucuTools
             _listeners.Clear();
         }
 
+        public void Silence(params IListenerEntity[] listeners)
+        {
+            if (listeners == null) return;
+            foreach (var listener in listeners)
+                Silence(listener);
+        }
+
+        public void Unsilence(params IListenerEntity[] listeners)
+        {
+            if (listeners == null) return;
+            foreach (var listener in listeners)
+                Unsilence(listener);
+        }
+
         public virtual void Silence(IListenerEntity listener)
         {
             if (IsSubscribed(listener))
@@ -42,7 +69,6 @@ namespace CucuTools
                 _listeners[listener] = true;
         }
 
-        [ContextMenu(nameof(UpdateObserver))]
         public virtual void UpdateObserver()
         {
             foreach (var pair in _listeners)

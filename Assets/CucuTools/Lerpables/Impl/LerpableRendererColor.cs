@@ -22,7 +22,7 @@ namespace CucuTools
 
             if (renderer == null) return false;
             
-            renderer.material.color = Result;
+            renderer.material.color = Value;
 
             return true;
         }

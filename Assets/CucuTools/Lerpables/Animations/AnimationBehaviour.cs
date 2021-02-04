@@ -4,7 +4,7 @@ using UnityEngine.Events;
 
 namespace CucuTools
 {
-    public abstract class AnimationEntity : LerpableEntity
+    public abstract class AnimationBehaviour : LerpableBehavior
     {
         public const string AnimLerpMenuRoot = LerpMenuRoot + "Animation/";
         

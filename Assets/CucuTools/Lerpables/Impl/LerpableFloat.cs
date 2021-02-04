@@ -34,17 +34,17 @@ namespace CucuTools
 
             if (iLeft < 0)
             {
-                Result = ordered[iRight].Value;
+                Value = ordered[iRight].Value;
                 return true;
             }
             
             if (iRight < 0)
             {
-                Result = ordered[iLeft].Value;
+                Value = ordered[iLeft].Value;
                 return true;
             }
 
-            Result = Mathf.Lerp(ordered[iLeft].Value, ordered[iRight].Value, t);
+            Value = Mathf.Lerp(ordered[iLeft].Value, ordered[iRight].Value, t);
             
             return true;
         }

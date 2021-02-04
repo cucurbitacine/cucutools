@@ -4,9 +4,9 @@ namespace CucuTools
 {
     /// <inheritdoc />
     [AddComponentMenu(AnimLerpMenuRoot + nameof(AnimationLerp))]
-    public class AnimationLerp : AnimationEntity
+    public class AnimationLerp : AnimationBehaviour
     {
-        public LerpableEntity Target
+        public LerpableBehavior Target
         {
             get => _target;
             set
@@ -17,7 +17,7 @@ namespace CucuTools
         }
 
         [Header("Lerpable target")]
-        [SerializeField] private LerpableEntity _target;
+        [SerializeField] private LerpableBehavior _target;
 
         /// <inheritdoc />
         protected override bool UpdateEntityInternal()

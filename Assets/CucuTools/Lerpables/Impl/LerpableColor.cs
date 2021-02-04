@@ -4,7 +4,7 @@ namespace CucuTools
 {
     /// <inheritdoc />
     [AddComponentMenu(LerpMenuRoot + nameof(LerpableColor))]
-    public class LerpableColor : LerpableEntity<Color>
+    public class LerpableColor : LerpableBehavior<Color>
     {
         public Gradient Gradient
         {
@@ -22,7 +22,7 @@ namespace CucuTools
         /// <inheritdoc />
         protected override bool UpdateEntityInternal()
         {
-            Result = Gradient.Evaluate(LerpValue);
+            Value = Gradient.Evaluate(LerpValue);
             return true;
         }
 

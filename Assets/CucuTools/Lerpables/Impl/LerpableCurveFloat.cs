@@ -4,7 +4,7 @@ namespace CucuTools
 {
     /// <inheritdoc />
     [AddComponentMenu(LerpMenuRoot + nameof(LerpableCurveFloat))]
-    public class LerpableCurveFloat : LerpableEntity<float>
+    public class LerpableCurveFloat : LerpableBehavior<float>
     {
         public AnimationCurve Curve
         {
@@ -22,7 +22,7 @@ namespace CucuTools
         /// <inheritdoc />
         protected override bool UpdateEntityInternal()
         {
-            Result = Curve.Evaluate(LerpValue);
+            Value = Curve.Evaluate(LerpValue);
             return true;
         }
 

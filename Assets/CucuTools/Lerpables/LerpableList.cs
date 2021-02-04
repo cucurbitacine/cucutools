@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace CucuTools
 {
-    public abstract class LerpableList<TResult, TElement> : LerpableEntity<TResult>, IList<LerpPoint<TElement>>
+    public abstract class LerpableList<TResult, TElement> : LerpableBehavior<TResult>, IList<LerpPoint<TElement>>
     {
         public abstract List<LerpPoint<TElement>> Elements { get; protected set; }
 

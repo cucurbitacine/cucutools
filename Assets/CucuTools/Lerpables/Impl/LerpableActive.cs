@@ -18,7 +18,7 @@ namespace CucuTools
 
             try
             {
-                target.SetActive(Result);
+                target.SetActive(Value);
             }
             catch
             {

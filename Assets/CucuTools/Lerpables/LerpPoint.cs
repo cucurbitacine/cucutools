@@ -1,12 +1,11 @@
 using System;
 using System.Collections.Generic;
-using UnityEditor;
 using UnityEngine;
 
 namespace CucuTools
 {
     [Serializable]
-    public struct LerpPoint<TValue> : IComparable<LerpPoint<TValue>>
+    public struct LerpPoint<TValue> : IComparable<LerpPoint<TValue>>, IHaveValue<TValue>
     {
         public float T
         {
