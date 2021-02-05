@@ -153,6 +153,7 @@ namespace CucuTools
         private void Validate()
         {
             UseTolerance = false;
+            UseCurve = false;
             
             AnimationTime = AnimationTime;
             AnimationSpeed = AnimationSpeed;

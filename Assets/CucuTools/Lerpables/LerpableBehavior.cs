@@ -18,6 +18,18 @@ namespace CucuTools
             get => lerpTolerance.value;
             set => lerpTolerance.value = value;
         }
+
+        public bool UseCurve
+        {
+            get => lerpCurve.useCurve;
+            set => lerpCurve.useCurve = value;
+        }
+        
+        public AnimationCurve Curve
+        {
+            get => lerpCurve.curve;
+            set => lerpCurve.curve = value;
+        }
         
         /// <inheritdoc />
         public float LerpValue
@@ -34,7 +46,7 @@ namespace CucuTools
         [Header("Lerpable")]
         [Range(0f, 1f)]
         [SerializeField] private float lerpValue = 0f;
-        [SerializeField] protected LerpTolerance lerpTolerance;
+        [SerializeField] private LerpTolerance lerpTolerance;
 
         [SerializeField] private LerpCurve lerpCurve;
         [SerializeField] private LerpEvents lerpEvents;
