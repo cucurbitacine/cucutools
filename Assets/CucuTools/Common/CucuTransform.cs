@@ -6,15 +6,33 @@ namespace CucuTools
     [Serializable]
     public struct CucuTransform
     {
-        public Vector3 position { get; set; }
-        public Quaternion rotation { get; set; }
-        public Vector3 scale { get; set; }
+        public Vector3 position
+        {
+            get => _position;
+            set => _position = value;
+        }
 
+        public Quaternion rotation
+        {
+            get =>  _rotation;
+            set => _rotation = value;
+        }
+
+        public Vector3 scale
+        {
+            get => _scale;
+            set => _scale = value;
+        }
+
+        [SerializeField] private Vector3 _position;
+        [SerializeField] private Quaternion _rotation;
+        [SerializeField] private Vector3 _scale;
+ 
         public CucuTransform(Vector3 position, Quaternion rotation, Vector3 scale)
         {
-            this.position = position;
-            this.rotation = rotation;
-            this.scale = scale;
+            _position = position;
+            _rotation = rotation;
+            _scale = scale;
         }
 
         public CucuTransform(Transform transform) : this(transform.position, transform.rotation, transform.localScale)
@@ -23,9 +41,22 @@ namespace CucuTools
 
         public static implicit operator CucuTransform(Transform tr)
         {
-            return new CucuTransform {position = tr.position, rotation = tr.rotation, scale = tr.localScale};
+            return tr != null
+                ? new CucuTransform {position = tr.position, rotation = tr.rotation, scale = tr.localScale}
+                : new CucuTransform();
         }
 
+        public Transform Set(Transform transform)
+        {
+            Set(ref transform);
+            return transform;
+        }
+        
+        public void Set(ref Transform transform)
+        {
+            CucuTransform.Set(ref transform, this);
+        }
+        
         public static CucuTransform Lerp(CucuTransform a, CucuTransform b, float t)
         {
             return new CucuTransform(

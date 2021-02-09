@@ -120,8 +120,10 @@ namespace CucuTools
         }
         
         #endregion
-        
-        public static float[] LinSpace(int count, float origin = 0f, float target = 1f)
+
+        #region LinSpace
+
+        public static float[] LinSpace(float origin, float target, int count)
         {
             var isForward = count >= 0;
 
@@ -151,60 +153,168 @@ namespace CucuTools
             }
         }
 
-        public static Func<float, float> GetFunction(IEnumerable<float> args, IEnumerable<float> values, bool smooth = false)
+        public static float[] LinSpace(int count)
+        {
+            return LinSpace(0f, 1f, count);
+        }
+
+        #endregion
+
+        #region GetFunction
+
+        public static Func<float, float> GetFunction(float[] args, float[] values)
         {
             return arg =>
             {
-                GetBorderIndexes(arg, args, out var iLeftArg, out var iRightArg);
+                GetEdges(arg, out var iLeftArg, out var iRightArg, args);
 
-                var argsArray = args.ToArray();
-                var leftArg = argsArray[iLeftArg];
-                var rightArg = argsArray[iRightArg];
-
-                var valuesArray = values.ToArray();
-                var leftValue = valuesArray[iLeftArg];
-                var rightValue = valuesArray[iRightArg];
-
-                var t = Mathf.Abs(rightArg - leftArg) > float.Epsilon
-                    ? (arg - leftArg) / (rightArg - leftArg)
+                var t = Mathf.Abs(args[iRightArg] - args[iLeftArg]) > float.Epsilon
+                    ? (arg - args[iLeftArg]) / (args[iRightArg] - args[iLeftArg])
                     : 0f;
 
-                t = Mathf.Clamp01(smooth ? (Mathf.Sin(-Mathf.PI / 2f + Mathf.PI * t) + 1f) / 2f : t);
-                
-                var result = leftValue + (rightValue - leftValue) * t;
+                var result = values[iLeftArg] + (values[iRightArg] - values[iLeftArg]) * t;
 
                 return result;
             };
         }
-
-        public static void GetBorderIndexes<Targ>(Targ arg, IEnumerable<Targ> args, out int iLeft, out int iRight) where Targ : IComparable
+        
+        public static Func<float, float> GetFunction(params float[] values)
         {
-            iLeft = -1;
+            return GetFunction(LinSpace(values.Length), values);
+        }
+        
+        public static Func<float, float> GetFunction(IEnumerable<float> args, IEnumerable<float> values)
+        {
+            return GetFunction(args.ToArray(), values.ToArray());
+        }
+
+        public static Func<float, float> GetFunction(IEnumerable<float> values)
+        {
+            return GetFunction(values.ToArray());
+        }
+
+        #endregion
+
+        #region Edges
+
+        public static void GetLeftEdge<TArg>(TArg arg, out int iLeft, params TArg[] args)
+            where TArg : IComparable
+        {
+            iLeft  = -1;
+            
+            if (args == null || args.Length == 0) return;
+            
+            if (arg.CompareTo(args[0]) < 0)
+            {
+                iLeft  = -1;
+                return;
+            }
+            
+            if (arg.CompareTo(args[args.Length - 1]) > 0)
+            {
+                iLeft  = args.Length - 1;
+                return;
+            }
+
+            iLeft = args.Select((t, i) => (t, i)).Last(x => arg.CompareTo(x.t) >= 0f).i;
+        }
+
+        public static void GetLeftEdge<TArg>(TArg arg, out int iLeft, IEnumerable<TArg> args)
+            where TArg : IComparable
+        {
+            GetLeftEdge(arg, out iLeft, args.ToArray());
+        }
+        
+        public static void GetRightEdge<TArg>(TArg arg, out int iRight, params TArg[] args)
+            where TArg : IComparable
+        {
+            iRight  = -1;
+            
+            if (args == null || args.Length == 0) return;
+
+            if (arg.CompareTo(args[0]) < 0) // x O--------o
+            {
+                iRight  = 0;
+                return;
+            }
+            
+            if (arg.CompareTo(args[args.Length - 1]) > 0) // o--------o x
+            {
+                iRight  = -1;
+                return;
+            }
+
+            iRight = args.Select((t, i) => (t, i)).First(x => arg.CompareTo(x.t) <= 0f).i;
+        }
+
+        public static void GetRightEdge<TArg>(TArg arg, out int iRight, IEnumerable<TArg> args)
+            where TArg : IComparable
+        {
+            GetRightEdge(arg, out iRight, args.ToArray());
+        }
+        
+        public static void GetEdges<TArg>(TArg arg, out int iLeft, out int iRight, params TArg[] args)
+            where TArg : IComparable
+        {
+            iLeft  = -1;
             iRight = -1;
 
             if (args == null || !args.Any()) return;
 
-            var argsArray = args.ToArray();
-
-            if (arg.CompareTo(argsArray[0]) < 0)
+            if (arg.CompareTo(args[0]) < 0)
             {
-                iLeft = 0;
+                iLeft  = -1;
                 iRight = 0;
                 return;
             }
 
-            if (arg.CompareTo(argsArray[argsArray.Length - 1]) > 0)
+            if (arg.CompareTo(args[args.Length - 1]) > 0)
             {
-                iLeft = argsArray.Length - 1;
-                iRight = argsArray.Length - 1;
+                iLeft  = args.Length - 1;
+                iRight = -1;
                 return;
             }
 
-            iLeft = args.Select((t, i) => (t, i))
-                .Last(x => arg.CompareTo(x.t) >= 0f).i;
+            iLeft  = args.Select((t, i) => (t, i)) .Last(x => arg.CompareTo(x.t) >= 0f).i;
+            iRight = args.Select((t, i) => (t, i)).First(x => arg.CompareTo(x.t) <= 0f).i;
+        }
 
-            iRight = args.Select((t, i) => (t, i))
-                .First(x => arg.CompareTo(x.t) <= 0f).i;
+        public static void GetEdges<TArg>(TArg arg, out int iLeft, out int iRight, IEnumerable<TArg> args)
+            where TArg : IComparable
+        {
+            GetEdges(arg, out iLeft, out iRight, args.ToArray());
+        }
+        
+        #endregion
+
+        /// <summary>
+        /// If t = a return 0f; if t = b return 1f 
+        /// </summary>
+        public static float GetLerpValue(float t, float a = 0f, float b = 1f)
+        {
+            return a != b ? (t - a) / (b - a) : 0f;
+        }
+
+        public static float GetLerpEdges<T>(float lerpValue, out int iLeft, out int iRight, params LerpPoint<T>[] points)
+        {
+            GetEdges(lerpValue, out iLeft, out iRight, points.Select(p => p.T));
+            
+            if (iLeft < 0 && iRight >= 0)
+            {
+                return 0f;
+            }
+            
+            if (iRight < 0 && iLeft >= 0)
+            {
+                return 1f;
+            }
+
+            return GetLerpValue(lerpValue, points[iLeft].T, points[iRight].T);
+        }
+
+        public static float GetLerpEdges<T>(float lerpValue, out int iLeft, out int iRight, IEnumerable<LerpPoint<T>> points)
+        {
+            return GetLerpEdges(lerpValue, out iLeft, out iRight, points.ToArray());
         }
     }
 
@@ -276,6 +386,12 @@ namespace CucuTools
         public static IEnumerable<float> Sub(this IEnumerable<float> array, float value)
         {
             return array.Add(-value);
+        }
+
+        public static void GetEdges<TArg>(this IEnumerable<TArg> array, TArg arg, out int iLeft, out int iRight)
+            where TArg : IComparable
+        {
+            CucuMath.GetEdges<TArg>(arg, out iLeft, out iRight, array);
         }
     }
 }

@@ -4,32 +4,39 @@ using UnityEngine;
 namespace CucuTools
 {
     [Serializable]
-    public class CucuRange<T> : IComparable
+    public class CucuRange<T> : ObserverEntity, IComparable, IObserverEntity<T>, ISetValue<T>
         where T : IComparable
     {
         public T Value
         {
-            get
-            {
-                UpdateValue();
-                return value;
-            }
-
+            get => value;
             set
             {
+                if (this.value.CompareTo(value)==0)
+                {
+                    return;
+                }
+                
                 this.value = value;
+                
                 UpdateValue();
+                
+                UpdateObserver();
             }
         }
 
         public T Max => limitFirst.CompareTo(limitSecond) >= 0 ? limitFirst : limitSecond;
         public T Min => limitFirst.CompareTo(limitSecond) < 0 ? limitFirst : limitSecond;
 
-        [Header("Value")] [SerializeField] private T value;
-        [Space] [SerializeField] private T limitFirst;
+        [Header("Value")]
+        [SerializeField] private T value;
+        [Space]
+        [SerializeField] private T limitFirst;
         [SerializeField] private T limitSecond;
 
-        public CucuRange<T> SetBorder(T first, T second)
+        private T _cache;
+        
+        public CucuRange<T> SetEdges(T first, T second)
         {
             limitFirst = first;
             limitSecond = second;
@@ -121,7 +128,7 @@ namespace CucuTools
 
         public CucuRangeFloat(float min, float max, float value)
         {
-            SetBorder(min, max);
+            SetEdges(min, max);
             Value = value;
         }
 
@@ -220,7 +227,7 @@ namespace CucuTools
 
         public CucuRangeInt(int min, int max, int value)
         {
-            SetBorder(min, max);
+            SetEdges(min, max);
             Value = value;
         }
 
