@@ -6,24 +6,24 @@ using UnityEngine;
 namespace CucuTools
 {
     /// <inheritdoc />
-    [AddComponentMenu(LerpMenuRoot + nameof(LerpableQueue))]
-    public class LerpableQueue : LerpableBehavior
+    [AddComponentMenu(LerpMenuRoot + nameof(LerpQueue))]
+    public class LerpQueue : LerpBehavior
     {
         [Header("Lerp points")]
-        [SerializeField] private List<LerpPoint<LerpableBehavior>> points;
+        [SerializeField] private List<LerpPoint<LerpBehavior>> points;
 
-        public void Add(LerpPoint<LerpableBehavior> point)
+        public void Add(LerpPoint<LerpBehavior> point)
         {
-            if (points == null) points = new List<LerpPoint<LerpableBehavior>>();
+            if (points == null) points = new List<LerpPoint<LerpBehavior>>();
             if (point.IsValid() && point.Value != null && point.Value != this) points.Add(point);
         }
         
-        public void Add(float t, LerpableBehavior value)
+        public void Add(float t, LerpBehavior value)
         {
-            Add(new LerpPoint<LerpableBehavior>(t, value));
+            Add(new LerpPoint<LerpBehavior>(t, value));
         }
 
-        public bool Remove(LerpableBehavior value)
+        public bool Remove(LerpBehavior value)
         {
             if (points == null) return false;
 
@@ -39,14 +39,14 @@ namespace CucuTools
             return points.RemoveAll(p => p.T == t) > 0;
         }
 
-        public bool Remove(LerpPoint<LerpableBehavior> point)
+        public bool Remove(LerpPoint<LerpBehavior> point)
         {
             if (points == null) return false;
 
             return points.Remove(point);
         }
 
-        public int RemoveAll(Predicate<LerpPoint<LerpableBehavior>> match = null)
+        public int RemoveAll(Predicate<LerpPoint<LerpBehavior>> match = null)
         {
             if (points == null) return 0;
 
@@ -81,7 +81,7 @@ namespace CucuTools
         }
 
         /// <inheritdoc />
-        protected override bool UpdateEntityInternal()
+        protected override bool UpdateBehaviour()
         {
             if (points == null) return false;
             if (points.Count == 0) return false;
@@ -89,7 +89,7 @@ namespace CucuTools
             return LinearLerp(points.OrderBy(p => p.T).ToArray());
         }
 
-        private bool LinearLerp(params LerpPoint<LerpableBehavior>[] points)
+        private bool LinearLerp(params LerpPoint<LerpBehavior>[] points)
         {
             if (points.Length == 1)
             {

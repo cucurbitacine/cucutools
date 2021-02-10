@@ -59,7 +59,7 @@ namespace CucuTools
         [ContextMenu(nameof(UpdateObserver))]
         public virtual void UpdateObserver()
         {
-            ObserverEntity.UpdateObserver();
+            ObserverEntity.Update();
         }
     }
 }

@@ -3,8 +3,8 @@ using UnityEngine;
 namespace CucuTools
 {
     /// <inheritdoc />
-    [AddComponentMenu(LerpMenuRoot + nameof(LerpableCurveFloat))]
-    public class LerpableCurveFloat : LerpableBehavior<float>
+    [AddComponentMenu(LerpMenuRoot + nameof(LerpCurveFloat))]
+    public class LerpCurveFloat : LerpBehavior<float>
     {
         public AnimationCurve Curve
         {
@@ -12,7 +12,7 @@ namespace CucuTools
             set
             {
                 curve = value;
-                UpdateEntity();
+                OnObserverUpdated();
             }
         }
 
@@ -20,7 +20,7 @@ namespace CucuTools
         [SerializeField] private AnimationCurve curve;
 
         /// <inheritdoc />
-        protected override bool UpdateEntityInternal()
+        protected override bool UpdateBehaviour()
         {
             Value = Curve.Evaluate(LerpValue);
             return true;

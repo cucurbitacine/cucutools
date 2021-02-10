@@ -13,7 +13,7 @@ namespace CucuTools
         /// <summary>
         /// Do linear interpolation by value
         /// </summary>
-        /// <param name="lerpValue">Linear interpolation value. Must be between 0f and 1f</param>
-        void Lerp(float lerpValue);
+        /// <param name="t">Linear interpolation value. Must be between 0f and 1f</param>
+        void Lerp(float t);
     }
 }

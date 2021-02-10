@@ -5,56 +5,29 @@ using UnityEngine;
 
 namespace CucuTools
 {
-    [AddComponentMenu(LerpMenuRoot + nameof(LerpableTransform))]
-    public class LerpableTransform : LerpableList<Transform>
+    [AddComponentMenu(LerpMenuRoot + nameof(LerpTransform))]
+    public class LerpTransform : LerpList<CucuTransform, Transform>
     {
-        public override Transform Value
-        {
-            get => base.Value;
-            protected set
-            {
-                base.Value = value;
-                UpdateEntity();
-            }
-        }
-
         public override List<LerpPoint<Transform>> Elements
         {
             get => points ?? (points = new List<LerpPoint<Transform>>());
             protected set => points = value;
         }
 
+        [SerializeField] private Transform target;
         [SerializeField] private SyncParam syncParam;
         
         [Header("Transform points")]
         [SerializeField] private List<LerpPoint<Transform>> points;
 
-        private CucuTransform proxyTransform
-        {
-            set
-            {
-                if (Value == null) return;
-
-                if (syncParam.SyncAll)
-                {
-                    Value.Set(value);
-                    return;
-                }
-
-                if (syncParam.syncPosition) Value.SetPosition(value);
-                if (syncParam.syncRotation) Value.SetRotation(value);
-                if (syncParam.syncScale) Value.SetScale(value);
-            }
-        }
-        
-        protected override bool UpdateEntityInternal()
+        protected override bool UpdateBehaviour()
         {
             if (Elements == null) return false;
             if (Elements.Count == 0) return false;
             
             if (Elements.Count == 1)
             {
-                proxyTransform = Elements[0].Value;
+                Value = Elements[0].Value;
                 return false;
             }
 
@@ -64,28 +37,50 @@ namespace CucuTools
 
             if (iLeft < 0)
             {
-                proxyTransform = Elements[iRight].Value;
+                Value = Elements[iRight].Value;
                 return true;
             }
             
             if (iRight < 0)
             {
-                proxyTransform = Elements[iLeft].Value;
+                Value = Elements[iLeft].Value;
                 return true;
             }
             
-            proxyTransform = CucuTransform.Lerp(points[iLeft].Value, points[iRight].Value, t);
+            Value = CucuTransform.Lerp(points[iLeft].Value, points[iRight].Value, t);
+
+            if (target != null)
+            {
+                if (syncParam.SyncAll)
+                {
+                    target.Set(Value);
+                }
+                else
+                {
+                    if (syncParam.syncPosition) target.SetPosition(Value);
+                    if (syncParam.syncRotation) target.SetRotation(Value);
+                    if (syncParam.syncScale) target.SetScale(Value);
+                }
+            }
             
             return true;
         }
 
-        protected override void Reset()
+        protected virtual void Reset()
         {
-            base.Reset();
-
             syncParam.syncPosition = true;
             syncParam.syncRotation = true;
             syncParam.syncScale = true;
+        }
+
+        protected override void OnValidate()
+        {
+            base.OnValidate();
+
+            if (target != null && (points?.Any(p => p.Value == target) ?? false))
+            {
+                target = null;
+            }
         }
 
         [Serializable]

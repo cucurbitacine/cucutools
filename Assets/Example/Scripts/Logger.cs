@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using CucuTools;
+using UnityEngine;
 
 namespace Example.Scripts
 {
@@ -7,6 +8,11 @@ namespace Example.Scripts
         public void Log(string msg)
         {
             Debug.Log(msg);
+        }
+        
+        public void Log(Color clr)
+        {
+            Debug.Log(clr.ToHex());
         }
     }
 }

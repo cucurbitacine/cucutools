@@ -5,31 +5,31 @@ using UnityEngine;
 namespace CucuTools
 {
     /// <inheritdoc />
-    [AddComponentMenu(LerpMenuRoot + nameof(LerpableBool))]
-    public class LerpableBool : LerpableList<bool>
+    [AddComponentMenu(LerpMenuRoot + nameof(LerpFloat))]
+    public class LerpInt : LerpableList<int>
     {
         /// <inheritdoc />
-        public override List<LerpPoint<bool>> Elements
+        public override List<LerpPoint<int>> Elements
         {
-            get => points ?? (points = new List<LerpPoint<bool>>());
+            get => points ?? (points = new List<LerpPoint<int>>());
             protected set
             {
                 points = value;
-                UpdateEntity();
+                OnObserverUpdated();
             }
         }
 
         [Header("Points")]
-        [SerializeField] private List<LerpPoint<bool>> points;
+        [SerializeField] private List<LerpPoint<int>> points;
 
         /// <inheritdoc />
-        protected override bool UpdateEntityInternal()
+        protected override bool UpdateBehaviour()
         {
             if (Elements == null) return false;
             if (Elements.Count == 0) return false;
 
             var ordered = Elements.OrderBy(e => e.T).ToArray();
-
+            
             var t = CucuMath.GetLerpEdges(LerpValue, out var iLeft, out var iRight, ordered);
 
             if (iLeft < 0)
@@ -37,15 +37,15 @@ namespace CucuTools
                 Value = ordered[iRight].Value;
                 return true;
             }
-
+            
             if (iRight < 0)
             {
                 Value = ordered[iLeft].Value;
                 return true;
             }
 
-            Value = ordered[iLeft].Value;
-
+            Value = (int) Mathf.Lerp(ordered[iLeft].Value, ordered[iRight].Value, t);
+            
             return true;
         }
     }

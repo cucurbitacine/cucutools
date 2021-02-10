@@ -4,24 +4,24 @@ using UnityEngine.Events;
 
 namespace CucuTools
 {
-    public abstract class AnimationBehaviour : LerpableBehavior
+    public abstract class AnimationBehaviour : LerpBehavior
     {
         public const string AnimLerpMenuRoot = LerpMenuRoot + "Animation/";
         
         protected const string GroupBaseName = "Animation";
 
         #region Properties
-
+        
         public bool Paused
         {
-            get => paused;
-            set => paused = value;
+            get => Info.Paused;
+            set => Info.Paused = value;
         }
         
         public bool Playing
         {
-            get => playing;
-            private set => playing = value;
+            get => Info.Playing;
+            private set => Info.Playing = value;
         }
 
         public float CurrentTime => Mathf.Clamp(TotalTime * LerpValue, 0f, TotalTime);
@@ -34,44 +34,44 @@ namespace CucuTools
 
         public bool AutoStart
         {
-            get => animationSettings.autoStart;
-            set => animationSettings.autoStart = value;
+            get => Settings.autoStart;
+            set => Settings.autoStart = value;
         }
         
         public bool Looped
         {
-            get => animationSettings.looped;
-            set => animationSettings.looped = value;
+            get => Settings.looped;
+            set => Settings.looped = value;
         }
         
         public virtual float AnimationTime
         {
-            get => animationSettings.animationTime;
-            set => animationSettings.animationTime = Mathf.Max(0f, value);
+            get => Settings.animationTime;
+            set => Settings.animationTime = Mathf.Max(0f, value);
         }
 
         public virtual float AnimationSpeed
         {
-            get => animationSettings.animationSpeed;
-            set => animationSettings.animationSpeed = Mathf.Clamp(value,
+            get => Settings.animationSpeed;
+            set => Settings.animationSpeed = Mathf.Clamp(value,
                 AnimationSettings.MIN_ANIMATION_SPEED,
                 AnimationSettings.MAX_ANIMATION_SPEED);
         }
 
-        public UnityEvent OnAnimationStart => animationEvents.onAnimationStart ?? (animationEvents.onAnimationStart = new UnityEvent());
-        public UnityEvent OnAnimationStop => animationEvents.onAnimationStop ?? (animationEvents.onAnimationStop = new UnityEvent());
+        public UnityEvent OnAnimationStart => Events.OnAnimationStart;
+        public UnityEvent OnAnimationStop => Events.OnAnimationStop;
+        
+        public AnimationInfo Info => animationInfo ?? (animationInfo = new AnimationInfo());
+        public AnimationSettings Settings => animationSettings ?? (animationSettings = new AnimationSettings());
+        public AnimationEvents Events => animationEvents ?? (animationEvents = new AnimationEvents());
         
         #endregion
 
         #region SerializeField
 
         [Header("Animation")]
-        [SerializeField] private bool paused = false;
-        [SerializeField] private bool playing = false;
-        [Min(0f)]
-        [SerializeField] private float currentTime = 0f;
-        [Min(0f)]
-        [SerializeField] private float totalTime = 1f;
+
+        [SerializeField] private AnimationInfo animationInfo;
         [SerializeField] private AnimationSettings animationSettings;
         [SerializeField] private AnimationEvents animationEvents;
 
@@ -122,8 +122,9 @@ namespace CucuTools
         {
         }
 
-        protected virtual void OnAwake()
+        protected override void OnAwake()
         {
+            Validate();
         }
 
         protected virtual void OnStart()
@@ -152,23 +153,16 @@ namespace CucuTools
         
         private void Validate()
         {
-            UseTolerance = false;
-            UseCurve = false;
+            Tolerance.Use = false;
+            Curve.Use = false;
             
             AnimationTime = AnimationTime;
             AnimationSpeed = AnimationSpeed;
-            totalTime = TotalTime;
-            currentTime = CurrentTime;
+            Info.totalTime = TotalTime;
+            Info.currentTime = CurrentTime;
         }
 
         #region MonoBehaviour
-
-        private void Awake()
-        {
-            Validate();
-
-            OnAwake();
-        }
 
         private void Start()
         {
@@ -182,18 +176,10 @@ namespace CucuTools
             if (Playing)
             {
                 if (!Paused) AnimationFrame(Time.deltaTime);
-                currentTime = CurrentTime;
+                Info.currentTime = CurrentTime;
             }
 
             OnUpdate();
-        }
-
-        protected override void Reset()
-        {
-            base.Reset();
-
-            animationEvents.Reset();
-            animationSettings.Reset();
         }
 
         protected override void OnValidate()
@@ -206,12 +192,38 @@ namespace CucuTools
         #endregion
 
         [Serializable]
-        private struct AnimationEvents
+        public class AnimationInfo
         {
-            public UnityEvent onAnimationStart;
-            public UnityEvent onAnimationStop;
+            public bool Paused
+            {
+                get => paused;
+                set => paused = value;
+            }
+        
+            public bool Playing
+            {
+                get => playing;
+                set => playing = value;
+            }
 
-            public void Reset()
+            [SerializeField] private bool paused = false;
+            [SerializeField] private bool playing = false;
+            [Min(0f)]
+            public float currentTime = 0f;
+            [Min(0f)]
+            public float totalTime = 1f;
+        }
+        
+        [Serializable]
+        public class AnimationEvents
+        {
+            public UnityEvent OnAnimationStart => onAnimationStart;
+            public UnityEvent OnAnimationStop => onAnimationStop;
+            
+            [SerializeField] private UnityEvent onAnimationStart;
+            [SerializeField] private UnityEvent onAnimationStop;
+
+            public AnimationEvents()
             {
                 onAnimationStart = new UnityEvent();
                 onAnimationStop = new UnityEvent();
@@ -219,7 +231,7 @@ namespace CucuTools
         }
 
         [Serializable]
-        private struct AnimationSettings
+        public class AnimationSettings
         {
             public const float MIN_ANIMATION_SPEED = 0f;
             public const float MAX_ANIMATION_SPEED = 10f;
@@ -239,12 +251,8 @@ namespace CucuTools
                 animationSpeed = 1f;
             }
 
-            public void Reset()
+            public AnimationSettings() : this(false)
             {
-                autoStart = false;
-                looped = false;
-                animationTime = 1f;
-                animationSpeed = 1f;
             }
         }
     }

@@ -10,11 +10,11 @@ namespace CucuTools
     {
         public readonly static List<CucuTag> Tags = new List<CucuTag>();
         public string Key => _key;
-        public List<CucuTagArg> Args => args ?? (args = new List<CucuTagArg>());
+        public List<CucuArg> Args => args ?? (args = new List<CucuArg>());
         public Guid Guid => (Guid) (_guid ?? (_guid = Guid.NewGuid()));
 
         [SerializeField] private string _key;
-        [SerializeField] private List<CucuTagArg> args;
+        [SerializeField] private List<CucuArg> args;
         private Guid? _guid;
 
         [SerializeField] private bool _drawGizmos = false;
@@ -60,12 +60,12 @@ namespace CucuTools
             return Tags.SelectWithArg(key, value);
         }
 
-        public static IEnumerable<CucuTag> WithArg(CucuTagArg arg)
+        public static IEnumerable<CucuTag> WithArg(CucuArg arg)
         {
             return Tags.SelectWithArg(arg);
         }
 
-        public static IEnumerable<CucuTag> WithArgs(IEnumerable<CucuTagArg> args)
+        public static IEnumerable<CucuTag> WithArgs(IEnumerable<CucuArg> args)
         {
             return Tags.SelectWithArgs(args);
         }
@@ -100,7 +100,7 @@ namespace CucuTools
             return gameObject.AddComponent<CucuTag>().SetKey(tag);
         }
         
-        public static CucuTag AddArgs(this CucuTag tag, params CucuTagArg[] args)
+        public static CucuTag AddArgs(this CucuTag tag, params CucuArg[] args)
         {
             tag.Args.AddRange(args);
             return tag;
@@ -116,11 +116,11 @@ namespace CucuTools
             return tags.Where(t => t.Args.Any(a => keys.All(k => k == a.key)));
         }
         
-        public static IEnumerable<CucuTag> SelectWithArgs(this IEnumerable<CucuTag> tags, IEnumerable<CucuTagArg> args)
+        public static IEnumerable<CucuTag> SelectWithArgs(this IEnumerable<CucuTag> tags, IEnumerable<CucuArg> args)
         {
             return from tag in tags
                 let t = tag
-                where (args as CucuTagArg[] ?? args.ToArray()).All(a => t.Args.Contains(a))
+                where (args as CucuArg[] ?? args.ToArray()).All(a => t.Args.Contains(a))
                 select tag;
         }
 
@@ -130,7 +130,7 @@ namespace CucuTools
 
         public static CucuTag AddArgs(this CucuTag tag, string key, string value)
         {
-            return tag.AddArgs(new CucuTagArg(key, value));
+            return tag.AddArgs(new CucuArg(key, value));
         }
         
         public static CucuTag AddCucuTag(this Transform transform, string tag)
@@ -138,14 +138,14 @@ namespace CucuTools
             return transform.gameObject.AddCucuTag(tag);
         }
         
-        public static IEnumerable<CucuTag> SelectWithArg(this IEnumerable<CucuTag> tags, CucuTagArg arg)
+        public static IEnumerable<CucuTag> SelectWithArg(this IEnumerable<CucuTag> tags, CucuArg arg)
         {
             return tags.SelectWithArgs(new[] {arg});
         }
 
         public static IEnumerable<CucuTag> SelectWithArg(this IEnumerable<CucuTag> tags, string key, string value)
         {
-            return tags.SelectWithArg(new CucuTagArg(key, value));
+            return tags.SelectWithArg(new CucuArg(key, value));
         }
 
         #endregion

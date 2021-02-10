@@ -4,17 +4,17 @@ using UnityEngine;
 
 namespace CucuTools
 {
-    /// <inheritdoc cref="LerpableBehavior" />
-    [AddComponentMenu(LerpMenuRoot + nameof(LerpableComplex))]
-    public class LerpableComplex : LerpableBehavior, IList<LerpableBehavior>
+    /// <inheritdoc cref="LerpBehavior" />
+    [AddComponentMenu(LerpMenuRoot + nameof(LerpComplex))]
+    public class LerpComplex : LerpBehavior, IList<LerpBehavior>
     {
-        public List<LerpableBehavior> Elements => elements ?? (elements = new List<LerpableBehavior>());
+        public List<LerpBehavior> Elements => elements ?? (elements = new List<LerpBehavior>());
         
         [Header("Elements")]
-        [SerializeField] private List<LerpableBehavior> elements;
+        [SerializeField] private List<LerpBehavior> elements;
 
         /// <inheritdoc />
-        protected override bool UpdateEntityInternal()
+        protected override bool UpdateBehaviour()
         {
             if (Elements == null) return false;
             if (Elements.Count == 0) return false;
@@ -32,7 +32,7 @@ namespace CucuTools
         public int Count => Elements?.Count ?? 0;
         public bool IsReadOnly => false;
         
-        public IEnumerator<LerpableBehavior> GetEnumerator()
+        public IEnumerator<LerpBehavior> GetEnumerator()
         {
             return Elements.GetEnumerator();
         }
@@ -42,7 +42,7 @@ namespace CucuTools
             return Elements.GetEnumerator();
         }
 
-        public void Add(LerpableBehavior item)
+        public void Add(LerpBehavior item)
         {
             Elements.Add(item);
         }
@@ -52,27 +52,27 @@ namespace CucuTools
             Elements.Clear();
         }
 
-        public bool Contains(LerpableBehavior item)
+        public bool Contains(LerpBehavior item)
         {
             return Elements.Contains(item);
         }
 
-        public void CopyTo(LerpableBehavior[] array, int arrayIndex)
+        public void CopyTo(LerpBehavior[] array, int arrayIndex)
         {
             Elements.CopyTo(array, arrayIndex);
         }    
 
-        public bool Remove(LerpableBehavior item)
+        public bool Remove(LerpBehavior item)
         {
             return Elements.Remove(item);
         }
         
-        public int IndexOf(LerpableBehavior item)
+        public int IndexOf(LerpBehavior item)
         {
             return Elements.IndexOf(item);
         }
 
-        public void Insert(int index, LerpableBehavior item)
+        public void Insert(int index, LerpBehavior item)
         {
             Elements.Insert(index, item);
         }
@@ -82,7 +82,7 @@ namespace CucuTools
             Elements.RemoveAt(index);
         }
 
-        public LerpableBehavior this[int index]
+        public LerpBehavior this[int index]
         {
             get => Elements[index];
             set => Elements[index] = value;

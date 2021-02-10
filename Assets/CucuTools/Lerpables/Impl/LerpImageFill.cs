@@ -3,7 +3,8 @@ using UnityEngine.UI;
 
 namespace CucuTools
 {
-    public class LerpableImageFill : LerpableBehavior
+    [AddComponentMenu(LerpMenuRoot + nameof(LerpImageFill))]
+    public class LerpImageFill : LerpBehavior
     {
         [Header("Image")]
         [SerializeField] private Image image;
@@ -12,7 +13,7 @@ namespace CucuTools
         [SerializeField] private Image.FillMethod fillMethod;
         [SerializeField] private bool fillClockwise;
         
-        protected override bool UpdateEntityInternal()
+        protected override bool UpdateBehaviour()
         {
             if (image == null) return false;
             

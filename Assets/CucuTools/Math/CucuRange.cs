@@ -21,7 +21,7 @@ namespace CucuTools
                 
                 UpdateValue();
                 
-                UpdateObserver();
+                Update();
             }
         }
 

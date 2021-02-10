@@ -3,8 +3,8 @@
 namespace CucuTools
 {
     /// <inheritdoc />
-    [AddComponentMenu(LerpMenuRoot + nameof(LerpableCurveInt))]
-    public class LerpableCurveInt : LerpableBehavior<int>
+    [AddComponentMenu(LerpMenuRoot + nameof(LerpCurveInt))]
+    public class LerpCurveInt : LerpBehavior<int>
     {
         public AnimationCurve Curve
         {
@@ -12,7 +12,7 @@ namespace CucuTools
             set
             {
                 curve = value;
-                UpdateEntity();
+                OnObserverUpdated();
             }
         }
 
@@ -20,7 +20,7 @@ namespace CucuTools
         [SerializeField] private AnimationCurve curve;
 
         /// <inheritdoc />
-        protected override bool UpdateEntityInternal()
+        protected override bool UpdateBehaviour()
         {
             Value = (int) Curve.Evaluate(LerpValue);
             return true;

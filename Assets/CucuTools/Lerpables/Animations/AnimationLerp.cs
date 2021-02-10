@@ -6,21 +6,21 @@ namespace CucuTools
     [AddComponentMenu(AnimLerpMenuRoot + nameof(AnimationLerp))]
     public class AnimationLerp : AnimationBehaviour
     {
-        public LerpableBehavior Target
+        public LerpBehavior Target
         {
             get => _target;
             set
             {
                 _target = value;
-                UpdateEntity();
+                
+                OnObserverUpdated();
             }
         }
 
         [Header("Lerpable target")]
-        [SerializeField] private LerpableBehavior _target;
-
-        /// <inheritdoc />
-        protected override bool UpdateEntityInternal()
+        [SerializeField] private LerpBehavior _target;
+        
+        protected override bool UpdateBehaviour()
         {
             if (_target == null) return false;
             if (_target == this) return false;

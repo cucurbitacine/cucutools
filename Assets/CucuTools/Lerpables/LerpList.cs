@@ -1,11 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using UnityEngine;
 
 namespace CucuTools
 {
-    public abstract class LerpableList<TResult, TElement> : LerpableBehavior<TResult>, IList<LerpPoint<TElement>>
+    public abstract class LerpList<TResult, TElement> : LerpBehavior<TResult>, IList<LerpPoint<TElement>>
     {
         public abstract List<LerpPoint<TElement>> Elements { get; protected set; }
 
@@ -93,7 +92,7 @@ namespace CucuTools
         #endregion
     }
 
-    public abstract class LerpableList<TElement> : LerpableList<TElement, TElement>
+    public abstract class LerpableList<TElement> : LerpList<TElement, TElement>
     {
     }
     

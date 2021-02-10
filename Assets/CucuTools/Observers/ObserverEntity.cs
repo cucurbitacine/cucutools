@@ -16,26 +16,16 @@ namespace CucuTools
         {
             if (listeners == null) return;
             foreach (var listener in listeners)
-                Subscribe(listener);
+                if (!IsSubscribed(listener))
+                    _listeners.TryAdd(listener, true);
         }
 
         public void Unsubscribe(params IListenerEntity[] listeners)
         {
             if (listeners == null) return;
             foreach (var listener in listeners)
-                Unsubscribe(listener);
-        }
-
-        public virtual void Subscribe(IListenerEntity listener)
-        {
-            if (!IsSubscribed(listener))
-                _listeners.TryAdd(listener, true);
-        }
-
-        public virtual void Unsubscribe(IListenerEntity listener)
-        {
-            if (IsSubscribed(listener))
-                _listeners.TryRemove(listener, out _);
+                if (IsSubscribed(listener))
+                    _listeners.TryRemove(listener, out _);
         }
 
         public virtual void UnsubscribeAll()
@@ -47,29 +37,19 @@ namespace CucuTools
         {
             if (listeners == null) return;
             foreach (var listener in listeners)
-                Silence(listener);
+                if (IsSubscribed(listener))
+                    _listeners[listener] = false;
         }
 
         public void Unsilence(params IListenerEntity[] listeners)
         {
             if (listeners == null) return;
             foreach (var listener in listeners)
-                Unsilence(listener);
+                if (IsSubscribed(listener))
+                    _listeners[listener] = true;
         }
 
-        public virtual void Silence(IListenerEntity listener)
-        {
-            if (IsSubscribed(listener))
-                _listeners[listener] = false;
-        }
-
-        public virtual void Unsilence(IListenerEntity listener)
-        {
-            if (IsSubscribed(listener))
-                _listeners[listener] = true;
-        }
-
-        public virtual void UpdateObserver()
+        public virtual void Update()
         {
             foreach (var pair in _listeners)
             {

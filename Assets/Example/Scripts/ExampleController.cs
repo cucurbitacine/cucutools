@@ -6,7 +6,7 @@ namespace Example.Scripts
     public class ExampleController : MonoBehaviour
     {
         [Header("Observer")]
-        public LerpableColor lerpColor;
+        public LerpColor lerpColor;
 
         [Header("Listeners")]
         public ListenerEntity<Color> listenerColor;

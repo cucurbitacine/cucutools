@@ -3,8 +3,8 @@ using UnityEngine;
 namespace CucuTools
 {
     /// <inheritdoc />
-    [AddComponentMenu(LerpMenuRoot + nameof(LerpableRendererColor))]
-    public class LerpableRendererColor : LerpableColor
+    [AddComponentMenu(LerpMenuRoot + nameof(LerpRendererColor))]
+    public class LerpRendererColor : LerpColor
     {
         public Renderer Renderer
         {
@@ -16,9 +16,9 @@ namespace CucuTools
         [SerializeField] private Renderer renderer;
         
         /// <inheritdoc />
-        protected override bool UpdateEntityInternal()
+        protected override bool UpdateBehaviour()
         {
-            if (!base.UpdateEntityInternal()) return false;
+            if (!base.UpdateBehaviour()) return false;
 
             if (renderer == null) return false;
             

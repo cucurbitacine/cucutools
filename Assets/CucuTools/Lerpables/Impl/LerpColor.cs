@@ -3,8 +3,8 @@ using UnityEngine;
 namespace CucuTools
 {
     /// <inheritdoc />
-    [AddComponentMenu(LerpMenuRoot + nameof(LerpableColor))]
-    public class LerpableColor : LerpableBehavior<Color>
+    [AddComponentMenu(LerpMenuRoot + nameof(LerpColor))]
+    public class LerpColor : LerpBehavior<Color>
     {
         public Gradient Gradient
         {
@@ -12,7 +12,7 @@ namespace CucuTools
             set
             {
                 gradient = value;
-                UpdateEntity();
+                OnObserverUpdated();
             }
         }
 
@@ -20,7 +20,7 @@ namespace CucuTools
         [SerializeField] private Gradient gradient;
 
         /// <inheritdoc />
-        protected override bool UpdateEntityInternal()
+        protected override bool UpdateBehaviour()
         {
             Value = Gradient.Evaluate(LerpValue);
             return true;

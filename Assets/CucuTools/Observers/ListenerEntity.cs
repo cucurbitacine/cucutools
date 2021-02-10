@@ -36,22 +36,22 @@ namespace CucuTools
 
         [SerializeField] private TValue value;
 
-        private IGetValue<TValue> _resource;
+        private IGetValue<TValue> _observer;
 
-        public ListenerEntity(IGetValue<TValue> resource)
+        public ListenerEntity(IObserverEntity<TValue> observer)
         {
-            _resource = resource;
+            _observer = observer;
         }
 
         protected ListenerEntity()
         {
-            _resource = null;
+            _observer = null;
         }
         
         public void OnObserverUpdated()
         {
-            if (_resource != null)
-                Value = _resource.Value;
+            if (_observer != null)
+                Value = _observer.Value;
         }
     }
 

@@ -3,16 +3,16 @@
 namespace CucuTools
 {
     /// <inheritdoc />
-    [AddComponentMenu(LerpMenuRoot + nameof(LerpableActive))]
-    public class LerpableActive : LerpableBool
+    [AddComponentMenu(LerpMenuRoot + nameof(LerpActive))]
+    public class LerpActive : LerpBool
     {
         [Header("Target game object")]
         [SerializeField] private GameObject target;
 
         /// <inheritdoc />
-        protected override bool UpdateEntityInternal()
+        protected override bool UpdateBehaviour()
         {
-            if (!base.UpdateEntityInternal()) return false;
+            if (!base.UpdateBehaviour()) return false;
 
             if (target == null) return false;
 

@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace CucuTools.Editor.Tags
 {
-    [CustomPropertyDrawer(typeof(CucuTagArg))]
+    [CustomPropertyDrawer(typeof(CucuArg))]
     internal class CucuTagArgDrawer : PropertyDrawer
     {
         public override void OnGUI(Rect pos, SerializedProperty pro, GUIContent label)
