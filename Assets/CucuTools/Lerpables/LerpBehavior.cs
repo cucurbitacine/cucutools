@@ -37,7 +37,6 @@ namespace CucuTools
 
         protected virtual void OnAwake()
         {
-            
         }
         
         private void Awake()
@@ -50,6 +49,10 @@ namespace CucuTools
         protected virtual void OnValidate()
         {
             UpdateBehaviour();
+        }
+
+        protected virtual void OnDrawGizmos()
+        {
         }
     }
 
