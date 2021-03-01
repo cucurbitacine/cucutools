@@ -5053,8 +5053,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1494643342}
-  - component: {fileID: 1494643341}
   - component: {fileID: 1494643343}
+  - component: {fileID: 1494643341}
   m_Layer: 0
   m_Name: StateMachine
   m_TagString: Untagged
@@ -5106,6 +5106,56 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8c44da4c661bc9942a0bb9ea96733039, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  currentSceneName: cucuexample
+  args:
+    delay: 0
+  timer:
+    isDone: 0
+    success: 0
+    started: 0
+    delay: 0
+    _beforeTimer:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1494643343}
+          m_TargetAssemblyTypeName: Example.Scripts.ExampleController, CucuTools.Example
+          m_MethodName: Log
+          m_Mode: 5
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: Scene loaded
+            m_BoolArgument: 0
+          m_CallState: 2
+    _afterTimer:
+      m_PersistentCalls:
+        m_Calls:
+        - m_Target: {fileID: 1494643343}
+          m_TargetAssemblyTypeName: Example.Scripts.ExampleController, CucuTools.Example
+          m_MethodName: Log
+          m_Mode: 5
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: Start animation
+            m_BoolArgument: 0
+          m_CallState: 2
+        - m_Target: {fileID: 1822970829}
+          m_TargetAssemblyTypeName: CucuTools.AnimationBehaviour, CucuTools
+          m_MethodName: StartAnimation
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
 --- !u!43 &1505046497
 Mesh:
   m_ObjectHideFlags: 0
@@ -6133,7 +6183,7 @@ MonoBehaviour:
     currentTime: 0
     totalTime: 4
   animationSettings:
-    autoStart: 1
+    autoStart: 0
     looped: 1
     animationTime: 4
     animationSpeed: 1

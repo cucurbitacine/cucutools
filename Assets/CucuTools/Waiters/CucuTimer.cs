@@ -15,14 +15,17 @@ namespace CucuTools
         }
         
         public bool Started => started;
+
+        private UnityEvent beforeTimer => _beforeTimer ?? (_beforeTimer = new UnityEvent());
+        private UnityEvent afterTimer => _afterTimer ?? (_afterTimer = new UnityEvent());
         
         [Header("Timer")]
         [SerializeField] private bool started;
         [Min(0f)]
         [SerializeField] private float delay;
 
-        [SerializeField] private UnityEvent beforeTimer;
-        [SerializeField] private UnityEvent afterTimer;
+        private UnityEvent _beforeTimer;
+        private UnityEvent _afterTimer;
         
         private Task _task;
         
@@ -30,9 +33,6 @@ namespace CucuTools
         {
             this.delay = delay;
 
-            beforeTimer = new UnityEvent();
-            afterTimer = new UnityEvent();
-            
             OnCompleted.AddListener(() =>
             {
                 started = false;

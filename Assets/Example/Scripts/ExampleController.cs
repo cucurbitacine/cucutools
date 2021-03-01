@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Threading.Tasks;
 using CucuTools;
@@ -7,8 +8,18 @@ using Random = UnityEngine.Random;
 
 namespace Example.Scripts
 {
-    public class ExampleController : MonoBehaviour
+    public class ExampleController : CucuInjectorBehaviour
     {
+        [Header("Example")]
+        [SerializeField] private CucuTimer timer;
+        [InjectArg]
+        [SerializeField] private AnimationBehaviour animation;
+
+        [InjectArg]
+        [SerializeField] private ExampleCucuArg cucuArg;
+        
+        #region Log
+
         public void Log(string msg)
         {
             Debug.Log(msg);
@@ -23,6 +34,8 @@ namespace Example.Scripts
         {
             Debug.LogError(msg);
         }
+
+        #endregion
 
         #region Task
 
@@ -72,7 +85,8 @@ namespace Example.Scripts
         [CucuButton("Wait AsyncOperation", group: "AsyncOperation")]
         private void WaitAsyncOperation()
         {
-            new WaiterOperation(SceneManager.LoadSceneAsync(SceneManager.GetActiveScene().name))
+            new WaiterOperation(CucuSceneManager.LoadSingleSceneAsync(
+                    SceneManager.GetActiveScene().name, new ExampleCucuArg(3f)))
                 .OnCompleted.AddListener(() => Debug.Log("Wait :: AsyncOperation :: Done"));
         }
 
@@ -114,17 +128,28 @@ namespace Example.Scripts
 
         #endregion
 
-        public CucuTimer timer;
-        public AnimationBehaviour animation;
-        
-        private void Start()
+        protected override void OnAwake()
         {
-            timer = new CucuTimer(3f);
+            timer = new CucuTimer(0f);
 
+            if (cucuArg != null && cucuArg.IsValid) timer.Delay = cucuArg.delay;
+            
             timer
-                .Before(() => Debug.Log($"The animation will start in {timer.Delay} seconds"))
+                .Before(() => Debug.Log($"Starting animation in {timer.Delay} seconds"))
                 .After(() => animation.StartAnimation())
                 .Start();
+        }
+    }
+    
+    [Serializable]
+    public class ExampleCucuArg : CucuArg
+    {
+        [Min(0f)]
+        public float delay;
+
+        public ExampleCucuArg(float d)
+        {
+            delay = d;
         }
     }
 }
