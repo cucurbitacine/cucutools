@@ -13,7 +13,7 @@ namespace Example.Scripts
         [Header("Example")]
         [SerializeField] private CucuTimer timer;
         [InjectArg]
-        [SerializeField] private AnimationBehaviour animation;
+        [SerializeField] private AnimationBehaviour animationBehaviour;
 
         [InjectArg]
         [SerializeField] private ExampleCucuArg cucuArg;
@@ -136,7 +136,7 @@ namespace Example.Scripts
             
             timer
                 .Before(() => Debug.Log($"Starting animation in {timer.Delay} seconds"))
-                .After(() => animation.StartAnimation())
+                .After(() => animationBehaviour.StartAnimation())
                 .Start();
         }
     }

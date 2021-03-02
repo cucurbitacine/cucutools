@@ -8,23 +8,23 @@ namespace CucuTools
     {
         public Renderer Renderer
         {
-            get => renderer;
-            set => renderer = value;
+            get => rendererTarget;
+            set => rendererTarget = value;
         }
         
         [Header("Renderer")]
-        [SerializeField] private Renderer renderer;
+        [SerializeField] private Renderer rendererTarget;
         
         /// <inheritdoc />
         protected override bool UpdateBehaviour()
         {
             if (!base.UpdateBehaviour()) return false;
 
-            if (renderer == null) return false;
+            if (rendererTarget == null) return false;
 
             if (Application.isPlaying)
             {
-                renderer.material.color = Value;
+                rendererTarget.material.color = Value;
             }
 
             return true;

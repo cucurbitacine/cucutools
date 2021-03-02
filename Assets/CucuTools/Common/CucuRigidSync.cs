@@ -21,8 +21,8 @@ namespace CucuTools
     
         public Rigidbody Rigidbody
         {
-            get => rigidbody;
-            protected set => rigidbody = value;
+            get => rigid;
+            protected set => rigid = value;
         }
 
         [Header("Main Settings")]
@@ -38,7 +38,7 @@ namespace CucuTools
         [SerializeField] private float syncWeight = 1f;
     
         [Header("References")]
-        [SerializeField] private Rigidbody rigidbody;
+        [SerializeField] private Rigidbody rigid;
         [SerializeField] private Collider[] colliders;
     
         public bool IsValid()
