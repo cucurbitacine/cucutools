@@ -13,19 +13,19 @@ namespace CucuTools
             return SceneManager.LoadSceneAsync(name, mode);
         }
 
-        public static AsyncOperation LoadSceneAsync(string name, LoadSceneMode mode, params object[] args)
+        public static AsyncOperation LoadSceneAsync(string name, LoadSceneMode mode, object[] args)
         {
             ArgumentManager.SetArguments(args);
 
             return LoadSceneAsync(name, mode);
         }
 
-        public static AsyncOperation LoadSingleSceneAsync(string name, params object[] args)
+        public static AsyncOperation LoadSingleSceneAsync(string name, object[] args)
         {
             return LoadSceneAsync(name, LoadSceneMode.Single, args);
         }
 
-        public static AsyncOperation LoadAdditiveSceneAsync(string name, params object[] args)
+        public static AsyncOperation LoadAdditiveSceneAsync(string name, object[] args)
         {
             return LoadSceneAsync(name, LoadSceneMode.Additive, args);
         }

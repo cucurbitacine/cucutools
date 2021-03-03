@@ -1,5 +1,6 @@
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Threading.Tasks;
 using CucuTools;
 using UnityEngine;
@@ -12,12 +13,15 @@ namespace Example.Scripts
     {
         [Header("Example")]
         [SerializeField] private CucuTimer timer;
-        [InjectArg]
         [SerializeField] private AnimationBehaviour animationBehaviour;
 
+        [Header("Serialized storage")]
+        [SerializeField] private SerializedSceneObject storage;
+        
         [InjectArg]
         [SerializeField] private ExampleCucuArg cucuArg;
-        
+
+
         #region Log
 
         public void Log(string msg)
@@ -85,8 +89,12 @@ namespace Example.Scripts
         [CucuButton("Wait AsyncOperation", group: "AsyncOperation")]
         private void WaitAsyncOperation()
         {
+            var args = new List<CucuArg>();
+            
+            args.Add(new ExampleCucuArg(3f));
+
             new WaiterOperation(CucuSceneManager.LoadSingleSceneAsync(
-                    SceneManager.GetActiveScene().name, new ExampleCucuArg(3f)))
+                    SceneManager.GetActiveScene().name, args.ToArray()))
                 .OnCompleted.AddListener(() => Debug.Log("Wait :: AsyncOperation :: Done"));
         }
 
@@ -99,7 +107,7 @@ namespace Example.Scripts
         {
             var waiter = new WaiterCustom();
             waiter.OnCompleted.AddListener(() => Log($"Wait :: Custom :: Done"));
-            
+
             StartCoroutine(InvokeDelay(waiter, Random.Range(1f, 5f)));
         }
 
@@ -108,21 +116,21 @@ namespace Example.Scripts
         {
             var waiter = new WaiterCustom<string>();
             waiter.OnCompletedResult.AddListener(t => Log($"Wait :: Custom :: Done :: {t}"));
-            
+
             StartCoroutine(InvokeDelay(waiter, Random.Range(1f, 5f)));
         }
-        
+
         private IEnumerator InvokeDelay(WaiterCustom custom, float delay)
         {
             yield return new WaitForSeconds(delay);
-            
+
             custom.Invoke();
         }
-        
+
         private IEnumerator InvokeDelay(WaiterCustom<string> custom, float delay)
         {
             yield return new WaitForSeconds(delay);
-            
+
             custom.Invoke("Result");
         }
 
@@ -133,19 +141,18 @@ namespace Example.Scripts
             timer = new CucuTimer(0f);
 
             if (cucuArg != null && cucuArg.IsValid) timer.Delay = cucuArg.delay;
-            
+
             timer
                 .Before(() => Debug.Log($"Starting animation in {timer.Delay} seconds"))
                 .After(() => animationBehaviour.StartAnimation())
                 .Start();
         }
     }
-    
+
     [Serializable]
     public class ExampleCucuArg : CucuArg
     {
-        [Min(0f)]
-        public float delay;
+        [Min(0f)] public float delay;
 
         public ExampleCucuArg(float d)
         {
