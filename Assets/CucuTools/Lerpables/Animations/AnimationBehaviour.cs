@@ -1,8 +1,9 @@
 using System;
+using CucuTools.Attributes;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace CucuTools
+namespace CucuTools.Lerpables.Animations
 {
     public abstract class AnimationBehaviour : LerpBehavior
     {
@@ -79,7 +80,7 @@ namespace CucuTools
 
         #region Public API
 
-        [CucuButton("Start", group: GroupBaseName, order: 0)]
+        [CucuButton("Start", @group: GroupBaseName, order: 0)]
         public void StartAnimation()
         {
             if (!Application.isPlaying) return;
@@ -93,7 +94,7 @@ namespace CucuTools
             if (Playing) OnAnimationStart.Invoke();
         }
 
-        [CucuButton("Stop", group: GroupBaseName, order: 1)]
+        [CucuButton("Stop", @group: GroupBaseName, order: 1)]
         public void StopAnimation()
         {
             if (!Application.isPlaying) return;

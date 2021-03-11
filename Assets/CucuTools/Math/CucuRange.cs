@@ -1,10 +1,11 @@
 using System;
+using CucuTools.Observers;
 using UnityEngine;
 
-namespace CucuTools
+namespace CucuTools.Math
 {
     [Serializable]
-    public class CucuRange<T> : ObserverEntity, IComparable, IObserverEntity<T>, ISetValue<T>
+    public class CucuRange<T> : ObserverEntity, IComparable, IObserverEntity<T>
         where T : IComparable
     {
         public T Value

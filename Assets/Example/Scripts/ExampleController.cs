@@ -1,28 +1,27 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using System.IO;
 using System.Threading.Tasks;
-using CucuTools;
-using CucuTools.FileUtility;
-using UnityEditor.Build;
+using CucuTools.ArgumentInjector;
+using CucuTools.Attributes;
+using CucuTools.Common;
+using CucuTools.Lerpables.Animations;
+using CucuTools.Waiters.Impl;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
 
 namespace Example.Scripts
 {
-    public class ExampleController : CucuInjectorBehaviour
+    public class ExampleController : CucuMonoBehaviour
     {
-        [Header("Example")]
+        [Header("Timer")]
         [SerializeField] private CucuTimer timer;
         [SerializeField] private AnimationBehaviour animationBehaviour;
 
-        [Header("Serialized storage")]
-        [SerializeField] private SerializedSceneObject storage;
-        
-        [InjectArg]
-        [SerializeField] private ExampleCucuArg cucuArg;
+        [Header("Argument")]
+        [CucuArg]
+        [SerializeField] private ExampleCucuArg exampleArg;
 
         #region Log
 
@@ -45,13 +44,13 @@ namespace Example.Scripts
 
         #region Task
 
-        [CucuButton("Wait Task", group: "Task")]
+        [CucuButton("Wait Task", group: "Waiter", colorHex: "0000AA")]
         private void WaitTask()
         {
             this.Wait(Task()).OnCompleted.AddListener(() => Log("Wait :: Task :: Done"));
         }
 
-        [CucuButton("Wait Task<string>", group: "Task")]
+        [CucuButton("Wait Task<string>", group: "Waiter", colorHex: "0000BB")]
         private void WaitTaskString()
         {
             this.Wait(TaskString()).OnCompletedResult.AddListener(t => Log($"Wait :: Task<string> :: Done :: {t}"));
@@ -73,7 +72,7 @@ namespace Example.Scripts
 
         #region Coroutine
 
-        [CucuButton("Wait coroutine", group: "Coroutine")]
+        [CucuButton("Wait coroutine", group: "Waiter", colorHex: "00AA00")]
         private void WaitCoroutine()
         {
             this.Wait(Coroutine()).OnCompleted.AddListener(() => Log("Wait :: Coroutine :: Done"));
@@ -88,7 +87,7 @@ namespace Example.Scripts
 
         #region AsyncOperation
 
-        [CucuButton("Wait AsyncOperation", group: "AsyncOperation")]
+        [CucuButton("Wait AsyncOperation", group: "Waiter", colorHex: "AA0000")]
         private void WaitAsyncOperation()
         {
             var args = new List<CucuArg>();
@@ -104,7 +103,7 @@ namespace Example.Scripts
 
         #region Custom
 
-        [CucuButton("Wait custom", group: "Custom")]
+        [CucuButton("Wait custom", group: "Waiter", colorHex: "AAAA00")]
         private void WaitCustom()
         {
             var waiter = new WaiterCustom();
@@ -113,7 +112,7 @@ namespace Example.Scripts
             StartCoroutine(InvokeDelay(waiter, Random.Range(1f, 5f)));
         }
 
-        [CucuButton("Wait custom result", group: "Custom")]
+        [CucuButton("Wait custom result", group: "Waiter", colorHex: "BBBB00")]
         private void WaitCustomString()
         {
             var waiter = new WaiterCustom<string>();
@@ -142,7 +141,7 @@ namespace Example.Scripts
         {
             timer = new CucuTimer(0f);
 
-            if (cucuArg != null && cucuArg.IsValid) timer.Delay = cucuArg.delay;
+            if (exampleArg != null && exampleArg.IsValid) timer.Delay = exampleArg.delay;
 
             timer
                 .Before(() => Debug.Log($"Starting animation in {timer.Delay} seconds"))

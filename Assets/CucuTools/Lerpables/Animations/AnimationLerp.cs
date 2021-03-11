@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace CucuTools
+namespace CucuTools.Lerpables.Animations
 {
     /// <inheritdoc />
     [AddComponentMenu(AnimLerpMenuRoot + nameof(AnimationLerp))]

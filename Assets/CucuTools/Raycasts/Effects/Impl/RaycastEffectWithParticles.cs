@@ -1,8 +1,8 @@
 ﻿using System;
-using UnityEditor;
+using CucuTools.Attributes;
 using UnityEngine;
 
-namespace CucuTools
+namespace CucuTools.Raycasts.Effects.Impl
 {
     /// <inheritdoc />
     public class RaycastEffectWithParticles : RaycastEffectBase
@@ -49,7 +49,7 @@ namespace CucuTools
             }
         }
 
-        [CucuButton(group: "Particles")]
+        [CucuButton(@group: "Particles")]
         private void Play()
         {
             if (effectUnits == null) return;
@@ -63,7 +63,7 @@ namespace CucuTools
             }
         }
         
-        [CucuButton(group: "Particles")]
+        [CucuButton(@group: "Particles")]
         private void Stop()
         {
             if (effectUnits == null) return;

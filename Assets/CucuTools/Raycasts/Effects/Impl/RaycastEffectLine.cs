@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace CucuTools
+namespace CucuTools.Raycasts.Effects.Impl
 {
     public class RaycastEffectLine : RaycastEffectBase
     {

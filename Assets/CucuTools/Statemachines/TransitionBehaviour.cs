@@ -1,7 +1,9 @@
 using System.Linq;
+using CucuTools.Attributes;
+using CucuTools.Statemachines.Core;
 using UnityEngine;
 
-namespace CucuTools
+namespace CucuTools.Statemachines
 {
     public class TransitionBehaviour : TransitionEntity
     {
@@ -33,7 +35,7 @@ namespace CucuTools
 
         private StateEntity _ownerCache;
         
-        [CucuButton]
+        [CucuButton(colorHex: "0000AA")]
         private void Setup()
         {
             conditions = GetComponentsInChildren<ConditionEntity>();

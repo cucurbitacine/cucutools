@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace CucuTools
+namespace CucuTools.Statemachines.Core
 {
     [DisallowMultipleComponent]
     public abstract class StateEntity : MonoBehaviour

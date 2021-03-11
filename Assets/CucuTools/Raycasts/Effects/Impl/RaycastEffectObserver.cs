@@ -1,7 +1,8 @@
 using System;
+using CucuTools.Attributes;
 using UnityEngine;
 
-namespace CucuTools
+namespace CucuTools.Raycasts.Effects.Impl
 {
     public class RaycastEffectObserver : RaycastEffectBase
     {
@@ -35,7 +36,7 @@ namespace CucuTools
             Observe();
         }
 
-        [CucuButton(group: "Observer")]
+        [CucuButton(@group: "Observer")]
         private void Observe()
         {
             hasHit = Raycaster.Raycast(out _hitCached);

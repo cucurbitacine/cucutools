@@ -1,7 +1,9 @@
 using System.Linq;
+using CucuTools.Attributes;
+using CucuTools.Statemachines.Core;
 using UnityEngine;
 
-namespace CucuTools
+namespace CucuTools.Statemachines
 {
     public class StateMachineBehaviour : StateMachineEntity
     {
@@ -29,7 +31,7 @@ namespace CucuTools
             return IsPlaying && Current.IsLast && ((nextState = Transitions?.FirstOrDefault(t => t.IsReady)?.Target) != null);
         }
 
-        [CucuButton("Start", group:"State")]
+        [CucuButton("Start", @group:"State", colorHex:"00AA00")]
         public override void StartState()
         {
             if (IsPlaying) return;
@@ -39,7 +41,7 @@ namespace CucuTools
             Current.StartState();
         }
 
-        [CucuButton("Stop", group:"State")]
+        [CucuButton("Stop", @group:"State", colorHex:"AA0000")]
         public override void StopState()
         {
             if (!IsPlaying) return;
@@ -49,7 +51,7 @@ namespace CucuTools
             Current.StopState();
         }
 
-        [CucuButton]
+        [CucuButton(colorHex:"0000AA")]
         private void Setup()
         {
             SetupTransitions();

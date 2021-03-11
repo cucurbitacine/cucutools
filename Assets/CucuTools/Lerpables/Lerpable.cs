@@ -1,10 +1,11 @@
 using System;
+using CucuTools.Observers;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace CucuTools
+namespace CucuTools.Lerpables
 {
-    /// <inheritdoc cref="CucuTools.ILerpable" />
+    /// <inheritdoc cref="ILerpable" />
     [Serializable]
     public sealed class Lerpable : ObserverEntity, ILerpable
     {

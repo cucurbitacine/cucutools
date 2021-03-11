@@ -1,8 +1,9 @@
-using System;
 using System.Linq;
+using CucuTools.Attributes;
+using CucuTools.Statemachines.Core;
 using UnityEngine;
 
-namespace CucuTools
+namespace CucuTools.Statemachines
 {
     public class StateBehaviour : StateEntity
     {
@@ -50,8 +51,8 @@ namespace CucuTools
                 trigger.Invoke(StateTrigger.InvokeMode.OnStop);
             }
         }
-        
-        [CucuButton]
+
+        [CucuButton(colorHex: "0000AA")]
         private void Setup()
         {
             SetupTransitions();

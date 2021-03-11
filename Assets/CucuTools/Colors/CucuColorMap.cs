@@ -1,4 +1,4 @@
-namespace CucuTools
+namespace CucuTools.Colors
 {
     public enum CucuColorMap
     {

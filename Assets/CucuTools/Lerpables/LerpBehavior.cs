@@ -1,10 +1,12 @@
 using System;
+using CucuTools.Common;
+using CucuTools.Observers;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace CucuTools
+namespace CucuTools.Lerpables
 {
-    /// <inheritdoc cref="CucuTools.ILerpable" />
+    /// <inheritdoc cref="ILerpable" />
     public abstract class LerpBehavior : ObserverBehaviour, ILerpable, IListenerEntity
     {
         public const string LerpMenuRoot = Cucu.MenuRoot + "Lerp/";

@@ -1,4 +1,4 @@
-namespace CucuTools
+namespace CucuTools.Statemachines.Core
 {
     public abstract class StateMachineEntity : StateEntity
     {

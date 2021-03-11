@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace CucuTools
+namespace CucuTools.Observers
 {
     public class ListenerEntity : IListenerEntity
     {
@@ -36,7 +36,7 @@ namespace CucuTools
 
         [SerializeField] private TValue value;
 
-        private IGetValue<TValue> _observer;
+        private IObserverEntity<TValue> _observer;
 
         public ListenerEntity(IObserverEntity<TValue> observer)
         {
@@ -55,7 +55,7 @@ namespace CucuTools
         }
     }
 
-    public static class ListenerExt
+    public static class ListenerExtenstions
     {
         public static void Subscribe(this IListenerEntity listener, IObserverEntity observer)
         {

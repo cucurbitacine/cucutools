@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace CucuTools
+namespace CucuTools.Lerpables.Impl
 {
     [AddComponentMenu(LerpMenuRoot + nameof(LerpImageFill))]
     public class LerpImageFill : LerpBehavior

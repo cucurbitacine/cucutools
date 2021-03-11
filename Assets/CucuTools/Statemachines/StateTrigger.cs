@@ -1,7 +1,8 @@
+using CucuTools.Statemachines.Core;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace CucuTools
+namespace CucuTools.Statemachines
 {
     public class StateTrigger : MonoBehaviour
     {

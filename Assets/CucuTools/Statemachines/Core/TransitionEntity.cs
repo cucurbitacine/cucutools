@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace CucuTools
+namespace CucuTools.Statemachines.Core
 {
     public abstract class TransitionEntity : MonoBehaviour
     {

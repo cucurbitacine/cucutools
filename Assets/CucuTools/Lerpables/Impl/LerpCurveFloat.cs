@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace CucuTools
+namespace CucuTools.Lerpables.Impl
 {
     /// <inheritdoc />
     [AddComponentMenu(LerpMenuRoot + nameof(LerpCurveFloat))]

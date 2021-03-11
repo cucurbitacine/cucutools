@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace CucuTools
+namespace CucuTools.Attributes
 {
     [AttributeUsage(AttributeTargets.Method)]
     public class CucuButtonAttribute : Attribute
@@ -8,14 +8,14 @@ namespace CucuTools
         public string Name { get; }
         public byte Order { get; }
         public string Group { get; }
-        public string Color { get; }
+        public string ColorHex { get; }
         
-        public CucuButtonAttribute(string name = null, byte order = 127, string group = null, string color = null)
+        public CucuButtonAttribute(string name = null, byte order = 127, string group = null, string colorHex = null)
         {
             Name = name;
             Order = order;
             Group = group;
-            Color = color;
+            ColorHex = colorHex ?? "888888";
         }
     }
 }

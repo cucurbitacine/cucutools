@@ -1,6 +1,7 @@
+using CucuTools.Statemachines.Core;
 using UnityEngine;
 
-namespace CucuTools
+namespace CucuTools.Statemachines
 {
     public class ConditionBehaviour : ConditionEntity
     {

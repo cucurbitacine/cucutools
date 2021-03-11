@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CucuTools
+namespace CucuTools.Lerpables
 {
     public abstract class LerpList<TResult, TElement> : LerpBehavior<TResult>, IList<LerpPoint<TElement>>
     {

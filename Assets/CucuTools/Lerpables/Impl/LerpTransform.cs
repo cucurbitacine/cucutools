@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using CucuTools.Colors;
+using CucuTools.Common;
+using CucuTools.Math;
 using UnityEngine;
 
-namespace CucuTools
+namespace CucuTools.Lerpables.Impl
 {
     [AddComponentMenu(LerpMenuRoot + nameof(LerpTransform))]
     public class LerpTransform : LerpList<CucuTransform, Transform>
@@ -101,7 +104,7 @@ namespace CucuTools
                 
                 if (point.Value == null) continue;
 
-                Gizmos.color = CucuColorPalette.Rainbow.Get(point.T);
+                Gizmos.color = CucuColor.Rainbow.Get(point.T);
                 
                 if (i < ordered.Length - 1)
                 {
