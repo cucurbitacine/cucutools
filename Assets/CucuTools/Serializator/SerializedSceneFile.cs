@@ -1,62 +1,47 @@
 using System;
-using System.IO;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
+using CucuTools.FileUtility;
 using UnityEngine;
-using Directory = System.IO.Directory;
-using File = System.IO.File;
 
 namespace CucuTools
 {
     public class SerializedSceneFile : SerializedSceneProvider
     {
-        private Encoding Encoding => Encoding.Default;
+        public DirectoryUtility DirectoryUtility => _directoryUtility ?? (_directoryUtility = new DirectoryUtility(folderName));
         
         [SerializeField] private string folderName;
-
-        public override async Task CreateScene(string sceneName, params SerializedComponent[] components)
+        [SerializeField] private string fileExtention = "json";
+        
+        private DirectoryUtility _directoryUtility;
+        
+        public override async Task CreateScene(string sceneDataName, params SerializedComponent[] components)
         {
-            if (!Directory.Exists(folderName))
-            {
-                Directory.CreateDirectory(folderName);
-            }
+            var fileName = GetSceneFileName(sceneDataName);
             
-            using var fs = new FileStream(GetPath(sceneName), FileMode.Create);
+            if (!DirectoryUtility.Exists()) DirectoryUtility.CreateDirectory();
             
             var json = GetJson(components);
-
-            var bytes = Encoding.GetBytes(json);
-
-            await fs.WriteAsync(bytes, 0, bytes.Length);
+            
+            await DirectoryUtility.CreateFileAsync(fileName, json);
         }
 
-        public override async Task<SerializedComponent[]> ReadScene(string sceneName)
+        public override async Task<SerializedComponent[]> ReadScene(string sceneDataName)
         {
-            if (!Directory.Exists(folderName)) return new SerializedComponent[0];
-
-            if (!File.Exists(GetPath(sceneName))) return new SerializedComponent[0];
+            var fileName = GetSceneFileName(sceneDataName);
             
-            using var fs = new FileStream(GetPath(sceneName), FileMode.Open);
+            if (!DirectoryUtility.ExistsFile(fileName)) return new SerializedComponent[0];
 
-            var bytes = new byte[fs.Length];
-
-            await fs.ReadAsync(bytes, 0, (int) fs.Length);
-
-            var json = Encoding.GetString(bytes);
+            var json = await DirectoryUtility.ReadFileStringAsync(fileName);
 
             return JsonUtility.FromJson<ComponentDTO>(json).components;
         }
 
-        public override async Task UpdateScene(string sceneName, params SerializedComponent[] components)
+        public override async Task UpdateScene(string sceneDataName, params SerializedComponent[] components)
         {
-            if (!Directory.Exists(folderName) || !File.Exists(GetPath(sceneName)))
-            {
-                await CreateScene(sceneName, components);
-                return;
-            }
-
-            var prevComps = await ReadScene(sceneName);
+            var fileName = GetSceneFileName(sceneDataName);
+            
+            var prevComps = await ReadScene(fileName);
 
             var newComps = components.Where(c => prevComps.All(p => p.Guid != c.Guid)).ToArray();
             var oldComps = components.Where(c => prevComps.Any(p => p.Guid == c.Guid)).ToArray();
@@ -74,47 +59,41 @@ namespace CucuTools
 
             var comps = prevComps.Concat(newComps).ToArray();
             
-            using var fs = new FileStream(GetPath(sceneName), FileMode.Create);
-            
             var json = GetJson(comps);
 
-            var bytes = Encoding.GetBytes(json);
-
-            await fs.WriteAsync(bytes, 0, bytes.Length);
+            await DirectoryUtility.WriteFileAsync(fileName, json);
         }
 
-        public override Task DeleteScenes(params string[] sceneNames)
+        public override Task DeleteScenes(params string[] sceneDataNames)
         {
-            if (!Directory.Exists(folderName)) return Task.CompletedTask;
+            if (!DirectoryUtility.Exists()) return Task.CompletedTask;
 
-            foreach (var sceneName in sceneNames)
+            foreach (var sceneDataName in sceneDataNames)
             {
-                if (!File.Exists(GetPath(sceneName))) return Task.CompletedTask;
+                var fileName = GetSceneFileName(sceneDataName);
                 
-                File.Delete(GetPath(sceneName));
+                if (!DirectoryUtility.ExistsFile(fileName)) continue;
+                
+                DirectoryUtility.DeleteFile(fileName);
             }
             
             return Task.CompletedTask;
-        }
-
-        private string GetFileName(string sceneName)
-        {
-            return $"{sceneName}.json";
-        }
-
-        private string GetPath(string sceneName)
-        {
-            return Path.Combine(folderName, GetFileName(sceneName));
         }
 
         private string GetJson(params SerializedComponent[] components)
         {
             return JsonUtility.ToJson(new ComponentDTO(components));
         }
+
+        private string GetSceneFileName(string sceneDataName)
+        {
+            return sceneDataName.FileExt(fileExtention);
+        }
         
         private void OnValidate()
         {
             folderName = Application.streamingAssetsPath;
+            DirectoryUtility.DirectoryPath = folderName;
         }
 
         [Serializable]

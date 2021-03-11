@@ -3,23 +3,23 @@ using UnityEngine;
 
 namespace CucuTools
 {
-    public class SerializableMeshRenderer : SerializableComponent<MeshRenderer, SerializedColor>
+    public class SerializableMeshRenderer : SerializableComponent<MeshRenderer, SerializedMeshRenderer>
     {
         [SerializeField] private Color color;
         
-        public override SerializedColor ReadComponent()
+        public override SerializedMeshRenderer ReadComponent()
         {
             if (Application.isPlaying)
             {
                 //color = Target.material.color;
             }
             
-            return new SerializedColor(color);
+            return new SerializedMeshRenderer(Target);
         }
 
-        public override bool WriteComponent(SerializedColor serialized)
+        public override bool WriteComponent(SerializedMeshRenderer serialized)
         {
-            color = serialized.colorHex.ToColor();
+            color = serialized.colorHexs[0].ToColor();
             
             if (Application.isPlaying)
             {
@@ -47,13 +47,23 @@ namespace CucuTools
     }
 
     [Serializable]
-    public class SerializedColor : SerializableData
+    public class SerializedMeshRenderer : SerializableData
     {
-        public string colorHex;
+        public string[] colorHexs;
+        public string[] materialNames;
 
-        public SerializedColor(Color color)
+        public SerializedMeshRenderer(MeshRenderer meshRenderer)
         {
-            colorHex = color.ToHex();
+            var materials = meshRenderer.sharedMaterials;
+            
+            colorHexs = new string[materials.Length];
+            materialNames = new string[materials.Length];
+            
+            for (int i = 0; i < materials.Length; i++)
+            {
+                colorHexs[i] = materials[i].color.ToHex();
+                materialNames[i] = materials[i].name;
+            }
         }
     }
 }

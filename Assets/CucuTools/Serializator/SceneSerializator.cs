@@ -8,7 +8,7 @@ namespace CucuTools
 {
     public class SceneSerializator : MonoBehaviour
     {
-        public string SceneName => SceneManager.GetActiveScene().name;
+        public string SceneDataName => SceneManager.GetActiveScene().name;
 
         public UnityEvent OnDeserialized => onDeserialized ?? (onDeserialized = new UnityEvent());
         public UnityEvent OnSerialized=> onSerialized ?? (onSerialized = new UnityEvent());
@@ -43,7 +43,7 @@ namespace CucuTools
 
         private IEnumerator Deserializing()
         {
-            var reading = provider.ReadScene(SceneName);
+            var reading = provider.ReadScene(SceneDataName);
 
             while (!reading.IsCompleted)
             {
@@ -81,7 +81,7 @@ namespace CucuTools
                 .Select(c => new SerializedComponent(c.GuidEntity.Guid, c.Serialize()))
                 .ToArray();
             
-            var updating = provider.UpdateScene(SceneName, serializedComponents);
+            var updating = provider.UpdateScene(SceneDataName, serializedComponents);
 
             while (!updating.IsCompleted)
             {

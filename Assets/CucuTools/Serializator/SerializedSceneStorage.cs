@@ -6,24 +6,24 @@ namespace CucuTools
     {
         public SerializedSceneObject storage;
         
-        public override async Task CreateScene(string sceneName, params SerializedComponent[] components)
+        public override async Task CreateScene(string sceneDataName, params SerializedComponent[] components)
         {
-            await storage.CreateScene(sceneName, components);
+            await storage.CreateScene(sceneDataName, components);
         }
 
-        public override async Task<SerializedComponent[]> ReadScene(string sceneName)
+        public override async Task<SerializedComponent[]> ReadScene(string sceneDataName)
         {
-            return await storage.ReadScene(sceneName);
+            return await storage.ReadScene(sceneDataName);
         }
 
-        public override async Task UpdateScene(string sceneName, params SerializedComponent[] components)
+        public override async Task UpdateScene(string sceneDataName, params SerializedComponent[] components)
         {
-            await storage.UpdateScene(sceneName, components);
+            await storage.UpdateScene(sceneDataName, components);
         }
 
-        public override async Task DeleteScenes(params string[] sceneNames)
+        public override async Task DeleteScenes(params string[] sceneDataNames)
         {
-            await storage.DeleteScenes(sceneNames);
+            await storage.DeleteScenes(sceneDataNames);
         }
     }
 }

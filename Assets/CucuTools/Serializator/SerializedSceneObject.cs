@@ -13,11 +13,11 @@ namespace CucuTools
         
         [SerializeField] private List<SerializedScene> _storage;
         
-        public Task CreateScene(string sceneName, params SerializedComponent[] components)
+        public Task CreateScene(string sceneDataName, params SerializedComponent[] components)
         {
             storage.Clear();
 
-            var scene = new SerializedScene(sceneName);
+            var scene = new SerializedScene(sceneDataName);
             scene.CreateComponents(components);
             
             storage.Add(scene);
@@ -25,19 +25,19 @@ namespace CucuTools
             return Task.CompletedTask;
         }
 
-        public Task<SerializedComponent[]> ReadScene(string sceneName)
+        public Task<SerializedComponent[]> ReadScene(string sceneDataName)
         {
-            return Task.FromResult(storage.FirstOrDefault(s => s.SceneName == sceneName)?.ReadComponents() ??
+            return Task.FromResult(storage.FirstOrDefault(s => s.SceneName == sceneDataName)?.ReadComponents() ??
                                    new SerializedComponent[0]);
         }
 
-        public Task UpdateScene(string sceneName, params SerializedComponent[] components)
+        public Task UpdateScene(string sceneDataName, params SerializedComponent[] components)
         {
-            var scene = storage.FirstOrDefault(s => s.SceneName == sceneName);
+            var scene = storage.FirstOrDefault(s => s.SceneName == sceneDataName);
             
             if (scene == null)
             {
-                scene = new SerializedScene(sceneName);
+                scene = new SerializedScene(sceneDataName);
                 storage.Add(scene);
             }
 
@@ -46,9 +46,9 @@ namespace CucuTools
             return Task.CompletedTask;
         }
 
-        public Task DeleteScenes(params string[] sceneNames)
+        public Task DeleteScenes(params string[] sceneDataNames)
         {
-            storage.RemoveAll(s => sceneNames.Any(sn => sn == s.SceneName));
+            storage.RemoveAll(s => sceneDataNames.Any(sn => sn == s.SceneName));
             
             return Task.CompletedTask;
         }
@@ -112,10 +112,10 @@ namespace CucuTools
     /// </summary>
     public interface ISerializedSceneProvider
     {
-        Task CreateScene(string sceneName, params SerializedComponent[] components);
-        Task<SerializedComponent[]> ReadScene(string sceneName);
-        Task UpdateScene(string sceneName, params SerializedComponent[] components);
-        Task DeleteScenes(params string[] sceneNames);
+        Task CreateScene(string sceneDataName, params SerializedComponent[] components);
+        Task<SerializedComponent[]> ReadScene(string sceneDataName);
+        Task UpdateScene(string sceneDataName, params SerializedComponent[] components);
+        Task DeleteScenes(params string[] sceneDataNames);
     }
 
     public interface ISerializedComponentProvider
