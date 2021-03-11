@@ -39,11 +39,11 @@ namespace CucuTools
             return guid;
         }
 
-        public void UpdateGuid(string guid)
+        public Guid UpdateGuid(string guid)
         {
             guidString = guid;
             
-            UpdateGuid();
+            return UpdateGuid();
         }
         
         public override string ToString()

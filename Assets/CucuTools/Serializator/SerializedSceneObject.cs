@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 using UnityEngine;
 
 namespace CucuTools
@@ -8,11 +9,11 @@ namespace CucuTools
     [CreateAssetMenu(fileName = "SerializedComponents", menuName = "CucuCreate", order = 0)]
     public class SerializedSceneObject : ScriptableObject, ISerializedSceneProvider
     {
-        protected List<SerializedScene> storage => _storage ?? (_storage = new List<SerializedScene>());
+        private List<SerializedScene> storage => _storage ?? (_storage = new List<SerializedScene>());
         
         [SerializeField] private List<SerializedScene> _storage;
         
-        public void CreateScene(string sceneName, params SerializedComponent[] components)
+        public Task CreateScene(string sceneName, params SerializedComponent[] components)
         {
             storage.Clear();
 
@@ -20,15 +21,17 @@ namespace CucuTools
             scene.CreateComponents(components);
             
             storage.Add(scene);
+            
+            return Task.CompletedTask;
         }
 
-        public SerializedComponent[] ReadScene(string sceneName)
+        public Task<SerializedComponent[]> ReadScene(string sceneName)
         {
-            return storage.FirstOrDefault(s => s.SceneName == sceneName)?.ReadComponents() ??
-                   new SerializedComponent[0];
+            return Task.FromResult(storage.FirstOrDefault(s => s.SceneName == sceneName)?.ReadComponents() ??
+                                   new SerializedComponent[0]);
         }
 
-        public void UpdateScene(string sceneName, params SerializedComponent[] components)
+        public Task UpdateScene(string sceneName, params SerializedComponent[] components)
         {
             var scene = storage.FirstOrDefault(s => s.SceneName == sceneName);
             
@@ -39,11 +42,15 @@ namespace CucuTools
             }
 
             scene.UpdateComponents(components);
+            
+            return Task.CompletedTask;
         }
 
-        public void DeleteScenes(params string[] sceneNames)
+        public Task DeleteScenes(params string[] sceneNames)
         {
             storage.RemoveAll(s => sceneNames.Any(sn => sn == s.SceneName));
+            
+            return Task.CompletedTask;
         }
         
         [Serializable]
@@ -105,10 +112,10 @@ namespace CucuTools
     /// </summary>
     public interface ISerializedSceneProvider
     {
-        void CreateScene(string sceneName, params SerializedComponent[] components);
-        SerializedComponent[] ReadScene(string sceneName);
-        void UpdateScene(string sceneName, params SerializedComponent[] components);
-        void DeleteScenes(params string[] sceneNames);
+        Task CreateScene(string sceneName, params SerializedComponent[] components);
+        Task<SerializedComponent[]> ReadScene(string sceneName);
+        Task UpdateScene(string sceneName, params SerializedComponent[] components);
+        Task DeleteScenes(params string[] sceneNames);
     }
 
     public interface ISerializedComponentProvider

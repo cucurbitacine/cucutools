@@ -46,6 +46,13 @@ namespace CucuTools
             layer = gameObject.layer;
             activeSelf = gameObject.activeSelf;
         }
+        
+        public GameObject Create()
+        {
+            var res = new GameObject(name) {tag = tag, layer = layer};
+            res.SetActive(activeSelf);
+            return res;
+        }
     }
     
     [Serializable]
@@ -60,6 +67,7 @@ namespace CucuTools
             var type = component.GetType();
             typeSerializableComponent = type.FullName;
             typeComponent = type.GetProperty("Target")?.GetMethod?.ReturnType?.FullName;
+            serializedComponent = new SerializedComponent(component.GuidEntity.Guid, component.Serialize());
         }
     }
 

@@ -1,5 +1,7 @@
+using System.Collections;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 
 namespace CucuTools
@@ -7,19 +9,50 @@ namespace CucuTools
     public class SceneSerializator : MonoBehaviour
     {
         public string SceneName => SceneManager.GetActiveScene().name;
+
+        public UnityEvent OnDeserialized => onDeserialized ?? (onDeserialized = new UnityEvent());
+        public UnityEvent OnSerialized=> onSerialized ?? (onSerialized = new UnityEvent());
         
         public SerializedSceneProvider provider;
+
+        [SerializeField] private UnityEvent onDeserialized;
+        [SerializeField] private UnityEvent onSerialized;
         
         public SerializableComponent[] components;
+
+        private Coroutine _deserializing;
+        private Coroutine _serializing;
         
         [CucuButton]
         public void DeserializeScene()
         {
             if (provider == null) return;
-            
-            var serializedComponents = provider.ReadScene(SceneName);
 
-            if ((serializedComponents?.Length ?? 0) == 0) return;
+            if (_deserializing != null) StopCoroutine(_deserializing);
+            _deserializing = StartCoroutine(Deserializing());
+        }
+        
+        [CucuButton]
+        public void SerializeScene()
+        {
+            if (provider == null) return;
+
+            if (_serializing != null) StopCoroutine(_serializing);
+            _serializing = StartCoroutine(Serializing());
+        }
+
+        private IEnumerator Deserializing()
+        {
+            var reading = provider.ReadScene(SceneName);
+
+            while (!reading.IsCompleted)
+            {
+                yield return null;
+            }
+
+            var serializedComponents = reading.Result;
+
+            if ((serializedComponents?.Length ?? 0) == 0) yield break;
             
             components = FindObjectsOfType<SerializableComponent>();
             
@@ -35,13 +68,12 @@ namespace CucuTools
                 
                 component.Deserialize(serialized);
             }
+            
+            OnDeserialized.Invoke();
         }
-        
-        [CucuButton]
-        public void SerializeScene()
-        {
-            if (provider == null) return;
 
+        private IEnumerator Serializing()
+        {
             components = FindObjectsOfType<SerializableComponent>();
 
             var serializedComponents = components
@@ -49,7 +81,14 @@ namespace CucuTools
                 .Select(c => new SerializedComponent(c.GuidEntity.Guid, c.Serialize()))
                 .ToArray();
             
-            provider.UpdateScene(SceneName, serializedComponents);
+            var updating = provider.UpdateScene(SceneName, serializedComponents);
+
+            while (!updating.IsCompleted)
+            {
+                yield return null;
+            }
+            
+            OnSerialized.Invoke();
         }
         
         private void Awake()

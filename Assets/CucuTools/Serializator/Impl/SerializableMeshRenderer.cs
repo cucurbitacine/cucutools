@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace CucuTools
 {
-    public class SerializableRendererColor : SerializableComponent<Renderer, SerializedColor>
+    public class SerializableMeshRenderer : SerializableComponent<MeshRenderer, SerializedColor>
     {
         [SerializeField] private Color color;
         
