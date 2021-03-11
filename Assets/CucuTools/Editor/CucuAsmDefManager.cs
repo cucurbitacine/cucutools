@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
+using CucuTools.Colors;
 using UnityEditor;
 using UnityEditor.Compilation;
 using UnityEngine;
@@ -66,7 +67,7 @@ namespace CucuTools.Editor
                 false);
             EditorGUILayout.Separator();
             
-            UpdateAssemblies(CucuColorPalette.Rainbow);
+            UpdateAssemblies(CucuColor.Rainbow);
 
             ShowSearchField();
 
@@ -150,7 +151,7 @@ namespace CucuTools.Editor
             }
 
             if (palette == null)
-                palette = CucuColorPalette.Rainbow;
+                palette = CucuColor.Rainbow;
             
             for (var i = 0; i < assemblies.Count; i++)
             {
@@ -165,7 +166,7 @@ namespace CucuTools.Editor
                 GUILayout.BeginHorizontal();
                 {
                     GUILayout.Label("", GUILayout.Width(position.width * 0.15f));
-                    GUILayout.Label("Search : ", new GUIStyle() {alignment = TextAnchor.MiddleRight},
+                    GUILayout.Label("Search : ", new GUIStyle() {alignment = TextAnchor.MiddleRight, normal = new GUIStyleState(){textColor = Color.white}},
                         GUILayout.Width(position.width * 0.1f));
                     searchField = GUILayout.TextArea(searchField, GUILayout.Width(position.width * 0.5f));
                 }
@@ -173,7 +174,7 @@ namespace CucuTools.Editor
 
                 GUILayout.Space(20f);
 
-                searchIdToolbar = GUILayout.Toolbar(searchIdToolbar, new[] {"Dependents", "Name", "Dependencies"});
+                searchIdToolbar = GUILayout.Toolbar(searchIdToolbar, new[] {"Depend on me", "Name", "I depend on"});
             }
             GUILayout.EndVertical();
         }
@@ -186,11 +187,11 @@ namespace CucuTools.Editor
                     {alignment = TextAnchor.MiddleCenter};
                 
                 style.fontStyle = searchType == SearchType.OnlyRefsOn ? FontStyle.Bold : FontStyle.Italic;
-                style.normal.textColor = searchType == SearchType.OnlyRefsOn ? Color.black : Color.gray;
+                style.normal.textColor = searchType == SearchType.OnlyRefsOn ? Color.white : Color.gray;
                 GUILayout.Label("Dependents", style, GUILayout.Width(position.width / 2));
 
                 style.fontStyle = searchType == SearchType.OnlyRefsTo ? FontStyle.Bold : FontStyle.Italic;
-                style.normal.textColor = searchType == SearchType.OnlyRefsTo ? Color.black : Color.gray;
+                style.normal.textColor = searchType == SearchType.OnlyRefsTo ? Color.white : Color.gray;
                 GUILayout.Label("Dependencies", style, GUILayout.Width(position.width / 2));
             }
             GUILayout.EndHorizontal();

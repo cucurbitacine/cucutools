@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using CucuTools.Math;
 using UnityEngine;
 
-namespace CucuTools
+namespace CucuTools.Lerpables.Impl
 {
     /// <inheritdoc />
     [AddComponentMenu(LerpMenuRoot + nameof(LerpBool))]

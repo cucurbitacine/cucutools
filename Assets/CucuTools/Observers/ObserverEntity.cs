@@ -1,6 +1,6 @@
 ﻿using System.Collections.Concurrent;
 
-namespace CucuTools
+namespace CucuTools.Observers
 {
     public class ObserverEntity : IObserverEntity
     {

@@ -1,8 +1,9 @@
 using System;
+using CucuTools.Attributes;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace CucuTools
+namespace CucuTools.Lerpables.Animations
 {
     public abstract class AnimationBehaviour : LerpBehavior
     {
@@ -58,12 +59,12 @@ namespace CucuTools
                 AnimationSettings.MAX_ANIMATION_SPEED);
         }
 
-        public UnityEvent OnAnimationStart => Events.OnAnimationStart;
-        public UnityEvent OnAnimationStop => Events.OnAnimationStop;
+        public UnityEvent OnAnimationStart => AnimEvents.OnAnimationStart;
+        public UnityEvent OnAnimationStop => AnimEvents.OnAnimationStop;
         
         public AnimationInfo Info => animationInfo ?? (animationInfo = new AnimationInfo());
         public AnimationSettings Settings => animationSettings ?? (animationSettings = new AnimationSettings());
-        public AnimationEvents Events => animationEvents ?? (animationEvents = new AnimationEvents());
+        public AnimationEvents AnimEvents => animationEvents ?? (animationEvents = new AnimationEvents());
         
         #endregion
 
@@ -79,7 +80,7 @@ namespace CucuTools
 
         #region Public API
 
-        [CucuButton("Start", group: GroupBaseName, order: 0)]
+        [CucuButton("Start", @group: GroupBaseName, order: 0)]
         public void StartAnimation()
         {
             if (!Application.isPlaying) return;
@@ -93,7 +94,7 @@ namespace CucuTools
             if (Playing) OnAnimationStart.Invoke();
         }
 
-        [CucuButton("Stop", group: GroupBaseName, order: 1)]
+        [CucuButton("Stop", @group: GroupBaseName, order: 1)]
         public void StopAnimation()
         {
             if (!Application.isPlaying) return;
@@ -153,8 +154,8 @@ namespace CucuTools
         
         private void Validate()
         {
-            Tolerance.Use = false;
-            Curve.Use = false;
+            LerpTolerance.Use = false;
+            LerpCurve.Use = false;
             
             AnimationTime = AnimationTime;
             AnimationSpeed = AnimationSpeed;

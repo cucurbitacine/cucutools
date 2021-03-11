@@ -1,21 +1,22 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using CucuTools.Math;
 using UnityEngine;
 
-namespace CucuTools
+namespace CucuTools.Lerpables.Impl
 {
     /// <inheritdoc />
     [AddComponentMenu(LerpMenuRoot + nameof(LerpQueue))]
     public class LerpQueue : LerpBehavior
     {
         [Header("Lerp points")]
-        [SerializeField] private List<LerpPoint<LerpBehavior>> points;
+        [SerializeField] private List<LerpPoint<LerpBehavior>> elements;
 
         public void Add(LerpPoint<LerpBehavior> point)
         {
-            if (points == null) points = new List<LerpPoint<LerpBehavior>>();
-            if (point.IsValid() && point.Value != null && point.Value != this) points.Add(point);
+            if (elements == null) elements = new List<LerpPoint<LerpBehavior>>();
+            if (point.IsValid() && point.Value != null && point.Value != this) elements.Add(point);
         }
         
         public void Add(float t, LerpBehavior value)
@@ -25,68 +26,68 @@ namespace CucuTools
 
         public bool Remove(LerpBehavior value)
         {
-            if (points == null) return false;
+            if (elements == null) return false;
 
             if (value == null) return false;
 
-            return points.RemoveAll(p => p.Value == value) > 0;
+            return elements.RemoveAll(p => p.Value == value) > 0;
         }
 
         public bool Remove(float t)
         {
-            if (points == null) return false;
+            if (elements == null) return false;
 
-            return points.RemoveAll(p => p.T == t) > 0;
+            return elements.RemoveAll(p => p.T == t) > 0;
         }
 
         public bool Remove(LerpPoint<LerpBehavior> point)
         {
-            if (points == null) return false;
+            if (elements == null) return false;
 
-            return points.Remove(point);
+            return elements.Remove(point);
         }
 
         public int RemoveAll(Predicate<LerpPoint<LerpBehavior>> match = null)
         {
-            if (points == null) return 0;
+            if (elements == null) return 0;
 
-            if (match != null) return points.RemoveAll(match);
+            if (match != null) return elements.RemoveAll(match);
             
-            var count = points.Count;
-            points.Clear();
+            var count = elements.Count;
+            elements.Clear();
             return count;
         }
 
         public void RemoveAt(params int[] index)
         {
-            if (points == null) return;
+            if (elements == null) return;
 
             var indexes = index
-                .Where(t => 0 <= t && t < points.Count)
+                .Where(t => 0 <= t && t < elements.Count)
                 .Distinct()
                 .OrderByDescending(t => t)
                 .ToArray();
 
             for (int i = 0; i < indexes.Length; i++)
             {
-                points.RemoveAt(indexes[i]);
+                elements.RemoveAt(indexes[i]);
             }
         }
 
         public void Sort()
         {
-            if (points == null) return;
+            if (elements == null) return;
 
-            points = points.OrderBy(p => p).ToList();
+            elements = elements.OrderBy(p => p).ToList();
         }
 
         /// <inheritdoc />
         protected override bool UpdateBehaviour()
         {
-            if (points == null) return false;
-            if (points.Count == 0) return false;
+            if (elements == null) return false;
+            if (elements.Count == 0) return false;
 
-            return LinearLerp(points.OrderBy(p => p.T).ToArray());
+            return LinearLerp(elements.OrderBy(p => p.T).ToArray());
         }
 
         private bool LinearLerp(params LerpPoint<LerpBehavior>[] points)
@@ -119,9 +120,9 @@ namespace CucuTools
         {
             base.OnValidate();
 
-            if (points != null)
+            if (elements != null)
             {
-                points = points.Where(p => p.Value != this).ToList();
+                elements = elements.Where(p => p.Value != this).ToList();
             }
         }
     }

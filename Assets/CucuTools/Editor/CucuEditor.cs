@@ -1,6 +1,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using CucuTools.Attributes;
+using CucuTools.Colors;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
@@ -73,11 +75,12 @@ namespace CucuTools.Editor
 
             try
             {
-                if (!string.IsNullOrEmpty(button.attribute.Color) &&
-                    ColorUtility.TryParseHtmlString(button.attribute.Color, out var color))
+                if (!string.IsNullOrEmpty(button.attribute.ColorHex) &&
+                    ColorUtility.TryParseHtmlString(button.attribute.ColorHex, out var color))
                     GUI.backgroundColor = color;
 
-                if (GUILayout.Button(buttonName, GetButtonGUIStyle()))
+                //if (GUILayout.Button(buttonName, GetButtonGUIStyle()))
+                if(CucuGUI.Button(buttonName, button.attribute.ColorHex.ToColor()))
                 {
                     foreach (var target in targets)
                     {

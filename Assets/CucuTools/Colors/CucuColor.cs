@@ -4,7 +4,7 @@ using System.Globalization;
 using System.Linq;
 using UnityEngine;
 
-namespace CucuTools
+namespace CucuTools.Colors
 {
     public static class CucuColor
     {
@@ -19,6 +19,8 @@ namespace CucuTools
         {
             return new Color(color.r, color.g, color.b, alpha);
         }
+
+        #region Lerp
 
         public static Color Lerp(Color origin, Color target, float value)
         {
@@ -46,9 +48,65 @@ namespace CucuTools
 
             return colors.Last();
         }
-        
-        #region Extentsions
-        
+
+        #endregion
+
+        #region Palettes
+
+        public static readonly Dictionary<CucuColorMap, CucuColorPalette> PaletteMaps =
+            new Dictionary<CucuColorMap, CucuColorPalette>
+            {
+                {CucuColorMap.Rainbow, Rainbow},
+                {CucuColorMap.Jet, Jet},
+                {CucuColorMap.Hot, Hot},
+                {CucuColorMap.BlackToWhite, BlackToWhite},
+                {CucuColorMap.WhiteToBlack, WhiteToBlack}
+            };
+
+        public static readonly CucuColorPalette Rainbow = new CucuColorPalette(
+            "Rainbow",
+            new[]
+            {
+                Color.red,
+                Color.red.LerpTo(Color.yellow),
+                Color.yellow,
+                Color.green,
+                Color.cyan,
+                Color.blue,
+                "CC00FF".ToColor()
+            });
+
+        public static readonly CucuColorPalette Jet = new CucuColorPalette(
+            "Jet",
+            new[]
+            {
+                new Color(0.000f, 0.000f, 0.666f, 1.000f),
+                new Color(0.000f, 0.000f, 1.000f, 1.000f),
+                new Color(0.000f, 0.333f, 1.000f, 1.000f),
+                new Color(0.000f, 0.666f, 1.000f, 1.000f),
+                new Color(0.000f, 1.000f, 1.000f, 1.000f),
+                new Color(0.500f, 1.000f, 0.500f, 1.000f),
+                new Color(1.000f, 1.000f, 0.000f, 1.000f),
+                new Color(1.000f, 0.666f, 0.000f, 1.000f),
+                new Color(1.000f, 0.333f, 0.000f, 1.000f),
+                new Color(1.000f, 0.000f, 0.000f, 1.000f),
+                new Color(0.666f, 0.000f, 0.000f, 1.000f)
+            });
+
+        public static readonly CucuColorPalette Hot =
+            new CucuColorPalette("Hot", Color.black, Color.red, Color.yellow, Color.white);
+
+        public static readonly CucuColorPalette BlackToWhite =
+            new CucuColorPalette("BlackToWhite", Color.black, Color.white);
+
+        public static readonly CucuColorPalette WhiteToBlack =
+            new CucuColorPalette("WhiteToBlack", Color.white, Color.black);
+
+        #endregion
+    }
+
+    public static class CucuColorExtentions
+    {
         public static string ToHex(this Color color)
         {
             var result = "";
@@ -97,7 +155,7 @@ namespace CucuTools
 
             return new Color(r, g, b, 1f);
         }
-        
+
         public static string ToColoredString(this object obj, Color color)
         {
             return $"<color=#{color.ToHex()}>{obj}</color>";
@@ -110,12 +168,12 @@ namespace CucuTools
 
         public static Color LerpTo(this Color color, Color target, float t = 0.5f)
         {
-            return Lerp(color, target, t);
+            return CucuColor.Lerp(color, target, t);
         }
 
         public static Color LerpColor(this float value, params Color[] colors)
         {
-            return Lerp(value, colors);
+            return CucuColor.Lerp(value, colors);
         }
 
         public static Color LerpColor(this IEnumerable<Color> colors, float value)
@@ -125,14 +183,12 @@ namespace CucuTools
 
         public static Color SetColorAlpha(this Color color, float value)
         {
-            return SetAlpha(color, value);
+            return CucuColor.SetAlpha(color, value);
         }
 
         public static Color SetColorIntensity(this Color color, float value)
         {
-            return SetIntensity(color, value);
+            return CucuColor.SetIntensity(color, value);
         }
-
-        #endregion
     }
 }

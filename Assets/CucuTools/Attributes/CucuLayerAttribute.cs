@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace CucuTools
+namespace CucuTools.Attributes
 {
     public class CucuLayerAttribute : PropertyAttribute
     {

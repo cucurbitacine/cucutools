@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace CucuTools
+namespace CucuTools.Lerpables.Impl
 {
     /// <inheritdoc />
     [AddComponentMenu(LerpMenuRoot + nameof(LerpActive))]
@@ -26,6 +26,24 @@ namespace CucuTools
             }
 
             return true;
+        }
+
+        protected override void OnDrawGizmos()
+        {
+            base.OnDrawGizmos();
+
+            if (target == null) return;
+
+            if (Value) return;
+
+            var tr = target.transform;
+
+            var sharedMesh = tr.GetComponent<MeshFilter>()?.sharedMesh;
+            
+            if (sharedMesh == null) return;
+            
+            Gizmos.color = Color.gray;
+            Gizmos.DrawWireMesh(sharedMesh, tr.position, tr.rotation, tr.lossyScale);
         }
     }
 }

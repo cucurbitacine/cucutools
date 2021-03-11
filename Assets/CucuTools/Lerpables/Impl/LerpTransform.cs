@@ -1,9 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using CucuTools.Colors;
+using CucuTools.Common;
+using CucuTools.Math;
 using UnityEngine;
 
-namespace CucuTools
+namespace CucuTools.Lerpables.Impl
 {
     [AddComponentMenu(LerpMenuRoot + nameof(LerpTransform))]
     public class LerpTransform : LerpList<CucuTransform, Transform>
@@ -80,6 +83,39 @@ namespace CucuTools
             if (target != null && (points?.Any(p => p.Value == target) ?? false))
             {
                 target = null;
+            }
+        }
+
+        protected override void OnDrawGizmos()
+        {
+            base.OnDrawGizmos();
+
+            if (target == null) return;
+
+            var sharedMesh = target.GetComponent<MeshFilter>()?.sharedMesh;
+
+            if (sharedMesh == null) return;
+
+            var ordered = Elements.OrderBy(e => e.T).ToArray();
+
+            for (var i = 0; i < ordered.Length; i++)
+            {
+                var point = ordered[i];
+                
+                if (point.Value == null) continue;
+
+                Gizmos.color = CucuColor.Rainbow.Get(point.T);
+                
+                if (i < ordered.Length - 1)
+                {
+                    var next = ordered[i + 1];
+                    if (next.Value != null)
+                    {
+                        Gizmos.DrawLine(point.Value.position, next.Value.position);
+                    }
+                }
+                
+                Gizmos.DrawWireMesh(sharedMesh, point.Value.position, point.Value.rotation, point.Value.lossyScale);
             }
         }
 

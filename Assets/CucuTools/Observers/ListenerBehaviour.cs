@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using UnityEngine.Events;
 
-namespace CucuTools
+namespace CucuTools.Observers
 {
     public class ListenerBehaviour : MonoBehaviour, IListenerEntity
     {

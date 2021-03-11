@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using CucuTools.Math;
 using UnityEngine;
 
-namespace CucuTools
+namespace CucuTools.Colors
 {
     [Serializable]
     public class CucuColorPalette
@@ -43,60 +44,9 @@ namespace CucuTools
         {
             return Colors.ToGradient();
         }
-
-        #region Palettes
-
-        public static readonly Dictionary<CucuColorMap, CucuColorPalette> PaletteMaps =
-            new Dictionary<CucuColorMap, CucuColorPalette>
-            {
-                {CucuColorMap.Rainbow, Rainbow},
-                {CucuColorMap.Jet, Jet},
-                {CucuColorMap.Hot, Hot},
-                {CucuColorMap.BlackToWhite, BlackToWhite},
-                {CucuColorMap.WhiteToBlack, WhiteToBlack}
-            };
-
-        public static readonly CucuColorPalette Rainbow = new CucuColorPalette(
-            "Rainbow",
-            new[]
-            {
-                Color.red,
-                Color.red.LerpTo(Color.yellow),
-                Color.yellow,
-                Color.green,
-                Color.cyan,
-                Color.blue,
-                "CC00FF".ToColor()
-            });
-
-        public static readonly CucuColorPalette Jet = new CucuColorPalette(
-            "Jet",
-            new[]
-            {
-                new Color(0.000f, 0.000f, 0.666f, 1.000f),
-                new Color(0.000f, 0.000f, 1.000f, 1.000f),
-                new Color(0.000f, 0.333f, 1.000f, 1.000f),
-                new Color(0.000f, 0.666f, 1.000f, 1.000f),
-                new Color(0.000f, 1.000f, 1.000f, 1.000f),
-                new Color(0.500f, 1.000f, 0.500f, 1.000f),
-                new Color(1.000f, 1.000f, 0.000f, 1.000f),
-                new Color(1.000f, 0.666f, 0.000f, 1.000f),
-                new Color(1.000f, 0.333f, 0.000f, 1.000f),
-                new Color(1.000f, 0.000f, 0.000f, 1.000f),
-                new Color(0.666f, 0.000f, 0.000f, 1.000f)
-            });
-
-        public static readonly CucuColorPalette Hot =
-            new CucuColorPalette("Hot", Color.black, Color.red, Color.yellow, Color.white);
-
-        public static readonly CucuColorPalette BlackToWhite = new CucuColorPalette("BlackToWhite", Color.black, Color.white);
-
-        public static readonly CucuColorPalette WhiteToBlack = new CucuColorPalette("WhiteToBlack", Color.white, Color.black);
-
-        #endregion
     }
 
-    public static class CucuColorPaletteExt
+    public static class CucuColorPaletteExtentions
     {
         public static CucuColorPalette ToColorPalette(this IEnumerable<Color> colors, string name = "")
         {

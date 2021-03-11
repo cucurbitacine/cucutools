@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace CucuTools
+namespace CucuTools.Common
 {
     public interface IMonoBehaviour : ITransform, IGameObject, IComponentGetter
     {

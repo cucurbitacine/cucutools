@@ -1,18 +1,20 @@
 using System;
+using CucuTools.Common;
+using CucuTools.Observers;
 using UnityEngine;
 using UnityEngine.Events;
 
-namespace CucuTools
+namespace CucuTools.Lerpables
 {
-    /// <inheritdoc cref="CucuTools.ILerpable" />
+    /// <inheritdoc cref="ILerpable" />
     public abstract class LerpBehavior : ObserverBehaviour, ILerpable, IListenerEntity
     {
         public const string LerpMenuRoot = Cucu.MenuRoot + "Lerp/";
         
         public float LerpValue => Lerpable.LerpValue;
-        public Lerpable.LerpTolerance Tolerance => Lerpable.Tolerance;
-        public Lerpable.LerpCurve Curve => Lerpable.Curve;
-        public Lerpable.LerpEvents Events => Lerpable.Events;
+        public Lerpable.LerpTolerance LerpTolerance => Lerpable.Tolerance;
+        public Lerpable.LerpCurve LerpCurve => Lerpable.Curve;
+        public Lerpable.LerpEvents LerpEvents => Lerpable.Events;
         
         protected Lerpable Lerpable => lerpable ?? (lerpable = new Lerpable());
         
@@ -37,7 +39,6 @@ namespace CucuTools
 
         protected virtual void OnAwake()
         {
-            
         }
         
         private void Awake()
@@ -50,6 +51,10 @@ namespace CucuTools
         protected virtual void OnValidate()
         {
             UpdateBehaviour();
+        }
+
+        protected virtual void OnDrawGizmos()
+        {
         }
     }
 

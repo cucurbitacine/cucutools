@@ -1,7 +1,7 @@
 ﻿using System;
 using UnityEngine;
 
-namespace CucuTools
+namespace CucuTools.Common
 {
     [Serializable]
     public struct CucuTransform

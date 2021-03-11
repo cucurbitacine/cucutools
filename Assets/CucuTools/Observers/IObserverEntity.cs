@@ -1,4 +1,4 @@
-﻿namespace CucuTools
+﻿namespace CucuTools.Observers
 {
     public interface IObserverEntity
     {
@@ -17,11 +17,12 @@
         void OnObserverUpdated();
     }
 
-    public interface IObserverEntity<out TValue> : IObserverEntity, IGetValue<TValue>
+    public interface IObserverEntity<out TValue> : IObserverEntity
     {
+        TValue Value { get; }
     }
     
-    public interface IListenerEntity<TValue> : IListenerEntity, IHaveValue<TValue>
+    public interface IListenerEntity<TValue> : IListenerEntity
     {
     }
 }

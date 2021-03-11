@@ -1,6 +1,6 @@
 ﻿using UnityEngine;
 
-namespace CucuTools
+namespace CucuTools.Raycasts.Effects.Impl
 {
     /// <inheritdoc />
     public class RaycastEffectLineParabola : RaycastEffectLine

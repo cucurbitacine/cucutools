@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace CucuTools
+namespace CucuTools.Lerpables.Impl
 {
     /// <inheritdoc cref="LerpBehavior" />
     [AddComponentMenu(LerpMenuRoot + nameof(LerpComplex))]

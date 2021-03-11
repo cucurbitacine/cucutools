@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace CucuTools
+namespace CucuTools.Observers
 {
     public class ObserverBehaviour : MonoBehaviour, IObserverEntity
     {

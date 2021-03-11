@@ -1,5 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Linq;
+using CucuTools.Colors;
+using CucuTools.Math;
 using UnityEditor;
 using UnityEngine;
 
@@ -60,7 +62,7 @@ namespace CucuTools.Editor
         {
             if (color == null) color = Color.black;
             return ButtonColored(new GUIContent(text), GetStyleButtonByColor(color.Value),
-                color.Value.LerpTo(Color.white, 0.75f), options);
+                color.Value.LerpTo(Color.white, 0.5f), options);
         }
 
         public static bool Button(string text = "Button", params GUILayoutOption[] options)
@@ -71,7 +73,7 @@ namespace CucuTools.Editor
         public static bool Button(GUIContent content, Color? color = null, params GUILayoutOption[] options)
         {
             if (color == null) color = Color.black;
-            return ButtonColored(content, GetStyleButtonByColor(color.Value), color.Value.LerpTo(Color.white, 0.75f),
+            return ButtonColored(content, GetStyleButtonByColor(color.Value), color.Value.LerpTo(Color.white, 0.5f),
                 options);
         }
 
@@ -100,8 +102,8 @@ namespace CucuTools.Editor
             if (styleButtonFromColorMap.TryGetValue(color, out var style)) return style;
 
             style = GetStyleButton();
-            style.normal.textColor = Color.black;
-            style.hover.textColor = color.SetColorIntensity(0.25f);
+            style.normal.textColor = Color.white.LerpTo(color, 0.25f);
+            style.hover.textColor = Color.white.LerpTo(color);//color.SetColorIntensity(0.75f);
             style.active.textColor = color;
 
             styleButtonFromColorMap.Add(color, style);
