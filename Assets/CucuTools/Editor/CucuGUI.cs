@@ -102,8 +102,11 @@ namespace CucuTools.Editor
             if (styleButtonFromColorMap.TryGetValue(color, out var style)) return style;
 
             style = GetStyleButton();
-            style.normal.textColor = Color.white.LerpTo(color, 0.25f);
-            style.hover.textColor = Color.white.LerpTo(color);//color.SetColorIntensity(0.75f);
+
+            style.normal.textColor = (EditorGUIUtility.isProSkin ? Color.white : Color.black).LerpTo(color, 0.25f);
+            style.hover.textColor = EditorGUIUtility.isProSkin
+                ? (Color.white.LerpTo(color))
+                : (color.SetColorIntensity(0.75f));
             style.active.textColor = color;
 
             styleButtonFromColorMap.Add(color, style);
