@@ -38,6 +38,11 @@ namespace CucuTools.Statemachines
 
             isPlaying = true;
             
+            foreach (var trigger in _triggers)
+            {
+                trigger.Invoke(StateTrigger.InvokeMode.OnStart);
+            }
+            
             Current.StartState();
         }
 
@@ -47,6 +52,11 @@ namespace CucuTools.Statemachines
             if (!IsPlaying) return;
 
             isPlaying = false;
+            
+            foreach (var trigger in _triggers)
+            {
+                trigger.Invoke(StateTrigger.InvokeMode.OnStop);
+            }
             
             Current.StopState();
         }

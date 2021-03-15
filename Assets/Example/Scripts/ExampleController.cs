@@ -7,12 +7,12 @@ using CucuTools.Attributes;
 using CucuTools.Common;
 using CucuTools.Waiters.Impl;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
 
 namespace Example.Scripts
 {
-    public class ExampleController : CucuMonoBehaviour
+    [SceneController("cucuexample")]
+    public class ExampleController : CucuSceneController
     {
         [CucuArg]
         public ExampleCucuArg exampleCucuArg;
@@ -92,8 +92,7 @@ namespace Example.Scripts
 
             args.Add(new ExampleCucuArg(indexZone));
 
-            new WaiterOperation(CucuSceneManager.LoadSingleSceneAsync(
-                    SceneManager.GetActiveScene().name, args.ToArray()))
+            new WaiterOperation(CucuSceneManager.LoadSingleSceneAsync<ExampleController>(args.ToArray()))
                 .OnCompleted.AddListener(() => Debug.Log("Wait :: AsyncOperation :: Done"));
         }
 

@@ -72,11 +72,13 @@ namespace Example.Scripts
         private void Update()
         {
             UpdateInput();
+            
+            if (isEnabled) UpdateView(Time.deltaTime);
         }
 
         private void LateUpdate()
         {
-            if (isEnabled) UpdateView(Time.deltaTime);
+            
         }
 
         private void FixedUpdate()
