@@ -190,5 +190,25 @@ namespace CucuTools.Colors
         {
             return CucuColor.SetIntensity(color, value);
         }
+
+        public static Color ToColor(this Vector3 vector3, float alpha = 1f)
+        {
+            return new Color(vector3.x, vector3.y, vector3.z, alpha);
+        }
+        
+        public static Color ToColor(this Vector4 vector4)
+        {
+            return new Color(vector4.x, vector4.y, vector4.z, vector4.w);
+        }
+        
+        public static Vector3 ToVector3(this Color color)
+        {
+            return new Vector3(color.r, color.g, color.b);
+        }
+        
+        public static Vector4 ToVector4(this Color color)
+        {
+            return new Vector4(color.r, color.g, color.b, color.a);
+        } 
     }
 }

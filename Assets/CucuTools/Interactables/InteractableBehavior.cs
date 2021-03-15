@@ -47,7 +47,7 @@ namespace CucuTools.Interactables
         [Header("Info")]
         [SerializeField] private bool isEnabled = true;
         [SerializeField] private bool defaultOnAwake = true;
-        [SerializeField] private InteratableState state;
+        [SerializeField] protected InteratableState state;
 
         [Header("Events")]
         [SerializeField] private InteractableEvents events;
@@ -57,7 +57,7 @@ namespace CucuTools.Interactables
         
         public void Normal()
         {
-            state.isNormal = true;
+            //state.isNormal = true;
             state.isHovered = false;
             
             if (!IsEnabled) return;
@@ -71,7 +71,7 @@ namespace CucuTools.Interactables
         
         public void Hover()
         {
-            state.isNormal = false;
+            //state.isNormal = false;
             state.isHovered = true;
             
             if (!IsEnabled) return;
@@ -152,7 +152,7 @@ namespace CucuTools.Interactables
         [Serializable]
         public struct InteratableState
         {
-            public bool isNormal;
+            public bool isNormal => !isHovered && !isClicked;
             public bool isHovered;
             public bool isClicked;
         }

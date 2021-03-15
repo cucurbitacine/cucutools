@@ -13,7 +13,7 @@ namespace CucuTools.Statemachines
 
         public override StateEntity Current => current;
 
-        public TransitionEntity[] Transitions
+        public override TransitionEntity[] Transitions
         {
             get => transitions;
             set => transitions = value;
@@ -24,6 +24,11 @@ namespace CucuTools.Statemachines
         [SerializeField] private TransitionEntity[] transitions;
         
         private StateTrigger[] _triggers;
+
+        public void SetCurrent(StateEntity state)
+        {
+            current = state;
+        }
         
         public override bool TryGetNextState(out StateEntity nextState)
         {

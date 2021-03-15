@@ -1,4 +1,5 @@
 using System;
+using CucuTools.Colors;
 using UnityEngine;
 
 namespace CucuTools.Interactables
@@ -55,6 +56,42 @@ namespace CucuTools.Interactables
         private void OnValidate()
         {
             Validate();
+        }
+
+        public void SetColorRed()
+        {
+            SetColorRoot(Color.red);
+        }
+
+        public void SetColorGreen()
+        {
+            SetColorRoot(Color.green);
+        }
+        
+        public void SetColorBlue()
+        {
+            SetColorRoot(Color.blue);
+        }
+        
+        public void SetColorRoot(Color color)
+        {
+            this.color.normal = color;
+            this.color.hovered = (color.ToVector3() * (205f / 255f)).ToColor();
+            this.color.clicked = (color.ToVector3() * (155f / 255f)).ToColor();
+            this.color.disabled = (color.ToVector3() * (105f / 255f)).ToColor();
+
+            UpdateColor();
+        }
+
+        public void UpdateColor()
+        {
+            if (IsEnabled)
+            {
+                if (state.isNormal) SetColor(color.normal);
+                if (state.isHovered) SetColor(color.hovered);
+                if (state.isClicked) SetColor(color.clicked);
+            }
+            else SetColor(color.disabled);
         }
         
         [Serializable]

@@ -11,7 +11,7 @@ namespace CucuTools.Statemachines
 
         public override bool IsLast => (Transitions?.Length ?? 0) == 0;
 
-        public TransitionEntity[] Transitions
+        public override TransitionEntity[] Transitions
         {
             get => transitions;
             set => transitions = value;
