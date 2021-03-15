@@ -8,6 +8,10 @@ namespace CucuTools.Lerpables
     {
         public abstract List<LerpPoint<TElement>> Elements { get; protected set; }
 
+        public List<LerpPoint<TElement>> SortedElements => _sortedElements ?? (_sortedElements = Elements?.OrderBy(p => p).ToList());
+
+        private List<LerpPoint<TElement>> _sortedElements;
+        
         public void Add(float t, TElement element)
         {
             Add(new LerpPoint<TElement>(t, element));
@@ -90,6 +94,11 @@ namespace CucuTools.Lerpables
         }
 
         #endregion
+
+        private void Awake()
+        {
+            _sortedElements = null;
+        }
     }
 
     public abstract class LerpableList<TElement> : LerpList<TElement, TElement>
