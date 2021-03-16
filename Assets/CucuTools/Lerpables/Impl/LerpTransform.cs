@@ -23,34 +23,36 @@ namespace CucuTools.Lerpables.Impl
         [Header("Transform points")]
         [SerializeField] private List<LerpPoint<Transform>> points;
 
+        private float tCached;
+        private int iLeftCached;
+        private int iRightCached;
+        
         protected override bool UpdateBehaviour()
         {
-            if (Elements == null) return false;
-            if (Elements.Count == 0) return false;
+            if (SortedElements == null) return false;
+            if (SortedElements.Count == 0) return false;
             
-            if (Elements.Count == 1)
+            if (SortedElements.Count == 1)
             {
                 Value = Elements[0].Value;
                 return false;
             }
 
-            var ordered = Elements.OrderBy(e => e.T).ToArray();
+            tCached = CucuMath.GetLerpEdges(LerpValue, out iLeftCached, out iRightCached, SortedElements);
 
-            var t = CucuMath.GetLerpEdges(LerpValue, out var iLeft, out var iRight, ordered);
-
-            if (iLeft < 0)
+            if (iLeftCached < 0)
             {
-                Value = Elements[iRight].Value;
+                Value = Elements[iRightCached].Value;
                 return true;
             }
             
-            if (iRight < 0)
+            if (iRightCached < 0)
             {
-                Value = Elements[iLeft].Value;
+                Value = Elements[iLeftCached].Value;
                 return true;
             }
             
-            Value = CucuTransform.Lerp(points[iLeft].Value, points[iRight].Value, t);
+            Value = CucuTransform.Lerp(points[iLeftCached].Value, points[iRightCached].Value, tCached);
 
             if (target != null)
             {

@@ -1,6 +1,7 @@
 using System;
 using CucuTools.Attributes;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace CucuTools.Raycasts.Effects.Impl
 {

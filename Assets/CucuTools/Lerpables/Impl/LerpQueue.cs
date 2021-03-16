@@ -8,108 +8,81 @@ namespace CucuTools.Lerpables.Impl
 {
     /// <inheritdoc />
     [AddComponentMenu(LerpMenuRoot + nameof(LerpQueue))]
-    public class LerpQueue : LerpBehavior
+    public class LerpQueue : LerpableList<LerpBehavior>
     {
+        public override List<LerpPoint<LerpBehavior>> Elements
+        {
+            get => elements ?? (elements = new List<LerpPoint<LerpBehavior>>());
+            protected set => elements = value;
+        }
+        
         [Header("Lerp points")]
         [SerializeField] private List<LerpPoint<LerpBehavior>> elements;
 
-        public void Add(LerpPoint<LerpBehavior> point)
-        {
-            if (elements == null) elements = new List<LerpPoint<LerpBehavior>>();
-            if (point.IsValid() && point.Value != null && point.Value != this) elements.Add(point);
-        }
+        private LerpPoint<LerpBehavior> leftCached;
+        private LerpPoint<LerpBehavior> rightCached;
         
-        public void Add(float t, LerpBehavior value)
-        {
-            Add(new LerpPoint<LerpBehavior>(t, value));
-        }
-
-        public bool Remove(LerpBehavior value)
-        {
-            if (elements == null) return false;
-
-            if (value == null) return false;
-
-            return elements.RemoveAll(p => p.Value == value) > 0;
-        }
 
         public bool Remove(float t)
         {
-            if (elements == null) return false;
-
-            return elements.RemoveAll(p => p.T == t) > 0;
-        }
-
-        public bool Remove(LerpPoint<LerpBehavior> point)
-        {
-            if (elements == null) return false;
-
-            return elements.Remove(point);
+            return Elements.RemoveAll(p => p.T == t) > 0;
         }
 
         public int RemoveAll(Predicate<LerpPoint<LerpBehavior>> match = null)
         {
-            if (elements == null) return 0;
-
-            if (match != null) return elements.RemoveAll(match);
+            if (match != null) return Elements.RemoveAll(match);
             
-            var count = elements.Count;
-            elements.Clear();
+            var count = Elements.Count;
+            Elements.Clear();
             return count;
         }
 
         public void RemoveAt(params int[] index)
         {
-            if (elements == null) return;
-
             var indexes = index
-                .Where(t => 0 <= t && t < elements.Count)
+                .Where(t => 0 <= t && t < Elements.Count)
                 .Distinct()
                 .OrderByDescending(t => t)
                 .ToArray();
 
             for (int i = 0; i < indexes.Length; i++)
             {
-                elements.RemoveAt(indexes[i]);
+                Elements.RemoveAt(indexes[i]);
             }
-        }
-
-        public void Sort()
-        {
-            if (elements == null) return;
-
-            elements = elements.OrderBy(p => p).ToList();
         }
 
         /// <inheritdoc />
         protected override bool UpdateBehaviour()
         {
-            if (elements == null) return false;
-            if (elements.Count == 0) return false;
+            if (SortedElements == null) return false;
+            if (SortedElements.Count == 0) return false;
 
-            return LinearLerp(elements.OrderBy(p => p.T).ToArray());
+            return LinearLerp(SortedElements);
         }
 
-        private bool LinearLerp(params LerpPoint<LerpBehavior>[] points)
+        private bool LinearLerp(List<LerpPoint<LerpBehavior>> points)
         {
-            if (points.Length == 1)
+            if (points.Count == 1)
             {
                 points[0].Value?.Lerp(LerpValue);
                 return true;
             }
 
-            for (var i = 1; i < points.Length; i++)
+            for (var i = 1; i < points.Count; i++)
             {
-                var left = points[i - 1];
-                var right = points[i];
+                leftCached.T = points[i - 1].T;
+                leftCached.Value = points[i - 1].Value;
 
-                var t = CucuMath.GetLerpValue(LerpValue, left.T, right.T);
-                right.Value?.Lerp(t);
+                rightCached.T = points[i].T;
+                rightCached.Value = points[i].Value;
+
+                var t = CucuMath.GetLerpValue(LerpValue, leftCached.T, rightCached.T);
+                rightCached.Value?.Lerp(t);
 
                 if (i == 1)
                 {
-                    t = CucuMath.GetLerpValue(LerpValue, 0f, left.T);
-                    left.Value?.Lerp(t);
+                    t = CucuMath.GetLerpValue(LerpValue, 0f, leftCached.T);
+                    leftCached.Value?.Lerp(t);
                 }
             }
 

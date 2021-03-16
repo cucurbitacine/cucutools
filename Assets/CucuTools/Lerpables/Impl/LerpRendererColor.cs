@@ -11,9 +11,13 @@ namespace CucuTools.Lerpables.Impl
             get => rendererTarget;
             set => rendererTarget = value;
         }
+
+        protected Material material => _materialCached ?? (_materialCached = Renderer?.material);
         
         [Header("Renderer")]
         [SerializeField] private Renderer rendererTarget;
+
+        private Material _materialCached;
         
         /// <inheritdoc />
         protected override bool UpdateBehaviour()
@@ -24,7 +28,7 @@ namespace CucuTools.Lerpables.Impl
 
             if (Application.isPlaying)
             {
-                rendererTarget.material.color = Value;
+                material.color = Value;
             }
 
             return true;

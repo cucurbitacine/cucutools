@@ -23,29 +23,30 @@ namespace CucuTools.Lerpables.Impl
         [Header("Bools")]
         [SerializeField] private List<LerpPoint<bool>> points;
 
+        private int iLeftCached;
+        private int iRightCached;
+        
         /// <inheritdoc />
         protected override bool UpdateBehaviour()
         {
-            if (Elements == null) return false;
-            if (Elements.Count == 0) return false;
+            if (SortedElements == null) return false;
+            if (SortedElements.Count == 0) return false;
 
-            var ordered = Elements.OrderBy(e => e.T).ToArray();
+            CucuMath.GetLerpEdges(LerpValue, out iLeftCached, out iRightCached, SortedElements);
 
-            var t = CucuMath.GetLerpEdges(LerpValue, out var iLeft, out var iRight, ordered);
-
-            if (iLeft < 0)
+            if (iLeftCached < 0)
             {
-                Value = ordered[iRight].Value;
+                Value = SortedElements[iRightCached].Value;
                 return true;
             }
 
-            if (iRight < 0)
+            if (iRightCached < 0)
             {
-                Value = ordered[iLeft].Value;
+                Value = SortedElements[iLeftCached].Value;
                 return true;
             }
 
-            Value = ordered[iLeft].Value;
+            Value = SortedElements[iLeftCached].Value;
 
             return true;
         }

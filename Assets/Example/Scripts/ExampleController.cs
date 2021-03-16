@@ -5,24 +5,18 @@ using System.Threading.Tasks;
 using CucuTools.ArgumentInjector;
 using CucuTools.Attributes;
 using CucuTools.Common;
-using CucuTools.Lerpables.Animations;
 using CucuTools.Waiters.Impl;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using Random = UnityEngine.Random;
 
 namespace Example.Scripts
 {
-    public class ExampleController : CucuMonoBehaviour
+    [SceneController("cucuexample")]
+    public class ExampleController : CucuSceneController
     {
-        [Header("Timer")]
-        [SerializeField] private CucuTimer timer;
-        [SerializeField] private AnimationBehaviour animationBehaviour;
-
-        [Header("Argument")]
         [CucuArg]
-        [SerializeField] private ExampleCucuArg exampleArg;
-
+        public ExampleCucuArg exampleCucuArg;
+        
         #region Log
 
         public void Log(string msg)
@@ -88,14 +82,17 @@ namespace Example.Scripts
         #region AsyncOperation
 
         [CucuButton("Wait AsyncOperation", group: "Waiter", colorHex: "AA0000")]
-        private void WaitAsyncOperation()
+        public void WaitAsyncOperation()
         {
             var args = new List<CucuArg>();
-            
-            args.Add(new ExampleCucuArg(3f));
 
-            new WaiterOperation(CucuSceneManager.LoadSingleSceneAsync(
-                    SceneManager.GetActiveScene().name, args.ToArray()))
+            var indexZone = exampleCucuArg?.indexZone ?? 0;
+
+            indexZone = (indexZone + 1) % FindObjectsOfType<ZoneExampleController>().Length;
+
+            args.Add(new ExampleCucuArg(indexZone));
+
+            new WaiterOperation(CucuSceneManager.LoadSingleSceneAsync<ExampleController>(args.ToArray()))
                 .OnCompleted.AddListener(() => Debug.Log("Wait :: AsyncOperation :: Done"));
         }
 
@@ -136,28 +133,16 @@ namespace Example.Scripts
         }
 
         #endregion
-
-        protected override void OnAwake()
-        {
-            timer = new CucuTimer(0f);
-
-            if (exampleArg != null && exampleArg.IsValid) timer.Delay = exampleArg.delay;
-
-            timer
-                .Before(() => Debug.Log($"Starting animation in {timer.Delay} seconds"))
-                .After(() => animationBehaviour.StartAnimation())
-                .Start();
-        }
     }
 
     [Serializable]
     public class ExampleCucuArg : CucuArg
     {
-        [Min(0f)] public float delay;
+        public int indexZone;
 
-        public ExampleCucuArg(float d)
+        public ExampleCucuArg(int index)
         {
-            delay = d;
+            indexZone = index;
         }
     }
 }

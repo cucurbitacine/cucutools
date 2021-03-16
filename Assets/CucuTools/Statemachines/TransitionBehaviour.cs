@@ -23,7 +23,7 @@ namespace CucuTools.Statemachines
             set => mode = value;
         }
 
-        public ConditionEntity[] Conditions
+        public override ConditionEntity[] Conditions
         {
             get => conditions;
             set => conditions = value;
