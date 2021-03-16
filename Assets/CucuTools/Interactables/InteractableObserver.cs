@@ -36,16 +36,17 @@ namespace CucuTools.Interactables
             {
                 var actualInteractables = Observer.ObservedObject.transform.GetComponents<IInteractableEntity>();
 
+                foreach (var lostInteractable in Interactables.Where(current => !actualInteractables.Contains(current)))
+                {
+                    lostInteractable?.Normal();
+                }
+                
                 foreach (var newInteractable in actualInteractables.Where(actual => !Interactables.Contains(actual)))
                 {
                     newInteractable?.Hover();
                 }
 
-                foreach (var lostInteractable in Interactables.Where(current => !actualInteractables.Contains(current)))
-                {
-                    lostInteractable?.Normal();
-                }
-
+                
                 Interactables.Clear();
                 Interactables.AddRange(actualInteractables);
             }

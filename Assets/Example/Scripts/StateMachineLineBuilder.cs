@@ -8,6 +8,7 @@ public class StateMachineLineBuilder : MonoBehaviour
 {
     public Transform parent;
     public LineRenderer linePrefab;
+    public StateMachineEntity mainState;
 
     private StateEntity[] states;
     
@@ -94,6 +95,8 @@ public class StateMachineLineBuilder : MonoBehaviour
     
     private void Update()
     {
+        if (!mainState.IsPlaying) return;
+        
         foreach (var state in states)
         {
             foreach (var transition in state.Transitions)
@@ -107,7 +110,6 @@ public class StateMachineLineBuilder : MonoBehaviour
                     line.endWidth = 0.05f;
                 }
             }
-            
         }
     }
 }
