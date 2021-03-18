@@ -124,11 +124,7 @@ namespace CucuTools.Interactables
             else if (state.isNormal) Normal();
         }
         
-        protected virtual void OnAwake()
-        {
-        }
-        
-        private void Awake()
+        protected virtual void Awake()
         {
             if (defaultOnAwake)
             {
@@ -145,8 +141,10 @@ namespace CucuTools.Interactables
                     Events.OnDisable.Invoke();
                 }
             }
+        }
 
-            OnAwake();
+        protected virtual void OnValidate()
+        {
         }
 
         [Serializable]
@@ -165,7 +163,7 @@ namespace CucuTools.Interactables
             public UnityEvent OnClick => onClick ?? (onClick = new UnityEvent());
             public UnityEvent OnDisable => onDisable ?? (onDisable = new UnityEvent());
 
-            [SerializeField] private UnityEvent onNormal;
+            [SerializeField] public UnityEvent onNormal;
             [SerializeField] private UnityEvent onHover;
             [SerializeField] private UnityEvent onClick;
             [SerializeField] private UnityEvent onDisable;

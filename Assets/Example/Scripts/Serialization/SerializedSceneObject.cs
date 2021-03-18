@@ -6,7 +6,7 @@ using CucuTools.Serializing;
 using CucuTools.Serializing.Components;
 using UnityEngine;
 
-namespace Example.Scripts.Ser
+namespace Example.Scripts.Serialization
 {
     [CreateAssetMenu(fileName = "SerializedComponents", menuName = "CucuCreate", order = 0)]
     public class SerializedSceneObject : ScriptableObject, ISerializedSceneProvider

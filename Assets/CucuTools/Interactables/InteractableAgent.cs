@@ -62,15 +62,17 @@ namespace CucuTools.Interactables
             }
         }
         
-        protected override void OnAwake()
+        protected override void Awake()
         {
-            base.OnAwake();
+            base.Awake();
 
             Validate();
         }
 
-        private void OnValidate()
+        protected override void OnValidate()
         {
+            base.OnValidate();
+            
             Validate();
         }
     }

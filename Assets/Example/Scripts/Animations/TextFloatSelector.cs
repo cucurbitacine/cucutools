@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Example.Scripts
+namespace Example.Scripts.Animations
 {
     public class TextFloatSelector : MonoBehaviour
     {

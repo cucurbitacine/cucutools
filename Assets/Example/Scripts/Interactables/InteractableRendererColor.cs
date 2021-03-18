@@ -1,8 +1,9 @@
 using System;
 using CucuTools.Colors;
+using CucuTools.Interactables;
 using UnityEngine;
 
-namespace CucuTools.Interactables
+namespace Example.Scripts.Interactables
 {
     public class InteractableRendererColor : InteractableBehavior
     {
@@ -48,13 +49,17 @@ namespace CucuTools.Interactables
             if (rendererTarget == null) rendererTarget = GetComponent<Renderer>();
         }
 
-        protected override void OnAwake()
+        protected override void Awake()
         {
+            base.Awake();
+            
             Validate();
         }
 
-        private void OnValidate()
+        protected override void OnValidate()
         {
+            base.OnValidate();
+            
             Validate();
         }
 

@@ -2,7 +2,7 @@ using System;
 using CucuTools.ArgumentInjector;
 using CucuTools.Serializing.Components;
 
-namespace Example.Scripts.Ser
+namespace Example.Scripts.Serialization
 {
     [Serializable]
     public class SerializingArg : CucuArg

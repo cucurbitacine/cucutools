@@ -3,7 +3,7 @@ using CucuTools.Serializing.Components;
 using CucuTools.Serializing.Datas;
 using UnityEngine;
 
-namespace Example.Scripts.Ser.Impl
+namespace Example.Scripts.Serialization.Impl
 {
     public class SerializableTransform : SerializableComponent<Transform, SerializedTransform>
     {

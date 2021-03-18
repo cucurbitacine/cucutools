@@ -7,7 +7,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 
-namespace Example.Scripts.Ser
+namespace Example.Scripts.Serialization
 {
     public class SceneSerializator : MonoBehaviour
     {

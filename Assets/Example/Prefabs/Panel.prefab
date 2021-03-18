@@ -173,7 +173,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Press [E]
+  m_Text: '[E] Return'
 --- !u!1 &5849539204816871118
 GameObject:
   m_ObjectHideFlags: 0
@@ -379,8 +379,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   isEnabled: 1
+  defaultOnAwake: 1
   state:
-    isNormal: 0
     isHovered: 0
     isClicked: 0
   events:
@@ -421,11 +421,11 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls: []
   clickDuration: 0.2
-  renderer: {fileID: 6217984749852684964}
+  rendererTarget: {fileID: 6217984749852684964}
   color:
     normal: {r: 1, g: 0, b: 0, a: 1}
-    hovered: {r: 0.8039216, g: 0, b: 0, a: 1}
-    clicked: {r: 0.60784316, g: 0, b: 0, a: 1}
+    hovered: {r: 1, g: 0.2971698, b: 0.2971698, a: 1}
+    clicked: {r: 1, g: 0.6839622, b: 0.6839622, a: 1}
     disabled: {r: 0.21568628, g: 0.21568628, b: 0.21568628, a: 0.5}
 --- !u!1 &7705071588166956666
 GameObject:
@@ -437,7 +437,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8209052204876506703}
   m_Layer: 0
-  m_Name: Plate
+  m_Name: Panel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -2,7 +2,7 @@ using System.Threading.Tasks;
 using CucuTools.Serializing;
 using CucuTools.Serializing.Components;
 
-namespace Example.Scripts.Ser
+namespace Example.Scripts.Serialization
 {
     public class SerializedSceneStorage : SerializedSceneProvider
     {
