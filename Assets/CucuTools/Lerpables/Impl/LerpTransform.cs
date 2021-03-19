@@ -106,7 +106,7 @@ namespace CucuTools.Lerpables.Impl
                 
                 if (point.Value == null) continue;
 
-                Gizmos.color = CucuColor.Rainbow.Get(point.T);
+                Gizmos.color = CucuColor.Rainbow.Evaluate(point.T);
                 
                 if (i < ordered.Length - 1)
                 {

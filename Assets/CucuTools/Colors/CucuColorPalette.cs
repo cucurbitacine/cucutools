@@ -1,15 +1,26 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using CucuTools.Lerpables;
 using CucuTools.Math;
 using UnityEngine;
 
 namespace CucuTools.Colors
 {
+    /// <summary>
+    /// Color palette
+    /// </summary>
     [Serializable]
     public class CucuColorPalette
     {
+        /// <summary>
+        /// Name of palette
+        /// </summary>
         public string Name => _name;
+        
+        /// <summary>
+        /// Colors
+        /// </summary>
         public Color[] Colors => _colors.ToArray();
 
         [SerializeField] private string _name;
@@ -27,7 +38,12 @@ namespace CucuTools.Colors
         {
         }
 
-        public Color Get(float value)
+        /// <summary>
+        /// Evaluate color by value
+        /// </summary>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public Color Evaluate(float value)
         {
             value = Mathf.Clamp01(value);
 
@@ -40,25 +56,44 @@ namespace CucuTools.Colors
             return color;
         }
 
+        /// <summary>
+        /// Get as <see cref="Gradient"/>
+        /// </summary>
+        /// <returns></returns>
         public Gradient GetGradient()
         {
             return Colors.ToGradient();
         }
     }
-
+    
+    /// <summary>
+    /// Palette extentions
+    /// </summary>
     public static class CucuColorPaletteExtentions
     {
+        /// <summary>
+        /// Convert colors to palette
+        /// </summary>
+        /// <param name="colors"></param>
+        /// <param name="name"></param>
+        /// <returns></returns>
         public static CucuColorPalette ToColorPalette(this IEnumerable<Color> colors, string name = "")
         {
             return new CucuColorPalette(name, colors.ToArray());
         }
 
+        /// <summary>
+        /// Convert palette to gradient
+        /// </summary>
+        /// <param name="pallete">Color palette</param>
+        /// <param name="mode">Gradient mode</param>
+        /// <returns>Gradient</returns>
         public static Gradient ToGradient(this CucuColorPalette pallete, GradientMode mode = GradientMode.Blend)
         {
             var result = new Gradient {mode = mode};
 
             var times = CucuMath.LinSpace(8);
-            var colors = times.ToDictionary(t => t, pallete.Get);
+            var colors = times.ToDictionary(t => t, pallete.Evaluate);
 
             result.colorKeys = times.Select(t => new GradientColorKey(colors[t], t)).ToArray();
             result.alphaKeys = times.Select(t => new GradientAlphaKey(colors[t].a, t)).ToArray();
@@ -66,6 +101,13 @@ namespace CucuTools.Colors
             return result;
         }
 
+        /// <summary>
+        /// Convert colors to gradient
+        /// </summary>
+        /// <param name="colors">Colors</param>
+        /// <param name="name"></param>
+        /// <param name="mode"></param>
+        /// <returns></returns>
         public static Gradient ToGradient(this IEnumerable<Color> colors,
             string name = "", GradientMode mode = GradientMode.Blend)
         {

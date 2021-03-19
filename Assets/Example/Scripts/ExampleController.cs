@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using CucuTools.ArgumentInjector;
+using CucuTools.Attributes;
 using CucuTools.Common;
 using CucuTools.Waiters.Impl;
 using UnityEngine;

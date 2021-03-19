@@ -1,11 +1,15 @@
 using System;
 using System.Reflection;
 using CucuTools.ArgumentInjector;
+using CucuTools.Attributes;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 namespace CucuTools.Common
 {
+    /// <summary>
+    /// Cucu scene manager. Wrapper around <see cref="SceneManager"/> only with setting <see cref="CucuArg"/> by <see cref="CucuArgumentManager"/>
+    /// </summary>
     public static class CucuSceneManager
     {
         private static CucuArgumentManager ArgumentManager => CucuArgumentManager.Singleton;
@@ -82,6 +86,7 @@ namespace CucuTools.Common
             else
                 throw new Exception($"Load scene of \"{nameof(TController)}\" was failed :: {msg}");
         }
+        
         public static void LoadSingleScene<TController>(object[] args)
             where TController : CucuSceneController
         {
@@ -96,6 +101,33 @@ namespace CucuTools.Common
         
         #endregion
 
+        /// <summary>
+        /// Async load scene <param name="name"></param> with mode <param name="mode"></param>
+        /// </summary>
+        /// <param name="name">Scene name</param>
+        /// <param name="mode">Load mode</param>
+        public static AsyncOperation LoadSceneAsync(string name, LoadSceneMode mode = LoadSceneMode.Single)
+        {
+            return SceneManager.LoadSceneAsync(name, mode);
+        }
+
+        /// <summary>
+        /// Load scene <param name="name"></param> with mode <param name="mode"></param>
+        /// </summary>
+        /// <param name="name">Scene name</param>
+        /// <param name="mode">Load mode</param>
+        public static void LoadScene(string name, LoadSceneMode mode = LoadSceneMode.Single)
+        {
+            SceneManager.LoadScene(name, mode);
+        }
+        
+        /// <summary>
+        /// Trying get scene name from attribute of scene controller
+        /// </summary>
+        /// <param name="sceneName">Result scene name</param>
+        /// <param name="msg">Message</param>
+        /// <typeparam name="TController">Type of scene controller</typeparam>
+        /// <returns>Success</returns>
         private static bool TryGetSceneName<TController>(out string sceneName, out string msg) where TController : CucuSceneController
         {
             sceneName = null;
@@ -118,16 +150,6 @@ namespace CucuTools.Common
             }
             
             return true;
-        }
-        
-        private static AsyncOperation LoadSceneAsync(string name, LoadSceneMode mode = LoadSceneMode.Single)
-        {
-            return SceneManager.LoadSceneAsync(name, mode);
-        }
-
-        private static void LoadScene(string name, LoadSceneMode mode = LoadSceneMode.Single)
-        {
-            SceneManager.LoadScene(name, mode);
         }
     }
 }
