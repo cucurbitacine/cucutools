@@ -1,4 +1,5 @@
 using CucuTools.ArgumentInjector;
+using CucuTools.Attributes;
 using CucuTools.Common;
 using UnityEngine;
 using UnityEngine.Events;

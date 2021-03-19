@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace CucuTools.Common
 {
+    /// <summary>
+    /// Simple MonoBehaviour but with Inject on awake
+    /// </summary>
     public abstract class CucuMonoBehaviour : MonoBehaviour
     {
         private CucuArgumentManager ArgumentManager => CucuArgumentManager.Singleton;
@@ -24,7 +27,7 @@ namespace CucuTools.Common
             }
         }
         
-        private void Awake()
+        protected virtual void Awake()
         {
             Inject();
             

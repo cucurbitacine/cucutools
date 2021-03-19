@@ -7,26 +7,45 @@ namespace CucuTools.Interactables
 {
     public class InteractableObserver : MonoBehaviour
     {
+        public bool IsEnabled
+        {
+            get => isEnabled;
+            set
+            {
+                isEnabled = value;
+                if (!isEnabled)
+                {
+                    foreach (var interactable in Interactables)
+                    {
+                        interactable?.Normal();
+                    }
+                
+                    Interactables.Clear();
+                }
+            }
+        }
+
         public RaycastEffectObserver Observer
         {
             get => observer;
             protected set => observer = value;
         }
 
-        private List<IInteractableEntity> Interactables =>
+        public List<IInteractableEntity> Interactables =>
             interactables ?? (interactables = new List<IInteractableEntity>());
         
+        [SerializeField] private bool isEnabled = true;
         [SerializeField] private RaycastEffectObserver observer;
         
         private List<IInteractableEntity> interactables;
-
+        
         [SerializeField] private string[] interactableInfos;
         
-        public void Click()
+        public void Press()
         {
             foreach (var interactable in interactables)
             {
-                interactable?.Click();                
+                interactable?.Press();               
             }
         }
         
@@ -70,6 +89,7 @@ namespace CucuTools.Interactables
         private void Validate()
         {
             if (Observer == null) Observer = GetComponent<RaycastEffectObserver>();
+            if (Observer == null) Observer = transform.parent?.GetComponent<RaycastEffectObserver>();
         }
         
         private void Awake()
@@ -79,7 +99,7 @@ namespace CucuTools.Interactables
 
         private void Update()
         {
-            if (Observer.IsEnabled) UpdateInteracable();
+            if (Observer.IsEnabled && IsEnabled) UpdateInteracable();
         }
 
         private void OnValidate()

@@ -1,7 +1,6 @@
 using System;
 using CucuTools.Attributes;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace CucuTools.Raycasts.Effects.Impl
 {
@@ -44,6 +43,7 @@ namespace CucuTools.Raycasts.Effects.Impl
 
             if (hasHit)
             {
+                observedObject.hasHit = hasHit;
                 observedObject.transform = _hitCached.transform;
                 observedObject.point = _hitCached.point;
                 observedObject.normal = _hitCached.normal;
@@ -105,10 +105,9 @@ namespace CucuTools.Raycasts.Effects.Impl
     [Serializable]
     public struct ObservedObject
     {
+        public bool hasHit;
         public Transform transform;
         public Vector3 point;
         public Vector3 normal;
-
-        public bool Exist() => transform != null;
     }
 }

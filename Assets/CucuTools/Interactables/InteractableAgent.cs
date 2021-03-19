@@ -3,69 +3,57 @@ using UnityEngine;
 
 namespace CucuTools.Interactables
 {
+    /// <inheritdoc />
     [DisallowMultipleComponent]
-    public sealed class InteractableAgent : InteractableBehavior
+    public sealed class InteractableAgent : InteractableEntity
     {
+        /// <inheritdoc />
         public override bool IsEnabled
         {
-            get => base.IsEnabled;
+            get => Target?.IsEnabled ?? false;
             set
             {
-                base.IsEnabled = value;
-                if (Target != null) Target.IsEnabled = base.IsEnabled;
+                if (Target != null) Target.IsEnabled = value;
             }
         }
 
-        public override float ClickDuration
-        {
-            get => base.ClickDuration;
-            set
-            {
-                base.ClickDuration = value;
-                if (Target != null) Target.ClickDuration = base.ClickDuration;
-            }
-        }
-
-        public InteractableBehavior Target
+        /// <summary>
+        /// Target of interactable agent
+        /// </summary>
+        public InteractableEntity Target
         {
             get => target;
-            private set => target = value;
+            set => target = value;
         }
-        
-        [SerializeField] private InteractableBehavior target;
-        
-        protected override void NormalInternal()
+
+        [SerializeField] private InteractableEntity target;
+
+        /// <inheritdoc />
+        public override void Normal()
         {
             Target?.Normal();
         }
 
-        protected override void HoverInternal()
+        /// <inheritdoc />
+        public override void Hover()
         {
             Target?.Hover();
         }
 
-        protected override void ClickInternal()
+        /// <inheritdoc />
+        public override void Press()
         {
-            Target?.Click();
+            Target?.Press();
         }
 
         private void Validate()
         {
             if (Target == this) Target = null;
-            if (Target == null) Target = GetComponentsInChildren<InteractableBehavior>()
-                .FirstOrDefault(ib => ib != this);
-            
-            if (Target != null)
-            {
-                Target.DefaultOnAwake = false;
-                Target.ClickDuration = ClickDuration;
-            }
+            if (Target == null) Target = GetComponentsInChildren<InteractableEntity>().FirstOrDefault(ib => ib != this);
         }
-        
-        protected override void OnAwake()
-        {
-            base.OnAwake();
 
+        private void Awake()
+        {
             Validate();
         }
 

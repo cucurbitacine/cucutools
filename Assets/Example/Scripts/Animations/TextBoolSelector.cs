@@ -1,8 +1,7 @@
-using System;
 using UnityEngine;
 using UnityEngine.UI;
 
-namespace Example.Scripts
+namespace Example.Scripts.Animations
 {
     public class TextBoolSelector : MonoBehaviour
     {

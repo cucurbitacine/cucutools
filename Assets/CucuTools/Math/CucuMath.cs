@@ -394,5 +394,30 @@ namespace CucuTools.Math
         {
             CucuMath.GetEdges<TArg>(arg, out iLeft, out iRight, array);
         }
+        
+        public static void Sync(this Rigidbody rigidbody, Transform target,  bool syncPosition = true, bool syncRotation = true, float maxVelocity = 500f, float syncWeight = 1f, float? deltaTime = null)
+        {
+            if (deltaTime == null) deltaTime = Time.fixedDeltaTime;
+            
+            if (syncPosition)
+            {
+                var dPos = target.position - rigidbody.transform.position;
+                rigidbody.velocity = Vector3.Lerp(rigidbody.velocity, Vector3.ClampMagnitude(dPos / deltaTime.Value, maxVelocity),
+                    syncWeight);
+            }
+
+            if (syncRotation)
+            {
+                var from = rigidbody.transform.rotation;
+                var to = target.rotation;
+                var conj = new Quaternion(-from.x, -from.y, -from.z, from.w);
+                var dq = new Quaternion((to.x - from.x) * 2.0f, 2.0f * (to.y - from.y), 2.0f * (to.z - from.z),
+                    2.0f * (to.w - from.w));
+                var c = dq * conj;
+                var dRot = new Vector3(c.x, c.y, c.z);
+
+                rigidbody.angularVelocity = Vector3.Lerp(rigidbody.angularVelocity, dRot / deltaTime.Value, syncWeight);
+            }
+        }
     }
 }

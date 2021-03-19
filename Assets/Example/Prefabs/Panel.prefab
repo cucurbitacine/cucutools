@@ -173,7 +173,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Press [E]
+  m_Text: '[E] Return'
 --- !u!1 &5849539204816871118
 GameObject:
   m_ObjectHideFlags: 0
@@ -380,9 +380,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   isEnabled: 1
   state:
-    isNormal: 0
     isHovered: 0
-    isClicked: 0
+    isPressed: 0
   events:
     onNormal:
       m_PersistentCalls:
@@ -414,18 +413,25 @@ MonoBehaviour:
             m_StringArgument: 
             m_BoolArgument: 1
           m_CallState: 2
-    onClick:
+    onPressDown:
+      m_PersistentCalls:
+        m_Calls: []
+    onPressUp:
+      m_PersistentCalls:
+        m_Calls: []
+    onEnabled:
       m_PersistentCalls:
         m_Calls: []
     onDisable:
       m_PersistentCalls:
         m_Calls: []
-  clickDuration: 0.2
-  renderer: {fileID: 6217984749852684964}
+  defaultOnAwake: 1
+  pressDuration: 0.01
+  rendererTarget: {fileID: 6217984749852684964}
   color:
-    normal: {r: 1, g: 0, b: 0, a: 1}
-    hovered: {r: 0.8039216, g: 0, b: 0, a: 1}
-    clicked: {r: 0.60784316, g: 0, b: 0, a: 1}
+    normal: {r: 0, g: 0.8861785, b: 1, a: 1}
+    hovered: {r: 0.26477396, g: 0.6153873, b: 0.6603774, a: 1}
+    clicked: {r: 0.6273585, g: 0.9576213, b: 1, a: 1}
     disabled: {r: 0.21568628, g: 0.21568628, b: 0.21568628, a: 0.5}
 --- !u!1 &7705071588166956666
 GameObject:
@@ -437,7 +443,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8209052204876506703}
   m_Layer: 0
-  m_Name: Plate
+  m_Name: Panel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

@@ -155,7 +155,7 @@ namespace CucuTools.Editor
             
             for (var i = 0; i < assemblies.Count; i++)
             {
-                assemblies[i].SetColor(palette.Get((float) i / (assemblies.Count - 1)));
+                assemblies[i].SetColor(palette.Evaluate((float) i / (assemblies.Count - 1)));
             }
         }
 

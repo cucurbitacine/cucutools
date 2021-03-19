@@ -6,7 +6,7 @@ using CucuTools.Serializing;
 using CucuTools.Serializing.Components;
 using UnityEngine;
 
-namespace Example.Scripts.Ser
+namespace Example.Scripts.Serialization
 {
     public class SerializedSceneFile : SerializedSceneProvider
     {

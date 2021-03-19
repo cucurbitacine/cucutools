@@ -4,7 +4,7 @@ using CucuTools.Serializing.Components;
 using CucuTools.Serializing.Datas;
 using UnityEngine;
 
-namespace Example.Scripts.Ser
+namespace Example.Scripts.Serialization
 {
     public class ComponentCreator : MonoBehaviour
     {

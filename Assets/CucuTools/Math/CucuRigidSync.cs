@@ -1,4 +1,5 @@
-﻿using CucuTools.Attributes;
+﻿using System.Collections.Generic;
+using CucuTools.Attributes;
 using UnityEngine;
 
 namespace CucuTools.Math
@@ -28,11 +29,12 @@ namespace CucuTools.Math
 
         [Header("Main Settings")]
         [SerializeField] private bool isEnabled = true;
+        [SerializeField] public bool defaultUseGravityOnDisable = true;
         [SerializeField] private Transform targetSync;
 
         [Header("Additional Settings")]
-        [SerializeField] private bool syncPosition = true;
-        [SerializeField] private bool syncRotation = true;
+        [SerializeField] public bool syncPosition = true;
+        [SerializeField] public bool syncRotation = true;
         [Range(0f, 1000f)]
         [SerializeField] private float maxVelocity = 500f;
         [Range(0f, 1f)]
@@ -41,7 +43,12 @@ namespace CucuTools.Math
         [Header("References")]
         [SerializeField] private Rigidbody rigid;
         [SerializeField] private Collider[] colliders;
-    
+
+        private bool defaultUseGravity;
+
+        private Dictionary<Collider, PhysicMaterial> defaultPhysicMaterials = new Dictionary<Collider, PhysicMaterial>();
+        private bool syncing;
+        
         public bool IsValid()
         {
             return TargetSync != null && Rigidbody != null;
@@ -51,7 +58,6 @@ namespace CucuTools.Math
         {
             if (Rigidbody == null) SetupRigidbody();
         
-            Rigidbody.useGravity = false;
             Rigidbody.isKinematic = false;
 
             Rigidbody.drag = 0f;
@@ -82,8 +88,8 @@ namespace CucuTools.Math
             }
         
             if (collider == null) return;
-            
-            collider.sharedMaterial = _rigidSyncPhysicMaterial;
+
+            if (collider.sharedMaterial == null) collider.sharedMaterial = _rigidSyncPhysicMaterial;
             collider.isTrigger = false;
         }
     
@@ -106,29 +112,6 @@ namespace CucuTools.Math
             ValidateColliders();
         }
 
-        private void Sync(float deltaTime)
-        {
-            if (syncPosition)
-            {
-                var dPos = TargetSync.position - transform.position;
-                Rigidbody.velocity = Vector3.Lerp(Rigidbody.velocity, Vector3.ClampMagnitude(dPos / deltaTime, maxVelocity),
-                    syncWeight);
-            }
-
-            if (syncRotation)
-            {
-                var from = transform.rotation;
-                var to = TargetSync.rotation;
-                var conj = new Quaternion(-from.x, -from.y, -from.z, from.w);
-                var dq = new Quaternion((to.x - from.x) * 2.0f, 2.0f * (to.y - from.y), 2.0f * (to.z - from.z),
-                    2.0f * (to.w - from.w));
-                var c = dq * conj;
-                var dRot = new Vector3(c.x, c.y, c.z);
-
-                Rigidbody.angularVelocity = Vector3.Lerp(Rigidbody.angularVelocity, dRot / deltaTime, syncWeight);
-            }
-        }
-
         protected virtual void Awake()
         {
             Validate();
@@ -136,7 +119,35 @@ namespace CucuTools.Math
 
         protected void FixedUpdate()
         {
-            if (IsEnabled) Sync(Time.fixedDeltaTime);
+            if (IsEnabled && IsValid())
+            {
+                if (!syncing)
+                {
+                    syncing = true;
+                    defaultUseGravity = Rigidbody.useGravity;
+                    Rigidbody.useGravity = false;
+                    foreach (var cld in colliders)
+                    {
+                        defaultPhysicMaterials[cld] = cld.sharedMaterial;
+                        cld.sharedMaterial = _rigidSyncPhysicMaterial;
+                    }
+                }
+
+                Rigidbody.Sync(TargetSync,
+                    syncPosition, syncRotation,
+                    maxVelocity, syncWeight,
+                    Time.fixedDeltaTime);
+            }
+            else
+            {
+                if (syncing)
+                {
+                    syncing = false;
+                    if (defaultUseGravityOnDisable) Rigidbody.useGravity = defaultUseGravity;
+                    foreach (var cld in colliders)
+                        cld.sharedMaterial = defaultPhysicMaterials[cld];
+                }
+            }
         }
 
         protected virtual void OnValidate()

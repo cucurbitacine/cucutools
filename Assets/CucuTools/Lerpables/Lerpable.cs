@@ -45,6 +45,7 @@ namespace CucuTools.Lerpables
             LerpValue = t;
 
             Events.OnUpdated.Invoke();
+            Events.OnUpdatedValue.Invoke(LerpValue);
             
             Update();
         }
@@ -135,13 +136,16 @@ namespace CucuTools.Lerpables
         [Serializable]
         public class LerpEvents
         {
-            public UnityEvent OnUpdated => onUpdated;
+            public UnityEvent OnUpdated => onUpdated ?? (onUpdated = new UnityEvent());
+            public UnityEvent<float> OnUpdatedValue => onUpdatedValue ?? (onUpdatedValue = new UnityEvent<float>());
             
             [SerializeField] private UnityEvent onUpdated;
+            [SerializeField] private UnityEvent<float> onUpdatedValue;
 
             public LerpEvents()
             {
                 onUpdated = new UnityEvent();
+                onUpdatedValue = new UnityEvent<float>();
             }
         }
     }

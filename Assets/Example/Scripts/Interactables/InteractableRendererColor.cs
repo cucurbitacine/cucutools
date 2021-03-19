@@ -1,8 +1,9 @@
 using System;
 using CucuTools.Colors;
+using CucuTools.Interactables;
 using UnityEngine;
 
-namespace CucuTools.Interactables
+namespace Example.Scripts.Interactables
 {
     public class InteractableRendererColor : InteractableBehavior
     {
@@ -24,9 +25,9 @@ namespace CucuTools.Interactables
             SetColor(color.hovered);
         }
 
-        protected override void ClickInternal()
+        protected override void PressDownInternal()
         {
-            base.ClickInternal();
+            base.PressDownInternal();
             
             SetColor(color.clicked);
         }
@@ -48,13 +49,17 @@ namespace CucuTools.Interactables
             if (rendererTarget == null) rendererTarget = GetComponent<Renderer>();
         }
 
-        protected override void OnAwake()
+        protected override void Awake()
         {
+            base.Awake();
+            
             Validate();
         }
 
-        private void OnValidate()
+        protected override void OnValidate()
         {
+            base.OnValidate();
+            
             Validate();
         }
 
@@ -87,9 +92,9 @@ namespace CucuTools.Interactables
         {
             if (IsEnabled)
             {
-                if (state.isNormal) SetColor(color.normal);
-                if (state.isHovered) SetColor(color.hovered);
-                if (state.isClicked) SetColor(color.clicked);
+                if (InteractState.isNormal) SetColor(color.normal);
+                if (InteractState.isHovered) SetColor(color.hovered);
+                if (InteractState.isPressed) SetColor(color.clicked);
             }
             else SetColor(color.disabled);
         }

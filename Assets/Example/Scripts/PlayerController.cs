@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using UnityEngine;
 
@@ -7,7 +6,25 @@ namespace Example.Scripts
     [RequireComponent(typeof(Rigidbody))]
     public class PlayerController : MonoBehaviour
     {
-        public bool isEnabled = true;
+        public bool IsEnabled
+        {
+            get => isEnabled;
+            set
+            {
+                isEnabled = value;
+
+                foreach (var inputHandler in GetComponentsInChildren<InputBehaviour>())
+                {
+                    inputHandler.enabled = isEnabled;
+                }
+                
+                cam.enabled = isEnabled;
+                if (bodies != null)
+                    foreach (var body in bodies)
+                        body?.SetActive(!isEnabled);
+            }
+        }
+        [SerializeField] private bool isEnabled = true;
 
         [SerializeField] private float speed = 250f;
         [SerializeField] private float speedView = 1f;
@@ -16,10 +33,11 @@ namespace Example.Scripts
         [SerializeField] private Vector2 view;
         
         [SerializeField] private Transform head;
+        [SerializeField] private GameObject[] bodies;
         
         private Rigidbody rigid;
+        private Camera cam;
         
-
         private void UpdateInput()
         {
             move.x = Input.GetAxis("Horizontal");
@@ -43,7 +61,7 @@ namespace Example.Scripts
 
             var x = head.localRotation.eulerAngles.x - view.y * speedView * dt;
             if (x > 180f) x -= 360f;
-            x = Mathf.Clamp(x, -60f, 60f);
+            x = Mathf.Clamp(x, -90f, 90f);
             head.localRotation = Quaternion.Euler(Vector3.right * x);
         }
 
@@ -54,8 +72,10 @@ namespace Example.Scripts
         
         private void Validate()
         {
+            cam = GetComponentInChildren<Camera>();
+            
             rigid = GetComponent<Rigidbody>();
-
+            
             rigid.constraints = RigidbodyConstraints.FreezeRotation;
 
             head = GetComponentsInChildren<Transform>().FirstOrDefault(t => t.name.ToLower() == "head");
@@ -66,24 +86,21 @@ namespace Example.Scripts
         {
             Validate();
 
-            Cursor.lockState = CursorLockMode.Locked;
+            IsEnabled = isEnabled;
+
+            if (IsEnabled) Cursor.lockState = CursorLockMode.Locked;
         }
 
         private void Update()
         {
             UpdateInput();
             
-            if (isEnabled) UpdateView(Time.deltaTime);
-        }
-
-        private void LateUpdate()
-        {
-            
+            if (IsEnabled) UpdateView(Time.deltaTime);
         }
 
         private void FixedUpdate()
         {
-            if (isEnabled) UpdateMove(Time.deltaTime);
+            if (IsEnabled) UpdateMove(Time.deltaTime);
         }
 
         private void OnValidate()

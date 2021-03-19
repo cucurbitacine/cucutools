@@ -3,6 +3,9 @@ using UnityEngine;
 
 namespace CucuTools.ArgumentInjector
 {
+    /// <summary>
+    /// Some argument
+    /// </summary>
     [Serializable]
     public abstract class CucuArg
     {

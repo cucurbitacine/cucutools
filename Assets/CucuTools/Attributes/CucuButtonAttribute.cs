@@ -2,6 +2,10 @@
 
 namespace CucuTools.Attributes
 {
+    /// <summary>
+    /// Cucu button attribtue.
+    /// Put it before some method for creating button into unity inspector
+    /// </summary>
     [AttributeUsage(AttributeTargets.Method)]
     public class CucuButtonAttribute : Attribute
     {
