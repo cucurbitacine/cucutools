@@ -13,11 +13,6 @@ namespace CucuTools.Raycasts.Effects
 
         #endregion
 
-        protected virtual void Validate()
-        {
-            if (raycastBase == null) raycastBase = GetComponent<RaycastBase>();
-        }
-
         #region IRaycastEffect
 
         /// <inheritdoc />
@@ -35,8 +30,14 @@ namespace CucuTools.Raycasts.Effects
 
         #endregion
         
-        #region MonoBehaviour
+        #region Virtual API
 
+        protected virtual void Validate()
+        {
+            if (raycastBase == null) raycastBase = GetComponent<RaycastBase>();
+            if (raycastBase == null) raycastBase = transform.parent?.GetComponent<RaycastBase>();
+        }
+        
         protected virtual void Update()
         {
             if (IsEnabled) UpdateEffect();

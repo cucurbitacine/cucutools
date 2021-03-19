@@ -13,7 +13,7 @@ namespace Example.Scripts
             {
                 isEnabled = value;
 
-                foreach (var inputHandler in GetComponentsInChildren<InputHandler>())
+                foreach (var inputHandler in GetComponentsInChildren<InputBehaviour>())
                 {
                     inputHandler.enabled = isEnabled;
                 }

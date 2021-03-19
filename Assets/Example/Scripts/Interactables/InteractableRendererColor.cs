@@ -25,9 +25,9 @@ namespace Example.Scripts.Interactables
             SetColor(color.hovered);
         }
 
-        protected override void ClickInternal()
+        protected override void PressDownInternal()
         {
-            base.ClickInternal();
+            base.PressDownInternal();
             
             SetColor(color.clicked);
         }
@@ -92,9 +92,9 @@ namespace Example.Scripts.Interactables
         {
             if (IsEnabled)
             {
-                if (state.isNormal) SetColor(color.normal);
-                if (state.isHovered) SetColor(color.hovered);
-                if (state.isClicked) SetColor(color.clicked);
+                if (InteractState.isNormal) SetColor(color.normal);
+                if (InteractState.isHovered) SetColor(color.hovered);
+                if (InteractState.isPressed) SetColor(color.clicked);
             }
             else SetColor(color.disabled);
         }

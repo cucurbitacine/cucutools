@@ -1,4 +1,3 @@
-using System;
 using System.Linq;
 using UnityEngine;
 
@@ -15,34 +14,44 @@ namespace CucuTools.Interactables.Pickables
         [Header("References")]
         [SerializeField] private InteractableObserver observer;
 
-        public void Switch()
+        public void SwitchPick()
         {
             if (actualPickable != null)
             {
-                if (Throw(actualPickable))
+                if (TryThrow(actualPickable))
                 {
                     actualPickable = null;
                 }
             }
             else
             {
-                if (Pick(observerPickable))
+                if (TryPick(observerPickable))
                 {
                     actualPickable = observerPickable;
                 }
             }
         }
         
-        public bool Pick(PickableBehaviour pickable)
+        public bool TryPick(PickableBehaviour pickable)
         {
             return pickable?.Pick(this) ?? false;
         }
 
-        public bool Throw(PickableBehaviour pickable)
+        public bool TryThrow(PickableBehaviour pickable)
         {
             return pickable?.Throw(this) ?? false;
         }
 
+        public void Pick(PickableBehaviour pickable)
+        {
+            TryPick(pickable);
+        }
+
+        public void Throw(PickableBehaviour pickable)
+        {
+            TryThrow(pickable);
+        }
+        
         private void Update()
         {
             if (Observer == null) return;

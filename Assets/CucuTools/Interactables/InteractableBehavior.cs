@@ -5,9 +5,135 @@ using UnityEngine.Events;
 
 namespace CucuTools.Interactables
 {
-    public class InteractableBehavior : MonoBehaviour, IInteractableEntity
+    /// <inheritdoc />
+    public class InteractableBehavior : InteractableEntity
     {
-        public virtual bool IsEnabled
+        /// <summary>
+        /// State info
+        /// </summary>
+        public InteratableState InteractState => state;
+        
+        /// <summary>
+        /// Events of interactable
+        /// </summary>
+        public InteractableEvents InteractEvents => events ?? (events = new InteractableEvents());
+        
+        /// <summary>
+        /// Flag set default state on awake
+        /// </summary>
+        public bool DefaultOnAwake
+        {
+            get => defaultOnAwake;
+            set => defaultOnAwake = value;
+        }
+
+        /// <summary>
+        /// Duration time after last press down
+        /// </summary>
+        public virtual float PressDuration
+        {
+            get => pressDuration;
+            set => pressDuration = value;
+        }
+        
+        protected float pressTimeLeft;
+        protected Coroutine pressCoroutine;
+
+        #region SerializeField
+
+        [Header("Info")]
+        [SerializeField] private bool isEnabled = true;
+        [SerializeField] private InteratableState state;
+
+        [SerializeField] private InteractableEvents events;
+        
+        [Header("Settings")]
+        [SerializeField] private bool defaultOnAwake = true;
+        [Range(0.005f, 1f)]
+        [SerializeField] private float pressDuration = 0.01f;
+
+        #endregion
+
+        #region Virtual API
+
+        protected virtual void NormalInternal()
+        {
+        }
+
+        protected virtual void HoverInternal()
+        {
+        }
+
+        protected virtual void PressDownInternal()
+        {
+        }
+        
+        protected virtual void PressUpInternal()
+        {
+        }
+
+        protected virtual void EnabledInternal()
+        {
+        }
+        
+        protected virtual void DisableInternal()
+        {
+        }
+
+        protected virtual IEnumerator _PressCoroutine()
+        {
+            PressDownInternal();
+            
+            InteractEvents.OnPressDown.Invoke();
+            
+            while (pressTimeLeft > 0f)
+            {
+                pressTimeLeft -= Time.deltaTime;
+                yield return null;
+            }
+
+            pressTimeLeft = 0f;
+            state.isPressed = false;
+
+            PressUpInternal();
+            
+            InteractEvents.OnPressUp.Invoke();
+            
+            if (state.isHovered) Hover();
+            else if (state.isNormal) Normal();
+        }
+
+        protected virtual void Awake()
+        {
+            if (defaultOnAwake)
+            {
+                if (IsEnabled)
+                {
+                    NormalInternal();
+
+                    EnabledInternal();
+                    
+                    InteractEvents.OnNormal.Invoke();
+                }
+                else
+                {
+                    DisableInternal();
+
+                    InteractEvents.OnDisable.Invoke();
+                }
+            }
+        }
+
+        protected virtual void OnValidate()
+        {
+        }
+        
+        #endregion
+        
+        #region IInteractableEntity
+
+        /// <inheritdoc />
+        public override bool IsEnabled
         {
             get => isEnabled;
             set
@@ -20,139 +146,76 @@ namespace CucuTools.Interactables
                 {
                     if (state.isHovered) Hover();
                     else if (state.isNormal) Normal();
+
+                    EnabledInternal();
+                    
+                    InteractEvents.OnEnabled.Invoke();
                 }
                 else
                 {
                     DisableInternal();
 
-                    Events.OnDisable.Invoke();
+                    InteractEvents.OnDisable.Invoke();
                 }
             }
         }
-
-        public bool DefaultOnAwake
+        
+        /// <inheritdoc />
+        public override void Normal()
         {
-            get => defaultOnAwake;
-            set => defaultOnAwake = value;
-        }
-
-        public InteractableEvents Events => events ?? (events = new InteractableEvents());
-        
-        public virtual float ClickDuration
-        {
-            get => clickDuration;
-            set => clickDuration = value;
-        }
-        
-        [Header("Info")]
-        [SerializeField] private bool isEnabled = true;
-        [SerializeField] private bool defaultOnAwake = true;
-        [SerializeField] protected InteratableState state;
-
-        [Header("Events")]
-        [SerializeField] private InteractableEvents events;
-        
-        [Header("Settings")]
-        [SerializeField] private float clickDuration = 0.2f;
-        
-        public void Normal()
-        {
-            //state.isNormal = true;
             state.isHovered = false;
             
             if (!IsEnabled) return;
 
-            if (state.isClicked) return;
+            if (state.isPressed) return;
 
             NormalInternal();
             
-            Events.OnNormal.Invoke();
+            InteractEvents.OnNormal.Invoke();
         }
         
-        public void Hover()
+        /// <inheritdoc />
+        public override void Hover()
         {
-            //state.isNormal = false;
             state.isHovered = true;
             
             if (!IsEnabled) return;
             
-            if (state.isClicked) return;
+            if (state.isPressed) return;
 
             HoverInternal();
             
-            Events.OnHover.Invoke();
+            InteractEvents.OnHover.Invoke();
         }
 
-        public void Click()
+        /// <inheritdoc />
+        public override void Press()
         {
             if (!IsEnabled) return;
+
+            state.isPressed = true;
             
-            if (state.isClicked) return;
-
-            StartCoroutine(_ClickCoroutine(clickDuration));
-            
-            ClickInternal();
-            
-            Events.OnClick.Invoke();
-        }
-
-        protected virtual void NormalInternal()
-        {
-        }
-
-        protected virtual void HoverInternal()
-        {
-        }
-
-        protected virtual void ClickInternal()
-        {
-        }
-        
-        protected virtual void DisableInternal()
-        {
-        }
-
-        protected virtual IEnumerator _ClickCoroutine(float delay)
-        {
-            state.isClicked = true;
-                
-            yield return new WaitForSeconds(delay);
-            
-            state.isClicked = false;
-
-            if (state.isHovered) Hover();
-            else if (state.isNormal) Normal();
-        }
-        
-        protected virtual void Awake()
-        {
-            if (defaultOnAwake)
+            if (pressTimeLeft <= 0f)
             {
-                if (IsEnabled)
-                {
-                    NormalInternal();
-
-                    Events.OnNormal.Invoke();
-                }
-                else
-                {
-                    DisableInternal();
-
-                    Events.OnDisable.Invoke();
-                }
+                pressTimeLeft = pressDuration;
+                
+                if (pressCoroutine != null) StopCoroutine(pressCoroutine);
+                pressCoroutine = StartCoroutine(_PressCoroutine());
             }
+            
+            pressTimeLeft = pressDuration;
         }
 
-        protected virtual void OnValidate()
-        {
-        }
+        #endregion
+
+        #region Settings
 
         [Serializable]
         public struct InteratableState
         {
-            public bool isNormal => !isHovered && !isClicked;
+            public bool isNormal => !isHovered && !isPressed;
             public bool isHovered;
-            public bool isClicked;
+            public bool isPressed;
         }
         
         [Serializable]
@@ -160,13 +223,19 @@ namespace CucuTools.Interactables
         {
             public UnityEvent OnNormal => onNormal ?? (onNormal = new UnityEvent());
             public UnityEvent OnHover => onHover ?? (onHover = new UnityEvent());
-            public UnityEvent OnClick => onClick ?? (onClick = new UnityEvent());
+            public UnityEvent OnPressDown => onPressDown ?? (onPressDown = new UnityEvent());
+            public UnityEvent OnPressUp => onPressUp ?? (onPressUp = new UnityEvent());
+            public UnityEvent OnEnabled => onEnabled ?? (onEnabled = new UnityEvent());
             public UnityEvent OnDisable => onDisable ?? (onDisable = new UnityEvent());
 
-            [SerializeField] public UnityEvent onNormal;
+            [SerializeField] private UnityEvent onNormal;
             [SerializeField] private UnityEvent onHover;
-            [SerializeField] private UnityEvent onClick;
+            [SerializeField] private UnityEvent onPressDown;
+            [SerializeField] private UnityEvent onPressUp;
+            [SerializeField] private UnityEvent onEnabled;
             [SerializeField] private UnityEvent onDisable;
         }
+
+        #endregion
     }
 }

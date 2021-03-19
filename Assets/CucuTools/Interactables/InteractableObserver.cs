@@ -41,11 +41,11 @@ namespace CucuTools.Interactables
         
         [SerializeField] private string[] interactableInfos;
         
-        public void Click()
+        public void Press()
         {
             foreach (var interactable in interactables)
             {
-                interactable?.Click();                
+                interactable?.Press();               
             }
         }
         
@@ -89,6 +89,7 @@ namespace CucuTools.Interactables
         private void Validate()
         {
             if (Observer == null) Observer = GetComponent<RaycastEffectObserver>();
+            if (Observer == null) Observer = transform.parent?.GetComponent<RaycastEffectObserver>();
         }
         
         private void Awake()
