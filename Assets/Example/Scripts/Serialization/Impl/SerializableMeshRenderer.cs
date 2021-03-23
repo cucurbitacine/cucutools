@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace Example.Scripts.Serialization.Impl
 {
-    public class SerializableMeshRenderer : SerializableComponent<MeshRenderer, SerializedMeshRenderer>
+    public class SerializableMeshRenderer : JsonSerializableComponent<MeshRenderer, SerializedMeshRenderer>
     {
         [SerializeField] private Color color;
         
@@ -55,6 +55,29 @@ namespace Example.Scripts.Serialization.Impl
         public string[] colorHexs;
         public string[] materialNames;
 
+        #region SerializedData
+
+        public SerializedMeshRenderer()
+        {
+        }
+
+        public override int SizeOf()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override byte[] Serialize()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Deserialize(byte[] bytes)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
+        
         public SerializedMeshRenderer(MeshRenderer meshRenderer)
         {
             var materials = meshRenderer.sharedMaterials;

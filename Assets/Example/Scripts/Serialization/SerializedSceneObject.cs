@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 using CucuTools.Serializing;
 using CucuTools.Serializing.Components;
@@ -54,7 +55,15 @@ namespace Example.Scripts.Serialization
             
             return Task.CompletedTask;
         }
-        
+
+        private void OnValidate()
+        {
+            foreach (var scene in storage)
+            {
+                scene.Validate();
+            }
+        }
+
         [Serializable]
         public class SerializedScene : ISerializedComponentProvider
         {
@@ -98,13 +107,28 @@ namespace Example.Scripts.Serialization
                         current = new SerializedComponent(component.guid);
                         storage.Add(current);
                     }
-                    current.serializedData = component.serializedData;
+                    current.bytes = component.bytes;
                 }
             }
 
             public void DeleteComponents(params SerializedComponent[] components)
             {
                 storage.RemoveAll(s => components.Any(c => c.guid == s.guid));
+            }
+
+            public void Validate()
+            {
+                foreach (var component in storage)
+                {
+                    try
+                    {
+                        component.raw = Encoding.Default.GetString(component.bytes);
+                    }
+                    catch
+                    {
+                        component.raw = "<cannot get string>";
+                    }
+                }
             }
         }
     }

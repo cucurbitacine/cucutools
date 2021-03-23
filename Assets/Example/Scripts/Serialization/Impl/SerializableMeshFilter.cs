@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Example.Scripts.Serialization.Impl
 {
-    public class SerializableMeshFilter : SerializableComponent<MeshFilter, SerializedMesh>
+    public class SerializableMeshFilter : JsonSerializableComponent<MeshFilter, SerializedMesh>
     {
         public override SerializedMesh ReadComponent()
         {
@@ -28,6 +28,29 @@ namespace Example.Scripts.Serialization.Impl
         public int[] triangles;
         public Vector2[] uv;
         public Vector4[] tangents;
+
+        #region SerializedData
+
+        public SerializedMesh()
+        {
+        }
+        
+        public override int SizeOf()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override byte[] Serialize()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Deserialize(byte[] bytes)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
         
         public SerializedMesh(Mesh mesh)
         {

@@ -7,8 +7,8 @@ namespace CucuTools.Serializing.Components
     public abstract class SerializableComponent : GuidBehavour
     {
         public abstract bool NeedSerializing { get; }
-        public abstract string Serialize();
-        public abstract bool Deserialize(string serialized);
+        public abstract byte[] Serialize();
+        public abstract void Deserialize(byte[] bytes);
 
         protected virtual void OnDrawGizmos()
         {
@@ -44,37 +44,46 @@ namespace CucuTools.Serializing.Components
 
     public abstract class SerializableComponent<TComponent, TSerialized> : SerializableComponent<TComponent>
         where TComponent : Component
-        where TSerialized : SerializedData
+        where TSerialized : SerializedData, new()
     {
-        public sealed override string Serialize()
+        public sealed override byte[] Serialize()
         {
             ValidateComponent();
-            
-            return Serializing(ReadComponent());
+
+            return TrySerializing(ReadComponent(), out var t) ? t : null;
         }
 
-        public sealed override bool Deserialize(string serialized)
+        public sealed override void Deserialize(byte[] bytes)
         {
-            return TryDeserializing(serialized, out var t) && WriteComponent(t);
+            if (TryDeserializing(bytes, out var t)) WriteComponent(t);
         }
 
         public abstract TSerialized ReadComponent();
         public abstract bool WriteComponent(TSerialized serialized);
 
-        protected virtual string Serializing(TSerialized t)
+        protected virtual bool TrySerializing(TSerialized t, out byte[] bytes)
         {
-            return JsonUtility.ToJson(t);
-        }
-        
-        protected virtual bool TryDeserializing(string raw, out TSerialized t)
-        {
-            t = default;
+            bytes = null;
 
-            if (string.IsNullOrWhiteSpace(raw)) return false;
-            
             try
             {
-                t = JsonUtility.FromJson<TSerialized>(raw);
+                bytes = t.Serialize();
+            }
+            catch
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        protected virtual bool TryDeserializing(byte[] bytes, out TSerialized t)
+        {
+            t = new TSerialized();
+
+            try
+            {
+                t.Deserialize(bytes);
             }
             catch
             {

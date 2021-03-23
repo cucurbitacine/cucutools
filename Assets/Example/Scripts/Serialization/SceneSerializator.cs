@@ -66,9 +66,9 @@ namespace Example.Scripts.Serialization
 
                 var serialized = serializedComponents
                     .FirstOrDefault(s => s.Guid == component.GuidEntity.Guid)?
-                    .serializedData;
+                    .bytes;
 
-                if (string.IsNullOrWhiteSpace(serialized)) continue;
+                if (serialized == null || serialized.Length == 0) continue;
                 
                 component.Deserialize(serialized);
             }

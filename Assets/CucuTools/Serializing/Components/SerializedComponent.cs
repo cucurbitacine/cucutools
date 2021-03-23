@@ -8,19 +8,20 @@ namespace CucuTools.Serializing.Components
         public Guid Guid => Guid.TryParse(guid, out var t) ? t : Guid.Empty;
         
         public string guid;
-        public string serializedData;
+        public string raw;
+        public byte[] bytes;
 
-        public SerializedComponent(string guid, string serializedData)
+        public SerializedComponent(string guid, byte[] bytes)
         {
             this.guid = guid;
-            this.serializedData = serializedData;
+            this.bytes = bytes;
         }
         
-        public SerializedComponent(Guid guid, string serializedData) : this(guid.ToString(), serializedData)
+        public SerializedComponent(Guid guid, byte[] bytes) : this(guid.ToString(), bytes)
         {
         }
 
-        public SerializedComponent(string guid) : this(guid, "")
+        public SerializedComponent(string guid) : this(guid, new byte[0])
         {
         }
         

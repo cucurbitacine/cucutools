@@ -56,7 +56,7 @@ namespace Example.Scripts.Serialization
 
                 if (old == null) continue;
 
-                comp.serializedData = old.serializedData;
+                comp.bytes = old.bytes;
             }
 
             var comps = prevComps.Concat(newComps).ToArray();

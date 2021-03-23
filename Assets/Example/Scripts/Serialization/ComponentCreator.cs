@@ -27,7 +27,7 @@ namespace Example.Scripts.Serialization
                 copy.CreateComponent(newComponent.typeComponent);
                 var comp = (SerializableComponent) copy.CreateComponent(newComponent.typeSerializableComponent);
                 comp.GuidEntity.UpdateGuid(newComponent.serializedComponent.guid);
-                comp.Deserialize(newComponent.serializedComponent.serializedData);
+                comp.Deserialize(newComponent.serializedComponent.bytes);
             }
         }
     }

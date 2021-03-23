@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace Example.Scripts.Serialization.Impl
 {
-    public class SerializableTransform : SerializableComponent<Transform, SerializedTransform>
+    public class SerializableTransform : JsonSerializableComponent<Transform, SerializedTransform>
     {
         public override SerializedTransform ReadComponent()
         {
@@ -28,6 +28,29 @@ namespace Example.Scripts.Serialization.Impl
         public Vector3 localPosition;
         public Quaternion localRotation;
         public Vector3 localScale;
+        
+        #region SerializedData
+
+        public SerializedTransform() : this(Vector3.zero, Quaternion.identity, Vector3.one)
+        {
+        }
+        
+        public override int SizeOf()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override byte[] Serialize()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Deserialize(byte[] bytes)
+        {
+            throw new NotImplementedException();
+        }
+
+        #endregion
         
         public SerializedTransform(Vector3 pos, Quaternion rot, Vector3 sca)
         {
@@ -55,11 +78,7 @@ namespace Example.Scripts.Serialization.Impl
         public SerializedTransform(Vector3 pos) : this(pos, Quaternion.identity, Vector3.one)
         {
         }
-        
-        public SerializedTransform() : this(Vector3.zero, Quaternion.identity, Vector3.one)
-        {
-        }
-        
+
         public SerializedTransform(Transform tr) : this(tr.localPosition, tr.localRotation, tr.localScale)
         {
         }
