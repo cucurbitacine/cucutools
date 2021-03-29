@@ -10,31 +10,31 @@ namespace Example.Scripts.Serialization
 {
     public class SerializedSceneFile : SerializedSceneProvider
     {
-        public DirectoryUtility DirectoryUtility => _directoryUtility ?? (_directoryUtility = new DirectoryUtility(folderName));
+        public DirectoryUnit DirectoryUnit => _directoryUnit ?? (_directoryUnit = new DirectoryUnit(folderName));
         
         [SerializeField] private string folderName;
         [SerializeField] private string fileExtention = "json";
         
-        private DirectoryUtility _directoryUtility;
+        private DirectoryUnit _directoryUnit;
         
         public override async Task CreateScene(string sceneDataName, params SerializedComponent[] components)
         {
             var fileName = GetSceneFileName(sceneDataName);
             
-            if (!DirectoryUtility.Exists()) DirectoryUtility.CreateDirectory();
+            if (!DirectoryUnit.Exists()) DirectoryUnit.CreateDirectory();
             
             var json = GetJson(components);
             
-            await DirectoryUtility.CreateFileAsync(fileName, json);
+            await DirectoryUnit.CreateFileAsync(fileName, json);
         }
 
         public override async Task<SerializedComponent[]> ReadScene(string sceneDataName)
         {
             var fileName = GetSceneFileName(sceneDataName);
             
-            if (!DirectoryUtility.ExistsFile(fileName)) return new SerializedComponent[0];
+            if (!DirectoryUnit.ExistsFile(fileName)) return new SerializedComponent[0];
 
-            var json = await DirectoryUtility.ReadFileStringAsync(fileName);
+            var json = await DirectoryUnit.ReadFileStringAsync(fileName);
 
             return JsonUtility.FromJson<ComponentDTO>(json).components;
         }
@@ -63,20 +63,20 @@ namespace Example.Scripts.Serialization
             
             var json = GetJson(comps);
 
-            await DirectoryUtility.WriteFileAsync(fileName, json);
+            await DirectoryUnit.WriteFileAsync(fileName, json);
         }
 
         public override Task DeleteScenes(params string[] sceneDataNames)
         {
-            if (!DirectoryUtility.Exists()) return Task.CompletedTask;
+            if (!DirectoryUnit.Exists()) return Task.CompletedTask;
 
             foreach (var sceneDataName in sceneDataNames)
             {
                 var fileName = GetSceneFileName(sceneDataName);
                 
-                if (!DirectoryUtility.ExistsFile(fileName)) continue;
+                if (!DirectoryUnit.ExistsFile(fileName)) continue;
                 
-                DirectoryUtility.DeleteFile(fileName);
+                DirectoryUnit.DeleteFile(fileName);
             }
             
             return Task.CompletedTask;
@@ -95,7 +95,7 @@ namespace Example.Scripts.Serialization
         private void OnValidate()
         {
             folderName = Application.streamingAssetsPath;
-            DirectoryUtility.DirectoryPath = folderName;
+            DirectoryUnit.DirectoryPath = folderName;
         }
 
         [Serializable]

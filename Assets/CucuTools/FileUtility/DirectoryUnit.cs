@@ -4,17 +4,17 @@ using UnityEngine;
 
 namespace CucuTools.FileUtility
 {
-    public class DirectoryUtility
+    public class DirectoryUnit
     {
-        public static DirectoryUtility StreamingAssets { get; }
-        public static DirectoryUtility DataPath { get; }
-        public static DirectoryUtility PersistentData { get; }
+        public static DirectoryUnit StreamingAssets { get; }
+        public static DirectoryUnit DataPath { get; }
+        public static DirectoryUnit PersistentData { get; }
 
-        static DirectoryUtility()
+        static DirectoryUnit()
         {
-            StreamingAssets = new DirectoryUtility(Application.streamingAssetsPath);
-            DataPath = new DirectoryUtility(Application.dataPath);
-            PersistentData = new DirectoryUtility(Application.persistentDataPath);
+            StreamingAssets = new DirectoryUnit(Application.streamingAssetsPath);
+            DataPath = new DirectoryUnit(Application.dataPath);
+            PersistentData = new DirectoryUnit(Application.persistentDataPath);
         }
 
         public FileUtility FileUtility
@@ -32,17 +32,17 @@ namespace CucuTools.FileUtility
         private FileUtility _fileUtility;
         private string _directoryPath;
 
-        public DirectoryUtility(string directoryPath, FileUtility fileUtility)
+        public DirectoryUnit(string directoryPath, FileUtility fileUtility)
         {
             _directoryPath = directoryPath;
             _fileUtility = fileUtility ?? FileUtility.Singleton;
         }
 
-        public DirectoryUtility(string directoryPath) : this(directoryPath, null)
+        public DirectoryUnit(string directoryPath) : this(directoryPath, null)
         {
         }
 
-        public DirectoryUtility() : this("", null)
+        public DirectoryUnit() : this("", null)
         {
         }
 
@@ -184,9 +184,9 @@ namespace CucuTools.FileUtility
             return GetFilePath(this, fileName);
         }
 
-        public static string GetFilePath(DirectoryUtility directoryUtility, string fileName)
+        public static string GetFilePath(DirectoryUnit directoryUnit, string fileName)
         {
-            return Path.Combine(directoryUtility.DirectoryPath, fileName);
+            return Path.Combine(directoryUnit.DirectoryPath, fileName);
         }
 
         public static bool DirectoryExists(string directoryPath)
