@@ -1,5 +1,7 @@
+using System;
 using System.Linq;
 using CucuTools.Buttons;
+using CucuTools.Workflows;
 using CucuTools.Workflows.Core;
 using UnityEngine;
 
@@ -30,7 +32,7 @@ namespace CucuTools.Workflows
             set => transitions = value;
         }
 
-        private IStateTrigger[] _triggers;
+        private TriggerHandler triggerHandler;
 
         #region Public API
 
@@ -46,17 +48,7 @@ namespace CucuTools.Workflows
             
             isPlaying = true;
 
-            var cond = _triggers.OfType<ConditionEntity>();
-
-            foreach (var entity in cond)
-            {
-                entity.Invoke(StateInvoke.OnStart);
-            }
-
-            foreach (var trigger in _triggers.Where(t => !cond.Contains(t)))
-            {
-                trigger.Invoke(StateInvoke.OnStart);
-            }
+            triggerHandler.Invoke(StateInvoke.OnStart);
         }
 
         public override void StopState()
@@ -65,17 +57,7 @@ namespace CucuTools.Workflows
             
             isPlaying = false;
             
-            var cond = _triggers.OfType<ConditionEntity>();
-
-            foreach (var entity in cond)
-            {
-                entity.Invoke(StateInvoke.OnStop);
-            }
-
-            foreach (var trigger in _triggers.Where(t => !cond.Contains(t)))
-            {
-                trigger.Invoke(StateInvoke.OnStop);
-            }
+            triggerHandler.Invoke(StateInvoke.OnStop);
         }
 
         #endregion
@@ -99,9 +81,9 @@ namespace CucuTools.Workflows
 
         private void SetupTriggers()
         {
-            _triggers = GetComponentsInChildren<IStateTrigger>()
+            triggerHandler = new TriggerHandler(this, GetComponentsInChildren<IStateTrigger>()
                 .Where(t => t.Owner == this)
-                .ToArray();
+                .ToArray());
         }
 
         #endregion
@@ -123,13 +105,41 @@ namespace CucuTools.Workflows
         
         #region Editor
 
-        [CucuButton("Create Transition")]
+        private const string crtGrp = "Create...";
+        private const string crtSwtGrp = "Create Switch...";
+        private const string addGrp = "Add...";
+        
+        [CucuButton("Transition", group:crtGrp)]
         private void CreateTransition()
         {
             new GameObject("").AddComponent<TransitionBehaviour>().transform.SetParent(transform);
         }
         
-        [CucuButton("Add Trigger")]
+        [CucuButton("Switch Bool", group:crtSwtGrp)]
+        private void CreateSwitchBool()
+        {
+            new GameObject("").AddComponent<SwitchBoolBehaviour>().transform.SetParent(transform);
+        }
+        
+        [CucuButton("Switch Int", group:crtSwtGrp)]
+        private void CreateSwitchInt()
+        {
+            new GameObject("").AddComponent<SwitchIntBehaviour>().transform.SetParent(transform);
+        }
+        
+        [CucuButton("Switch Float", group:crtSwtGrp)]
+        private void CreateSwitchFloat()
+        {
+            new GameObject("").AddComponent<SwitchFloatBehaviour>().transform.SetParent(transform);
+        }
+        
+        [CucuButton("Switch String", group:crtSwtGrp)]
+        private void CreateSwitchString()
+        {
+            new GameObject("").AddComponent<SwitchFloatBehaviour>().transform.SetParent(transform);
+        }
+        
+        [CucuButton("Trigger", group:addGrp)]
         private void AddTrigger()
         {
             gameObject.AddComponent<StateTrigger>();

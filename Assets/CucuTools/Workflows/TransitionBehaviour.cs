@@ -81,13 +81,13 @@ namespace CucuTools.Workflows
 
         #region Editor
 
-        [CucuButton("Create Condition")]
+        [CucuButton("Condition", group:"Create...")]
         private void CreateCondition()
         {
             new GameObject("Condition").AddComponent<ConditionBehaviour>().transform.SetParent(transform);
         }
         
-        [CucuButton("Add Trigger")]
+        [CucuButton("Trigger", group:"Add...")]
         private void AddTrigger()
         {
             gameObject.AddComponent<StateTrigger>();

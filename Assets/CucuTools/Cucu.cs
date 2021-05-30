@@ -6,6 +6,7 @@ namespace CucuTools
         public const string CreateAsset = Root + "/";
         public const string CreateGameObject = "GameObject/" + CreateAsset;
         public const string AddComponent = CreateAsset;
+        public const string Tools = "Tools/" + CreateAsset;
         
         public const string WorkflowGroup = "Workflow/";
     }

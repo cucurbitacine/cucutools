@@ -17,16 +17,16 @@ namespace CucuTools.Workflows
             get => done;
             set => done = value;
         }
-        
+
         protected override void OnValidate()
         {
             base.OnValidate();
-
+            
             if (!name.StartsWith("?")) name = $"? {name}";
             else if (!name.StartsWith("? ")) name = $"? {name.Substring(1)}";
         }
-        
-        [CucuButton("Add Trigger")]
+
+        [CucuButton("Trigger", group:"Add...")]
         private void AddTrigger()
         {
             gameObject.AddComponent<StateTrigger>();

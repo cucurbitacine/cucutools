@@ -2,6 +2,7 @@ using System;
 using CucuTools;
 using CucuTools.Injects;
 using CucuTools.Scenes;
+using CucuTools.Workflows;
 using CucuTools.Workflows.Core;
 using UnityEngine;
 using UnityEngine.Events;
@@ -29,10 +30,10 @@ namespace Example
         [Header("References")]
         public SceneLoader sceneLoader;
         
-        public ConditionEntity noUser;
-        public ConditionEntity haveUser;
+        public SwitchBoolBehaviour haveUser;
         
-        public ConditionEntity validUser;
+        public ConditionEntity validLogin;
+        public ConditionEntity validPassword;
         public ConditionEntity wrongUser;
         
         public Text loginSource;
@@ -40,14 +41,14 @@ namespace Example
         
         public void CheckUser()
         {
-            haveUser.Done = user != null && !user.IsDefault;
-            noUser.Done = !haveUser.Done;
+            haveUser.Value = user != null && !user.IsDefault;
         }
 
         public void VerifyUser()
         {
-            validUser.Done = user.login == login && user.password == password;
-            wrongUser.Done = !validUser.Done;
+            validLogin.Done = user.login == login;
+            validPassword.Done = user.password == password;
+            wrongUser.Done = !validPassword.Done || !validLogin.Done;
         }
         
         public void ReloadWithUser()

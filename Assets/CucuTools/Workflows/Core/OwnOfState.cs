@@ -34,6 +34,6 @@ namespace CucuTools.Workflows.Core
     
     public interface IOwnOfState
     {
-        public StateEntity Owner { get; }
+        StateEntity Owner { get; }
     }
 }

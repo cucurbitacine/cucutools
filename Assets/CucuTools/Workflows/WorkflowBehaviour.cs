@@ -48,7 +48,7 @@ namespace CucuTools.Workflows
 
         public StateEntity First => first;
         
-        private IStateTrigger[] _triggers;
+        private TriggerHandler triggerHandler;
 
         #region Public API
 
@@ -73,17 +73,7 @@ namespace CucuTools.Workflows
             
             isPlaying = true;
 
-            var cond = _triggers.OfType<ConditionEntity>();
-
-            foreach (var entity in cond)
-            {
-                entity.Invoke(StateInvoke.OnStart);
-            }
-
-            foreach (var trigger in _triggers.Where(t => !cond.Contains(t)))
-            {
-                trigger.Invoke(StateInvoke.OnStart);
-            }
+            triggerHandler.Invoke(StateInvoke.OnStart);
 
             Current.StartState();
         }
@@ -94,33 +84,31 @@ namespace CucuTools.Workflows
 
             isPlaying = false;
             
-            var cond = _triggers.OfType<ConditionEntity>();
-
-            foreach (var entity in cond)
-            {
-                entity.Invoke(StateInvoke.OnStop);
-            }
-
-            foreach (var trigger in _triggers.Where(t => !cond.Contains(t)))
-            {
-                trigger.Invoke(StateInvoke.OnStop);
-            }
+            triggerHandler.Invoke(StateInvoke.OnStop);
             
             Current.StopState();
         }
 
+        public void Validate()
+        {
+            SetupTransitions();
+            SetupTriggers();
+
+            foreach (var transition in transitions)
+            {
+                //transition?.Validate();
+            }
+
+            //First?.Validate();
+            
+            if (!name.StartsWith("#")) name = $"# {name}";
+            else if (!name.StartsWith("# ")) name = $"# {name.Substring(1)}";
+        }
+        
         #endregion
 
         #region Private API
 
-        private void Setup()
-        {
-            isPlaying = false;
-            
-            SetupTransitions();
-            SetupTriggers();
-        }
-        
         private void SetupTransitions()
         {
             transitions = GetComponentsInChildren<TransitionEntity>()
@@ -130,9 +118,9 @@ namespace CucuTools.Workflows
         
         private void SetupTriggers()
         {
-            _triggers = GetComponentsInChildren<IStateTrigger>()
+            triggerHandler = new TriggerHandler(this, GetComponentsInChildren<IStateTrigger>()
                 .Where(t => t.Owner == this)
-                .ToArray();
+                .ToArray());
         }
         
         private void UpdateStateMachine()
@@ -158,7 +146,9 @@ namespace CucuTools.Workflows
 
         private void Awake()
         {
-            Setup();
+            isPlaying = false;
+            
+            Validate();
         }
         
         private void Update()
@@ -168,24 +158,51 @@ namespace CucuTools.Workflows
 
         private void OnValidate()
         {
-            if (!name.StartsWith("#")) name = $"# {name}";
-            else if (!name.StartsWith("# ")) name = $"# {name.Substring(1)}";
+            Validate();
         }
 
         #endregion
         
         #region Editor
 
-        [CucuButton("Create State")]
-        public void CreateState()
-        {
-            new GameObject("State").AddComponent<StateBehaviour>().transform.SetParent(transform);
-        }
+        private const string crtGrp = "Create...";
+        private const string crtSwtGrp = "Create Switch...";
+        private const string addGrp = "Add...";
         
-        [CucuButton("Create Transition")]
+        [CucuButton("Transition", group:crtGrp)]
         private void CreateTransition()
         {
             new GameObject("").AddComponent<TransitionBehaviour>().transform.SetParent(transform);
+        }
+        
+        [CucuButton("Switch Bool", group:crtSwtGrp)]
+        private void CreateSwitchBool()
+        {
+            new GameObject("").AddComponent<SwitchBoolBehaviour>().transform.SetParent(transform);
+        }
+        
+        [CucuButton("Switch Int", group:crtSwtGrp)]
+        private void CreateSwitchInt()
+        {
+            new GameObject("").AddComponent<SwitchIntBehaviour>().transform.SetParent(transform);
+        }
+        
+        [CucuButton("Switch Float", group:crtSwtGrp)]
+        private void CreateSwitchFloat()
+        {
+            new GameObject("").AddComponent<SwitchFloatBehaviour>().transform.SetParent(transform);
+        }
+        
+        [CucuButton("Switch String", group:crtSwtGrp)]
+        private void CreateSwitchString()
+        {
+            new GameObject("").AddComponent<SwitchFloatBehaviour>().transform.SetParent(transform);
+        }
+        
+        [CucuButton("Trigger", group:addGrp)]
+        private void AddTrigger()
+        {
+            gameObject.AddComponent<StateTrigger>();
         }
 
         #endregion
