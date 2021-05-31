@@ -11,17 +11,27 @@ namespace CucuTools.Colors
         /// <summary>
         /// Name of palette
         /// </summary>
-        public string Name => _name;
-        
+        public string Name
+        {
+            get => _name;
+            set => _name = value;
+        }
+
+        public bool UseSmooth
+        {
+            get => _useSmooth;
+            set => _useSmooth = value;
+        }
+
         /// <summary>
         /// Colors
         /// </summary>
         public Color[] Colors => _colors.ToArray();
 
         [SerializeField] private string _name;
+        [SerializeField] private bool _useSmooth;
+        [CucuColor]
         [SerializeField] private Color[] _colors;
-
-        private readonly Dictionary<float, Color> _bufferedColors = new Dictionary<float, Color>();
 
         public CucuPalette(string name, params Color[] colors)
         {
@@ -41,14 +51,7 @@ namespace CucuTools.Colors
         public Color Evaluate(float value)
         {
             value = Mathf.Clamp01(value);
-
-            if (_bufferedColors.TryGetValue(value, out var color))
-                return color;
-
-            color = _colors.LerpColor(value);
-            _bufferedColors.Add(value, color);
-
-            return color;
+            return _colors.BlendColor(UseSmooth ? Mathf.SmoothStep(0f, 1f, value) : value);
         }
 
         /// <summary>
@@ -59,6 +62,79 @@ namespace CucuTools.Colors
         {
             return Colors.ToGradient();
         }
+        
+                #region Palettes
+
+        /// <summary>
+        /// Map of palettes
+        /// </summary>
+        public static readonly Dictionary<CucuColorMap, CucuPalette> PaletteMaps =
+            new Dictionary<CucuColorMap, CucuPalette>
+            {
+                {CucuColorMap.Rainbow, Rainbow},
+                {CucuColorMap.Jet, Jet},
+                {CucuColorMap.Hot, Hot},
+                {CucuColorMap.BlackToWhite, BlackToWhite},
+                {CucuColorMap.WhiteToBlack, WhiteToBlack}
+            };
+
+        /// <summary>
+        /// Rainbow palette
+        /// </summary>
+        public static readonly CucuPalette Rainbow = new CucuPalette(
+            "Rainbow",
+            new[]
+            {
+                Color.red,
+                Color.red.LerpTo(Color.yellow),
+                Color.yellow,
+                Color.green,
+                Color.cyan,
+                Color.blue,
+                "CC00FF".ToColor()
+            });
+
+        /// <summary>
+        /// Jet palette
+        /// </summary>
+        public static readonly CucuPalette Jet = new CucuPalette(
+            "Jet",
+            new[]
+            {
+                new Color(0.000f, 0.000f, 0.666f, 1.000f),
+                new Color(0.000f, 0.000f, 1.000f, 1.000f),
+                new Color(0.000f, 0.333f, 1.000f, 1.000f),
+                new Color(0.000f, 0.666f, 1.000f, 1.000f),
+                new Color(0.000f, 1.000f, 1.000f, 1.000f),
+                new Color(0.500f, 1.000f, 0.500f, 1.000f),
+                new Color(1.000f, 1.000f, 0.000f, 1.000f),
+                new Color(1.000f, 0.666f, 0.000f, 1.000f),
+                new Color(1.000f, 0.333f, 0.000f, 1.000f),
+                new Color(1.000f, 0.000f, 0.000f, 1.000f),
+                new Color(0.666f, 0.000f, 0.000f, 1.000f)
+            });
+
+        
+        /// <summary>
+        /// Hot palette
+        /// </summary>
+        public static readonly CucuPalette Hot =
+            new CucuPalette("Hot", Color.black, Color.red, Color.yellow, Color.white);
+
+        /// <summary>
+        /// Black to white palette
+        /// </summary>
+        public static readonly CucuPalette BlackToWhite =
+            new CucuPalette("BlackToWhite", Color.black, Color.white);
+
+        /// <summary>
+        /// White to black palette
+        /// </summary>
+        public static readonly CucuPalette WhiteToBlack =
+            new CucuPalette("WhiteToBlack", Color.white, Color.black);
+
+        #endregion
+        
     }
     
     /// <summary>
@@ -108,7 +184,17 @@ namespace CucuTools.Colors
         {
             return colors.ToColorPalette(name).ToGradient(mode);
         }
-        
-        
+    }
+    
+    /// <summary>
+    /// Color map list
+    /// </summary>
+    public enum CucuColorMap
+    {
+        Rainbow,
+        Jet,
+        Hot,
+        BlackToWhite,
+        WhiteToBlack
     }
 }

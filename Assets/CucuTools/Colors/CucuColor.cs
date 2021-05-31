@@ -11,31 +11,72 @@ namespace CucuTools.Colors
     /// </summary>
     public static class CucuColor
     {
-        /// <summary>
-        /// Set intensity. Keep alpha same
-        /// </summary>
-        /// <param name="color">Color</param>
-        /// <param name="intensity">Intensity from 0f to 1f</param>
-        /// <returns>Color</returns>
-        public static Color SetIntensity(Color color, float intensity)
+        public static Color Empty => (empty ?? (empty = Alpha(Color.black, 0f))).Value;
+        private static Color? empty;
+        
+        public static Color Scale(Color color, float scale)
         {
-            intensity = Mathf.Clamp01(intensity);
-
-            return new Color(color.r * intensity, color.g * intensity, color.b * intensity, color.a);
+            return new Color(color.r * scale, color.g * scale, color.b * scale, color.a);
         }
-
-        /// <summary>
-        /// Set alpha, Keep RGB same
-        /// </summary>
-        /// <param name="color">Color</param>
-        /// <param name="alpha">Alpha from 0f to 1f</param>
-        /// <returns>Color</returns>
-        public static Color SetAlpha(Color color, float alpha)
+        
+        public static Color Alpha(Color color, float alpha)
         {
             return new Color(color.r, color.g, color.b, alpha);
         }
 
-        #region Lerp
+        public static string Color2Hex(Color color)
+        {
+            var result = "";
+            for (var i = 0; i < 4; i++)
+            {
+                var val = (int) Mathf.Clamp(color[i] * 255, 0, 255);
+                var hex = val.ToString("X");
+                if (hex.Length < 2) hex = "0" + hex;
+                result += hex;
+            }
+
+            return result;
+        }
+
+        public static bool TryGetColorFromHex(string hex, out Color color)
+        {
+            color = Scale(Color.black, 0f);
+            
+            if (string.IsNullOrWhiteSpace(hex) || (hex.Length != 6 && hex.Length != 8))
+            {
+                return false;
+            }
+
+            var intR = 0;
+            var intG = 0;
+            var intB = 0;
+            var intA = 0;
+
+            try
+            {
+                intR = int.Parse(hex.Substring(0, 2), NumberStyles.HexNumber);
+                intG = int.Parse(hex.Substring(2, 2), NumberStyles.HexNumber);
+                intB = int.Parse(hex.Substring(4, 2), NumberStyles.HexNumber);
+                intA = hex.Length == 8
+                    ? int.Parse(hex.Substring(6, 2), NumberStyles.HexNumber)
+                    : 255;
+            }
+            catch
+            {
+                return false;
+            }
+
+            color = new Color(intR / 255f, intG / 255f, intB / 255f, intA / 255f);
+            return true;
+        }
+        
+        public static Color Hex2Color(string hex)
+        {
+            TryGetColorFromHex(hex, out var color);
+            return color;
+        }
+        
+        #region Lerp & Blend
 
         /// <summary>
         /// Lerping color.
@@ -47,108 +88,33 @@ namespace CucuTools.Colors
         /// <returns></returns>
         public static Color Lerp(Color origin, Color target, float value)
         {
-            value = Mathf.Clamp01(value);
-
             return Color.Lerp(origin, target, value);
         }
 
         /// <summary>
-        /// Lerping color in queue of colors. Lerping only between two neighbor colors
+        /// Blending color in queue of colors. Lerping only between two neighbor colors
         /// </summary>
-        /// <param name="value">Lerp value</param>
+        /// <param name="value">Blend value</param>
         /// <param name="colors">Colors</param>
         /// <returns>Color</returns>
-        public static Color Lerp(float value, params Color[] colors)
+        public static Color Blend(float value, params Color[] colors)
         {
-            if (colors == null || colors.Length == 0) return Color.white;
+            if (colors == null || colors.Length == 0) return Alpha(Color.black, 0f);
             if (colors.Length == 1) return colors.First();
 
             value = Mathf.Clamp01(value);
 
-            var x = Mathf.Clamp01(value);
             var dt = 1f / (colors.Length - 1);
 
             for (var i = 0; i < colors.Length - 1; i++)
             {
                 var t = dt * i;
-                if (t <= x && x <= t + dt)
-                    return colors[i].LerpTo(colors[i + 1], Mathf.Clamp01((x - t) / dt));
+                if (t <= value && value <= t + dt)
+                    return colors[i].LerpTo(colors[i + 1], Mathf.Clamp01((value - t) / dt));
             }
 
             return colors.Last();
         }
-
-        #endregion
-
-        #region Palettes
-
-        /// <summary>
-        /// Map of palettes
-        /// </summary>
-        public static readonly Dictionary<CucuColorMap, CucuPalette> PaletteMaps =
-            new Dictionary<CucuColorMap, CucuPalette>
-            {
-                {CucuColorMap.Rainbow, Rainbow},
-                {CucuColorMap.Jet, Jet},
-                {CucuColorMap.Hot, Hot},
-                {CucuColorMap.BlackToWhite, BlackToWhite},
-                {CucuColorMap.WhiteToBlack, WhiteToBlack}
-            };
-
-        /// <summary>
-        /// Rainbow palette
-        /// </summary>
-        public static readonly CucuPalette Rainbow = new CucuPalette(
-            "Rainbow",
-            new[]
-            {
-                Color.red,
-                Color.red.LerpTo(Color.yellow),
-                Color.yellow,
-                Color.green,
-                Color.cyan,
-                Color.blue,
-                "CC00FF".ToColor()
-            });
-
-        /// <summary>
-        /// Jet palette
-        /// </summary>
-        public static readonly CucuPalette Jet = new CucuPalette(
-            "Jet",
-            new[]
-            {
-                new Color(0.000f, 0.000f, 0.666f, 1.000f),
-                new Color(0.000f, 0.000f, 1.000f, 1.000f),
-                new Color(0.000f, 0.333f, 1.000f, 1.000f),
-                new Color(0.000f, 0.666f, 1.000f, 1.000f),
-                new Color(0.000f, 1.000f, 1.000f, 1.000f),
-                new Color(0.500f, 1.000f, 0.500f, 1.000f),
-                new Color(1.000f, 1.000f, 0.000f, 1.000f),
-                new Color(1.000f, 0.666f, 0.000f, 1.000f),
-                new Color(1.000f, 0.333f, 0.000f, 1.000f),
-                new Color(1.000f, 0.000f, 0.000f, 1.000f),
-                new Color(0.666f, 0.000f, 0.000f, 1.000f)
-            });
-
-        
-        /// <summary>
-        /// Hot palette
-        /// </summary>
-        public static readonly CucuPalette Hot =
-            new CucuPalette("Hot", Color.black, Color.red, Color.yellow, Color.white);
-
-        /// <summary>
-        /// Black to white palette
-        /// </summary>
-        public static readonly CucuPalette BlackToWhite =
-            new CucuPalette("BlackToWhite", Color.black, Color.white);
-
-        /// <summary>
-        /// White to black palette
-        /// </summary>
-        public static readonly CucuPalette WhiteToBlack =
-            new CucuPalette("WhiteToBlack", Color.white, Color.black);
 
         #endregion
     }
@@ -166,16 +132,7 @@ namespace CucuTools.Colors
         /// <returns>Hex string</returns>
         public static string ToHex(this Color color)
         {
-            var result = "";
-            for (var i = 0; i < 3; i++)
-            {
-                var val = (int) Mathf.Clamp(color[i] * 255, 0, 255);
-                var hex = val.ToString("X");
-                if (hex.Length < 2) hex = "0" + hex;
-                result += hex;
-            }
-
-            return result;
+            return CucuColor.Color2Hex(color);
         }
 
         /// <summary>
@@ -185,51 +142,7 @@ namespace CucuTools.Colors
         /// <returns>Color</returns>
         public static Color ToColor(this string hex)
         {
-            if (hex == null || hex.Length != 6)
-            {
-                Debug.LogWarning($"Not valid hex value \"{hex}\"");
-                return Color.black;
-            }
-
-            var intR = 0;
-            var intG = 0;
-            var intB = 0;
-
-            try
-            {
-                intR = int.Parse(hex.Substring(0, 2), NumberStyles.HexNumber);
-                intG = int.Parse(hex.Substring(2, 2), NumberStyles.HexNumber);
-                intB = int.Parse(hex.Substring(4, 2), NumberStyles.HexNumber);
-            }
-            catch (Exception e)
-            {
-                Debug.LogWarning($"Exception of parsing hex color : \"{e.Message}\"");
-                return Color.black;
-            }
-
-            return new Color(intR / 255f, intG / 255f, intB / 255f, 1f);
-        }
-
-        /// <summary>
-        /// Get string with html color tag
-        /// </summary>
-        /// <param name="obj">Message</param>
-        /// <param name="color">Color</param>
-        /// <returns>Result</returns>
-        public static string ToColoredString(this object obj, Color color)
-        {
-            return $"<color=#{color.ToHex()}>{obj}</color>";
-        }
-
-        /// <summary>
-        /// Get string with html color tag
-        /// </summary>
-        /// <param name="obj">Message</param>
-        /// <param name="hex">String color hex</param>
-        /// <returns>Result</returns>
-        public static string ToColoredString(this object obj, string hex)
-        {
-            return $"<color=#{hex}>{obj}</color>";
+            return CucuColor.Hex2Color(hex);
         }
 
         /// <summary>
@@ -250,20 +163,20 @@ namespace CucuTools.Colors
         /// <param name="value">Lerp value</param>
         /// <param name="colors">Colors</param>
         /// <returns>Color</returns>
-        public static Color LerpColor(this float value, params Color[] colors)
+        public static Color BlendColor(this float value, params Color[] colors)
         {
-            return CucuColor.Lerp(value, colors);
+            return CucuColor.Blend(value, colors);
         }
 
         /// <summary>
-        /// Lerping color in queue colors
+        /// Blending color in queue colors
         /// </summary>
         /// <param name="colors">Colors</param>
-        /// <param name="value">lerp value</param>
+        /// <param name="value">Blend value</param>
         /// <returns>Color</returns>
-        public static Color LerpColor(this IEnumerable<Color> colors, float value)
+        public static Color BlendColor(this IEnumerable<Color> colors, float value)
         {
-            return value.LerpColor(colors.ToArray());
+            return value.BlendColor(colors.ToArray());
         }
 
         /// <summary>
@@ -272,9 +185,9 @@ namespace CucuTools.Colors
         /// <param name="color">Color</param>
         /// <param name="value">Alpha</param>
         /// <returns>Color</returns>
-        public static Color SetColorAlpha(this Color color, float value)
+        public static Color AlphaTo(this Color color, float value)
         {
-            return CucuColor.SetAlpha(color, value);
+            return CucuColor.Alpha(color, value);
         }
 
         /// <summary>
@@ -283,9 +196,9 @@ namespace CucuTools.Colors
         /// <param name="color">Color</param>
         /// <param name="value">Intensity</param>
         /// <returns>Color</returns>
-        public static Color SetColorIntensity(this Color color, float value)
+        public static Color ScaleTo(this Color color, float value)
         {
-            return CucuColor.SetIntensity(color, value);
+            return CucuColor.Scale(color, value);
         }
 
         /// <summary>
@@ -328,17 +241,5 @@ namespace CucuTools.Colors
         {
             return new Vector4(color.r, color.g, color.b, color.a);
         } 
-    }
-    
-    /// <summary>
-    /// Color map list
-    /// </summary>
-    public enum CucuColorMap
-    {
-        Rainbow,
-        Jet,
-        Hot,
-        BlackToWhite,
-        WhiteToBlack
     }
 }
