@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
 using UnityEngine;
@@ -13,12 +12,12 @@ namespace CucuTools.Colors
     {
         public static Color Empty => (empty ?? (empty = Alpha(Color.black, 0f))).Value;
         private static Color? empty;
-        
+
         public static Color Scale(Color color, float scale)
         {
             return new Color(color.r * scale, color.g * scale, color.b * scale, color.a);
         }
-        
+
         public static Color Alpha(Color color, float alpha)
         {
             return new Color(color.r, color.g, color.b, alpha);
@@ -41,7 +40,7 @@ namespace CucuTools.Colors
         public static bool TryGetColorFromHex(string hex, out Color color)
         {
             color = Scale(Color.black, 0f);
-            
+
             if (string.IsNullOrWhiteSpace(hex) || (hex.Length != 6 && hex.Length != 8))
             {
                 return false;
@@ -69,13 +68,13 @@ namespace CucuTools.Colors
             color = new Color(intR / 255f, intG / 255f, intB / 255f, intA / 255f);
             return true;
         }
-        
+
         public static Color Hex2Color(string hex)
         {
             TryGetColorFromHex(hex, out var color);
             return color;
         }
-        
+
         #region Lerp & Blend
 
         /// <summary>
@@ -117,8 +116,97 @@ namespace CucuTools.Colors
         }
 
         #endregion
+
+        #region Gradients
+
+        public static Gradient Colors2Gradient(params Color[] colors)
+        {
+            if (colors.Length > 8)
+            {
+                var linSpace = Cucu.LinSpace(8);
+                colors = linSpace.Select(t => CucuColor.Blend(t, colors)).ToArray();
+            }
+
+            var times = Cucu.LinSpace(colors.Length);
+
+            return new Gradient
+            {
+                mode = GradientMode.Blend,
+                colorKeys = times.Select((t, i) => new GradientColorKey(colors[i], t)).ToArray(),
+                alphaKeys = times.Select((t, i) => new GradientAlphaKey(colors[i].a, t)).ToArray()
+            };
+        }
+
+        public static Color[] Gradient2Colors(Gradient gradient)
+        {
+            return gradient.colorKeys
+                .Select((c, i) => new Color(c.color.r, c.color.g, c.color.b, gradient.alphaKeys[i].alpha))
+                .ToArray();
+        }
+
+        /// <summary>
+        /// Map of palettes
+        /// </summary>
+        public static Dictionary<CucuColorMap, Gradient> GradientSample => grdSmpl ?? (grdSmpl =
+            new Dictionary<CucuColorMap, Gradient>
+            {
+                {CucuColorMap.Rainbow, Rainbow},
+                {CucuColorMap.Jet, Jet},
+                {CucuColorMap.Hot, Hot},
+                {CucuColorMap.BlackToWhite, BlackToWhite},
+                {CucuColorMap.WhiteToBlack, WhiteToBlack}
+            });
+        private static Dictionary<CucuColorMap, Gradient> grdSmpl;
+
+        /// <summary>
+        /// Rainbow palette
+        /// </summary>
+        public static Gradient Rainbow => CucuColor.Colors2Gradient(
+            Color.red,
+            Color.red.LerpTo(Color.yellow),
+            Color.yellow,
+            Color.green,
+            Color.cyan,
+            Color.blue,
+            "CC00FF".ToColor()
+        );
+
+        /// <summary>
+        /// Jet palette
+        /// </summary>
+        public static Gradient Jet => CucuColor.Colors2Gradient(
+            new Color(0.000f, 0.000f, 0.666f, 1.000f),
+            new Color(0.000f, 0.000f, 1.000f, 1.000f),
+            new Color(0.000f, 0.333f, 1.000f, 1.000f),
+            new Color(0.000f, 0.666f, 1.000f, 1.000f),
+            new Color(0.000f, 1.000f, 1.000f, 1.000f),
+            new Color(0.500f, 1.000f, 0.500f, 1.000f),
+            new Color(1.000f, 1.000f, 0.000f, 1.000f),
+            new Color(1.000f, 0.666f, 0.000f, 1.000f),
+            new Color(1.000f, 0.333f, 0.000f, 1.000f),
+            new Color(1.000f, 0.000f, 0.000f, 1.000f),
+            new Color(0.666f, 0.000f, 0.000f, 1.000f)
+        );
+
+        /// <summary>
+        /// Hot palette
+        /// </summary>
+        public static Gradient Hot => CucuColor.Colors2Gradient(Color.black, Color.red, Color.yellow, Color.white);
+
+        /// <summary>
+        /// Black to white palette
+        /// </summary>
+        public static Gradient BlackToWhite => CucuColor.Colors2Gradient(Color.black, Color.white);
+
+
+        /// <summary>
+        /// White to black palette
+        /// </summary>
+        public static Gradient WhiteToBlack => CucuColor.Colors2Gradient(Color.white, Color.black);
+
+        #endregion
     }
-    
+
     /// <summary>
     /// Color extentions
     /// </summary>
@@ -211,7 +299,7 @@ namespace CucuTools.Colors
         {
             return new Color(vector3.x, vector3.y, vector3.z, alpha);
         }
-        
+
         /// <summary>
         /// Convert vector4 to color
         /// </summary>
@@ -221,7 +309,7 @@ namespace CucuTools.Colors
         {
             return new Color(vector4.x, vector4.y, vector4.z, vector4.w);
         }
-        
+
         /// <summary>
         /// Convert color to vectro3
         /// </summary>
@@ -231,7 +319,7 @@ namespace CucuTools.Colors
         {
             return new Vector3(color.r, color.g, color.b);
         }
-        
+
         /// <summary>
         /// Convert color to vectro4
         /// </summary>
@@ -240,6 +328,28 @@ namespace CucuTools.Colors
         public static Vector4 ToVector4(this Color color)
         {
             return new Vector4(color.r, color.g, color.b, color.a);
-        } 
+        }
+
+        public static Gradient ToGradient(this IEnumerable<Color> colors)
+        {
+            return CucuColor.Colors2Gradient(colors.ToArray());
+        }
+
+        public static Color[] ToColors(this Gradient gradient)
+        {
+            return CucuColor.Gradient2Colors(gradient);
+        }
+    }
+
+    /// <summary>
+    /// Color map list
+    /// </summary>
+    public enum CucuColorMap
+    {
+        Rainbow,
+        Jet,
+        Hot,
+        BlackToWhite,
+        WhiteToBlack
     }
 }

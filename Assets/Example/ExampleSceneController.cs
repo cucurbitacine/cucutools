@@ -63,7 +63,6 @@ namespace Example
             sceneLoader.LoadSingleScene();
         }
         
-        
         private void Start()
         {
             OnStart.Invoke();
