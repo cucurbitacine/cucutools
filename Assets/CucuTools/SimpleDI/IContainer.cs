@@ -28,14 +28,16 @@ namespace CucuTools.SimpleDI
     
     public interface IBinder
     {
-        IBindCondition To(Type type);
-        IBindCondition To<T>();
+        IBindCondition Condition { get; }
+        
+        void To(Type type);
+        void To<T>();
 
-        IBindCondition ToSingleton(Type type);
-        IBindCondition ToSingleton<T>();
+        void ToSingleton(Type type);
+        void ToSingleton<T>();
 
-        IBindCondition ToInstance(Type type, object instance);
-        IBindCondition ToInstance<T>(T instance);
+        void ToInstance(Type type, object instance);
+        void ToInstance<T>(T instance);
     }
 
     public interface IBindCondition
