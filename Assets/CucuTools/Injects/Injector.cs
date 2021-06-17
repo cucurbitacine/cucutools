@@ -10,11 +10,11 @@ namespace CucuTools.Injects
     public static class Injector
     {
         /// <summary>
-        /// Fill fields with <see cref="CucuArgAttribute"/> into <param name="obj"></param> 
+        /// Fill fields with <see cref="CucuArgAttribute"/> into object
         /// </summary>
         /// <param name="obj">Target</param>
         /// <param name="poolArgs">Pool of arguments</param>
-        public static void Inject(object obj, CucuArg[] poolArgs)
+        public static void InjectArgs(object obj, CucuArg[] poolArgs)
         {
             if (obj == null) return;
 
@@ -91,9 +91,18 @@ namespace CucuTools.Injects
             }
         }
         
-        public static void InjectArgs(this object obj, params CucuArg[] poolArgs)
+        public static void InjectContainer(object target, IContainer container)
         {
-            Injector.Inject(obj, poolArgs);
+            var targetType = target.GetType();
+
+            var fields = targetType.GetFields(BindingFlags.Instance | BindingFlags.Public | BindingFlags.NonPublic);
+
+            foreach (var field in fields)
+            {
+                var cucuInject = field.GetCustomAttribute<CucuInjectAttribute>();
+                if (cucuInject == null) continue;
+                field.SetValue(target, container.Resolve(field.FieldType));
+            }
         }
     }
 }

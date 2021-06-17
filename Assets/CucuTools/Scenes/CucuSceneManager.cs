@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Reflection;
 using CucuTools.Injects;
 using UnityEngine;
@@ -13,6 +14,8 @@ namespace CucuTools.Scenes
     {
         private static CucuArgumentManager CucuArgumentManager => CucuArgumentManager.Singleton;
 
+        public static Scene GetActiveScene() => SceneManager.GetActiveScene();
+        
         #region Unload Async
 
         public static AsyncOperation UnloadSceneAsync(string name)
@@ -33,13 +36,6 @@ namespace CucuTools.Scenes
         
         #region Load Async
 
-        public static AsyncOperation LoadSceneAsync(string name, LoadSceneMode mode, object[] args)
-        {
-            CucuArgumentManager.SetArguments(args);
-
-            return LoadSceneAsync(name, mode);
-        }
-        
         /// <summary>
         /// Async load scene <param name="name"></param> with mode <param name="mode"></param>
         /// </summary>
@@ -50,34 +46,39 @@ namespace CucuTools.Scenes
             return SceneManager.LoadSceneAsync(name, mode);
         }
         
-        public static AsyncOperation LoadSingleSceneAsync(string name, object[] args = null)
+        public static AsyncOperation LoadSceneAsync(string name, LoadSceneMode mode, params CucuArg[] args)
+        {
+            CucuArgumentManager.SetArguments(args);
+            
+            return LoadSceneAsync(name, mode);
+        }
+        
+        public static AsyncOperation LoadSingleSceneAsync(string name, params CucuArg[] args)
         {
             return LoadSceneAsync(name, LoadSceneMode.Single, args);
         }
-        
-        public static AsyncOperation LoadAdditiveSceneAsync(string name, object[] args = null)
+
+        public static AsyncOperation LoadAdditiveSceneAsync(string name, params CucuArg[] args)
         {
             return LoadSceneAsync(name, LoadSceneMode.Additive, args);
         }
-
-        public static AsyncOperation LoadSceneAsync<TController>(LoadSceneMode mode, object[] args = null)
+        
+        public static AsyncOperation LoadSceneAsync<TController>(LoadSceneMode mode, params CucuArg[] args)
             where TController : CucuSceneController
         {
-            CucuArgumentManager.SetArguments(args);
-
             if (TryGetSceneName<TController>(out var name, out var msg))
-                return LoadSceneAsync(name, mode);
-            else
-                throw new Exception($"Load scene of \"{typeof(TController).Name}\" was failed :: {msg}");
+                return LoadSceneAsync(name, mode, args);
+            
+            throw new Exception($"Load scene of \"{typeof(TController).Name}\" was failed :: {msg}");
         }
-        
-        public static AsyncOperation LoadSingleSceneAsync<TController>(object[] args = null)
+
+        public static AsyncOperation LoadSingleSceneAsync<TController>(params CucuArg[] args)
             where TController : CucuSceneController
         {
             return LoadSceneAsync<TController>(LoadSceneMode.Single, args);
         }
         
-        public static AsyncOperation LoadAdditiveSceneAsync<TController>(object[] args = null)
+        public static AsyncOperation LoadAdditiveSceneAsync<TController>(params CucuArg[] args)
             where TController : CucuSceneController
         {
             return LoadSceneAsync<TController>(LoadSceneMode.Additive, args);
@@ -87,13 +88,6 @@ namespace CucuTools.Scenes
 
         #region Load
 
-        public static void LoadScene(string name, LoadSceneMode mode, object[] args)
-        {
-            CucuArgumentManager.SetArguments(args);
-
-            LoadScene(name, mode);
-        }
-        
         /// <summary>
         /// Load scene <param name="name"></param> with mode <param name="mode"></param>
         /// </summary>
@@ -104,34 +98,39 @@ namespace CucuTools.Scenes
             SceneManager.LoadScene(name, mode);
         }
         
-        public static void LoadSingleScene(string name, object[] args = null)
+        public static void LoadScene(string name, LoadSceneMode mode, params CucuArg[] args)
+        {
+            CucuArgumentManager.SetArguments(args);
+
+            LoadScene(name, mode);
+        }
+
+        public static void LoadSingleScene(string name, params CucuArg[] args)
         {
             LoadScene(name, LoadSceneMode.Single, args);
         }
         
-        public static void LoadAdditiveScene(string name, object[] args = null)
+        public static void LoadAdditiveScene(string name, params CucuArg[] args)
         {
             LoadScene(name, LoadSceneMode.Additive, args);
         }
 
-        public static void LoadScene<TController>(LoadSceneMode mode, object[] args = null)
+        public static void LoadScene<TController>(LoadSceneMode mode, params CucuArg[] args)
             where TController : CucuSceneController
         {
-            CucuArgumentManager.SetArguments(args);
-
             if (TryGetSceneName<TController>(out var name, out var msg))
-                LoadScene(name, mode);
-            else
-                throw new Exception($"Load scene of \"{nameof(TController)}\" was failed :: {msg}");
+                LoadScene(name, mode, args);
+            
+            throw new Exception($"Load scene of \"{nameof(TController)}\" was failed :: {msg}");
         }
         
-        public static void LoadSingleScene<TController>(object[] args = null)
+        public static void LoadSingleScene<TController>(params CucuArg[] args)
             where TController : CucuSceneController
         {
             LoadScene<TController>(LoadSceneMode.Single, args);
         }
         
-        public static void LoadAdditiveScene<TController>(object[] args = null)
+        public static void LoadAdditiveScene<TController>(params CucuArg[] args)
             where TController : CucuSceneController
         {
             LoadScene<TController>(LoadSceneMode.Additive, args);

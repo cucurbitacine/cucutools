@@ -41,9 +41,10 @@ namespace CucuTools.Injects
         /// Set list of arguments. Clear old list before set. 
         /// </summary>
         /// <param name="args">List of possible arguments</param>
-        public void SetArguments(params object[] args)
+        public void SetArguments(params CucuArg[] args)
         {
             Clear();
+            
             AddArguments(args);
         }
 
@@ -51,10 +52,10 @@ namespace CucuTools.Injects
         /// Add arguments to list
         /// </summary>
         /// <param name="args">List of possible arguments</param>
-        public void AddArguments(params object[] args)
+        public void AddArguments(params CucuArg[] args)
         {
             if (args == null) return;
-            Args.AddRange(args.Where(a => a != null).OfType<CucuArg>());
+            Args.AddRange(args.Where(a => a != null));
         }
 
         /// <summary>

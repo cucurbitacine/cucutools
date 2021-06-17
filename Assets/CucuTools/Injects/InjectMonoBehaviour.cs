@@ -8,21 +8,25 @@ namespace CucuTools.Injects
     /// </summary>
     public abstract class InjectMonoBehaviour : CucuBehaviour
     {
+        protected virtual IContainer Container { get; }
+        
         private CucuArgumentManager CucuArgumentManager => CucuArgumentManager.Singleton;
-
-        protected abstract void OnAwake();
 
         private void Inject()
         {
             try
             {
-                Injector.Inject(this, CucuArgumentManager.GetArgs());
+                Injector.InjectArgs(this, CucuArgumentManager.GetArgs());
+
+                if (Container != null) Injector.InjectContainer(this, Container);
             }
             catch (Exception exc)
             {
                 Debug.LogError($"Injection failed :: {exc}");
             }
         }
+        
+        protected abstract void OnAwake();
         
         protected virtual void Awake()
         {

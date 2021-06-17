@@ -1,6 +1,6 @@
 using System;
 
-namespace CucuTools.SimpleDI
+namespace CucuTools.Injects
 {
     public interface IContainer : ICanBinding, ICanResolving
     {
@@ -10,6 +10,8 @@ namespace CucuTools.SimpleDI
 
     public interface ICanBinding
     {
+        Type[] GetBindTypes();
+        
         IBinder Bind(Type type);
         IBinder Bind<T>();
         
@@ -28,7 +30,8 @@ namespace CucuTools.SimpleDI
     
     public interface IBinder
     {
-        IBindCondition Condition { get; }
+        Type BindType { get; }
+        IObjectFactory Factory { get; }
         
         void To(Type type);
         void To<T>();
@@ -38,10 +41,14 @@ namespace CucuTools.SimpleDI
 
         void ToInstance(Type type, object instance);
         void ToInstance<T>(T instance);
+
+        void ToSelf();
     }
 
-    public interface IBindCondition
+    public interface IObjectFactory
     {
+        public Type InstanceType { get; }
+        
         object Get();
         T Get<T>();
     }

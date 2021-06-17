@@ -1,6 +1,7 @@
 ﻿using System.Linq;
+using CucuTools.Workflows.Core;
 
-namespace CucuTools.Workflows.Core
+namespace CucuTools.Workflows
 {
     public class TriggerHandler : IStateTrigger
     {
