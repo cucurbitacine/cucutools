@@ -1,12 +1,12 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using CucuTools.Buttons;
+using CucuTools.Attributes;
 using UnityEditor;
 using UnityEngine;
 using Object = UnityEngine.Object;
 
-namespace CucuTools.Editor.Buttons
+namespace CucuTools.Editor
 {
     [CanEditMultipleObjects]
     [CustomEditor(typeof(CucuBehaviour), true, isFallback = false)]

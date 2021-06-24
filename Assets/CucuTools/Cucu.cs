@@ -1,3 +1,6 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace CucuTools
@@ -45,6 +48,41 @@ namespace CucuTools
         public static float[] LinSpace(int count)
         {
             return LinSpace(0f, 1f, count);
+        }
+
+        public static void IndexesOfBorder(out int left, out int right, float value, params float[] values)
+        {
+            left = -1;
+            right = -1;
+
+            for (int i = 0; i < values.Length; i++)
+            {
+                if (left < 0 && values[values.Length - 1 - i] <= value) left = values.Length - 1 - i;
+                if (right < 0 && value <= values[i]) right = i;
+
+                if (left >= 0 && right >= 0) return;
+            }
+        }
+
+        public static void IndexesOfBorder<T>(out int left, out int right, float value, params T[] values)
+            where T : IComparable<float>
+        {
+            left = -1;
+            right = -1;
+
+            for (int i = 0; i < values.Length; i++)
+            {
+                if (left < 0 && values[values.Length - 1 - i].CompareTo(value) <= 0) left = values.Length - 1 - i;
+                if (right < 0 && values[i].CompareTo(value) > 0) right = i;
+
+                if (left >= 0 && right >= 0) return;
+            }
+        }
+
+        public static void IndexesOfBorder<T>(out int left, out int right, float value, IEnumerable<T> values)
+            where T : IComparable<float>
+        {
+            IndexesOfBorder<T>(out left, out right, value, values.ToArray());
         }
     }
 }

@@ -1,6 +1,6 @@
 using System;
 
-namespace CucuTools.Buttons
+namespace CucuTools.Attributes
 {
     [AttributeUsage(AttributeTargets.Method)]
     public class CucuButtonAttribute : Attribute

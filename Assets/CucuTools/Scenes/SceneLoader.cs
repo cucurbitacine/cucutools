@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using CucuTools.Attributes;
 using CucuTools.Injects;
 
 namespace CucuTools.Scenes

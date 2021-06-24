@@ -1,9 +1,9 @@
 using System;
-using CucuTools.Scenes;
+using CucuTools.Attributes;
 using UnityEditor;
 using UnityEngine;
 
-namespace CucuTools.Editor.Scenes
+namespace CucuTools.Editor.Attributes
 {
     [CustomPropertyDrawer(typeof(CucuSceneAttribute))]
     public class CucuSceneDrawer : PropertyDrawer
