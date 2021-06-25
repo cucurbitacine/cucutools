@@ -4,7 +4,7 @@ using UnityEngine.Events;
 
 namespace CucuTools.Blend
 {
-    public class CucuBlend : CucuBehaviour
+    public abstract class CucuBlendEntity : CucuBehaviour
     {
         public float Blend
         {
@@ -17,13 +17,10 @@ namespace CucuTools.Blend
 
         [Range(0f, 1f)]
         [SerializeField] private float blend;
+        [Tooltip("Tolerance which control setting blend value.\n\nTolerance value is the minimum allowable change in blend value")]
         [SerializeField] private BlendTolerance tolerance;
+        [Tooltip("\"OnEntityUpdated\" invoke when entity was updated. Also it invoke before \"OnBlendChanged\"\n\n\"OnBlendChanged\" invoke when blend value was changed")]
         [SerializeField] private BlendEvents events;
-
-        public virtual void OnBlendChange()
-        {
-            Events.OnChanged.Invoke(Blend);
-        }
 
         protected virtual float GetBlend()
         {
@@ -37,24 +34,30 @@ namespace CucuTools.Blend
             if (AllowedBlendChange(value))
             {
                 blend = value;
+
+                UpdateEntity();
                 
-                OnBlendChange();
+                Events.OnBlendChanged.Invoke(Blend);
             }
         }
 
+        public virtual void UpdateEntity()
+        {
+            UpdateEntityInternal();
+                
+            Events.OnEntityUpdated.Invoke();
+        }
+        
         protected virtual bool AllowedBlendChange(float value)
         {
             return !Tolerance.Use || Mathf.Abs(Blend - value) >= Tolerance.Tolerance;
         }
 
-        protected virtual void Awake()
-        {
-            OnBlendChange();
-        }
-        
+        protected abstract void UpdateEntityInternal();
+
         protected virtual void OnValidate()
         {
-            OnBlendChange();
+            UpdateEntityInternal();
         }
     }
 
@@ -87,8 +90,10 @@ namespace CucuTools.Blend
     [Serializable]
     public class BlendEvents
     {
-        public UnityEvent<float> OnChanged => onChanged ?? (onChanged = new UnityEvent<float>());
+        public UnityEvent OnEntityUpdated => onEntityUpdated ?? (onEntityUpdated = new UnityEvent());
+        public UnityEvent<float> OnBlendChanged => onBlendChanged ?? (onBlendChanged = new UnityEvent<float>());
         
-        [SerializeField] private UnityEvent<float> onChanged;
+        [SerializeField] private UnityEvent onEntityUpdated;
+        [SerializeField] private UnityEvent<float> onBlendChanged;
     }
 }

@@ -1,9 +1,10 @@
 using CucuTools.Attributes;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace CucuTools.Blend
 {
-    public class CucuBlendColor : CucuBlend
+    public class CucuBlendColor : CucuBlendEntity
     {
         public Color Color
         {
@@ -13,24 +14,40 @@ namespace CucuTools.Blend
 
         public Gradient Gradient
         {
-            get => gradient ?? (gradient = new Gradient());
+            get
+            {
+                if (gradient != null) return gradient;
+                gradient = new Gradient();
+                gradient.SetKeys(new[] {new GradientColorKey(Color.white, 0f)}, new[] {new GradientAlphaKey(1f, 0f)});
+                return gradient;
+            }
             set
             {
-                gradient = value;
-                OnBlendChange();
+                Gradient.SetKeys(value.colorKeys, value.alphaKeys);
+                Gradient.mode = value.mode;
+                
+                UpdateEntity();
             }
         }
 
+        public UnityEvent<Color> OnColorChanged => onColorChanged ?? (onColorChanged = new UnityEvent<Color>());
+        
         [Header("Color")]
         [CucuReadOnly]
         [SerializeField] private Color color;
         [SerializeField] private Gradient gradient;
+        [SerializeField] private UnityEvent<Color> onColorChanged;
 
-        public override void OnBlendChange()
+        protected override void UpdateEntityInternal()
         {
-            base.OnBlendChange();
+            Color = Gradient.Evaluate(Blend);
             
-            color = Gradient.Evaluate(Blend);
+            OnColorChanged.Invoke(Color);
+        }
+
+        private void Reset()
+        {
+            UpdateEntityInternal();
         }
     }
 }

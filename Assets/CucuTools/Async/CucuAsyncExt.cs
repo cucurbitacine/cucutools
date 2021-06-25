@@ -57,20 +57,12 @@ namespace CucuTools.Async
         
         public static async Task<T> ToTask<T>(this UnityEvent<T> unityEvent)
         {
-            var tcs = new TaskCompletionSource<T>();
-
-            unityEvent.AddListener(t => tcs.TrySetResult(t));
-        
-            return await tcs.Task;
+            return await new EventTask<T>().AssignTo(unityEvent).Task;
         }
     
         public static async Task ToTask(this UnityEvent unityEvent)
         {
-            var tcs = new TaskCompletionSource<object>();
-
-            unityEvent.AddListener(() => tcs.TrySetResult(default));
-
-            await tcs.Task;
+            await new EventTask().AssignTo(unityEvent).Task;
         }
 
         private static IEnumerator Coroutine<T>(TaskCompletionSource<T> tcs, IEnumerator enumerator)
@@ -88,6 +80,54 @@ namespace CucuTools.Async
         private static IEnumerator Coroutine<T>(TaskCompletionSource<T> tcs, Coroutine coroutine)
         {
             yield return coroutine;
+            tcs.TrySetResult(default);
+        }
+    }
+
+    public class EventTask<T>
+    {
+        private readonly TaskCompletionSource<T> tcs;
+        private UnityEvent<T> unityEvent;
+
+        public EventTask()
+        {
+            tcs = new TaskCompletionSource<T>();
+        }
+        
+        public TaskCompletionSource<T> AssignTo(UnityEvent<T> unityEvent)
+        {
+            this.unityEvent = unityEvent;
+            this.unityEvent.AddListener(SetResult);
+            return tcs;
+        }
+
+        private void SetResult(T t)
+        {
+            this.unityEvent.RemoveListener(SetResult);
+            tcs.TrySetResult(t);
+        }
+    }
+    
+    public class EventTask
+    {
+        private readonly TaskCompletionSource<object> tcs;
+        private UnityEvent unityEvent;
+
+        public EventTask()
+        {
+            tcs = new TaskCompletionSource<object>();
+        }
+        
+        public TaskCompletionSource<object> AssignTo(UnityEvent unityEvent)
+        {
+            this.unityEvent = unityEvent;
+            this.unityEvent.AddListener(SetResult);
+            return tcs;
+        }
+
+        private void SetResult()
+        {
+            this.unityEvent.RemoveListener(SetResult);
             tcs.TrySetResult(default);
         }
     }

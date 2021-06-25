@@ -9,7 +9,7 @@ namespace CucuTools.Editor.Attributes
     {
         public override void OnGUI(Rect position, SerializedProperty prop, GUIContent label)
         {
-            string labelStr = $"{label.text} (show only)";
+            string labelStr = $"{label.text} (read only)";
  
             switch (prop.propertyType)
             {
