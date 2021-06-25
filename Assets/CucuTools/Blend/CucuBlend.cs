@@ -4,7 +4,7 @@ using UnityEngine.Events;
 
 namespace CucuTools.Blend
 {
-    public class CucuBlend : MonoBehaviour
+    public class CucuBlend : CucuBehaviour
     {
         public float Blend
         {
@@ -80,7 +80,7 @@ namespace CucuTools.Blend
         public BlendTolerance()
         {
             use = true;
-            tolerance = 0.01f;
+            tolerance = 0.001f;
         }
     }
 

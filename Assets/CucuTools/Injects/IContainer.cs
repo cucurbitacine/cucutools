@@ -4,8 +4,8 @@ namespace CucuTools.Injects
 {
     public interface IContainer : ICanBinding, ICanResolving
     {
-        public Guid Guid { get; }
-        public string Key { get; }
+        Guid Guid { get; }
+        string Key { get; }
     }
 
     public interface ICanBinding
@@ -47,7 +47,7 @@ namespace CucuTools.Injects
 
     public interface IObjectFactory
     {
-        public Type InstanceType { get; }
+        Type InstanceType { get; }
         
         object Get();
         T Get<T>();
