@@ -6,6 +6,13 @@ namespace CucuTools.Blend
 {
     public abstract class CucuBlendEntity : CucuBehaviour
     {
+        [Range(0f, 1f)]
+        [SerializeField] private float blend;
+        [Tooltip("Tolerance which control setting blend value.\n\nTolerance value is the minimum allowable change in blend value")]
+        [SerializeField] private BlendTolerance tolerance;
+        [Tooltip("\"OnEntityUpdated\" invoke when entity was updated. Also it invoke before \"OnBlendChanged\"\n\n\"OnBlendChanged\" invoke when blend value was changed")]
+        [SerializeField] private BlendEvents events;
+        
         public float Blend
         {
             get => GetBlend();
@@ -14,13 +21,6 @@ namespace CucuTools.Blend
 
         public BlendTolerance Tolerance => tolerance ?? (tolerance = new BlendTolerance());
         public BlendEvents Events => events ?? (events = new BlendEvents());
-
-        [Range(0f, 1f)]
-        [SerializeField] private float blend;
-        [Tooltip("Tolerance which control setting blend value.\n\nTolerance value is the minimum allowable change in blend value")]
-        [SerializeField] private BlendTolerance tolerance;
-        [Tooltip("\"OnEntityUpdated\" invoke when entity was updated. Also it invoke before \"OnBlendChanged\"\n\n\"OnBlendChanged\" invoke when blend value was changed")]
-        [SerializeField] private BlendEvents events;
 
         protected virtual float GetBlend()
         {

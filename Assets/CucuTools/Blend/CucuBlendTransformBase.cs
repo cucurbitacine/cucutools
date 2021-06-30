@@ -4,6 +4,9 @@ namespace CucuTools.Blend
 {
     public abstract class CucuBlendTransformBase : CucuBlendEntity
     {
+        [Header("Target")]
+        [SerializeField] private Transform target;
+        
         public virtual Transform Target
         {
             get => target;
@@ -14,9 +17,6 @@ namespace CucuTools.Blend
                 UpdateEntity();
             }
         }
-
-        [Header("Target")]
-        [SerializeField] private Transform target;
 
         protected override void OnValidate()
         {

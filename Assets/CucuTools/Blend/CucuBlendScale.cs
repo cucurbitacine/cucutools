@@ -5,6 +5,9 @@ namespace CucuTools.Blend
 {
     public class CucuBlendScale : CucuBlendTransformBase
     {
+        [Header("Scale")]
+        [SerializeField] private ScaleInfoParam scaleInfo;
+        
         public ScaleInfoParam ScaleInfo
         {
             get => scaleInfo ?? (scaleInfo = new ScaleInfoParam());
@@ -16,9 +19,6 @@ namespace CucuTools.Blend
             }
         }
 
-        [Header("Scale")]
-        [SerializeField] private ScaleInfoParam scaleInfo;
-        
         protected override void UpdateEntityInternal()
         {
             Target.localScale = ScaleInfo.Evaluate(Blend);

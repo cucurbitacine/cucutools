@@ -1,11 +1,14 @@
 using System;
-using CucuTools.Colors;
 using UnityEngine;
 
 namespace CucuTools.Blend
 {
     public class CucuBlendMove : CucuBlendTransformBase
     {
+        [Header("Move")]
+        [SerializeField] private bool changeLocal = true;
+        [SerializeField] private MoveInfoParam moveInfo;
+        
         public bool ChangeLocal
         {
             get => changeLocal;
@@ -27,11 +30,7 @@ namespace CucuTools.Blend
                 UpdateEntity();
             }
         }
-        
-        [Header("Move")]
-        [SerializeField] private bool changeLocal = true;
-        [SerializeField] private MoveInfoParam moveInfo;
-        
+
         protected override void UpdateEntityInternal()
         {
             if (ChangeLocal)

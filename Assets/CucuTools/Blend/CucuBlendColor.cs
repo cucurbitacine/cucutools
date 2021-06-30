@@ -6,6 +6,12 @@ namespace CucuTools.Blend
 {
     public class CucuBlendColor : CucuBlendEntity
     {
+        [Header("Color")]
+        [CucuReadOnly]
+        [SerializeField] private Color color;
+        [SerializeField] private Gradient gradient;
+        [SerializeField] private UnityEvent<Color> onColorChanged;
+        
         public Color Color
         {
             get => color;
@@ -31,12 +37,6 @@ namespace CucuTools.Blend
         }
 
         public UnityEvent<Color> OnColorChanged => onColorChanged ?? (onColorChanged = new UnityEvent<Color>());
-        
-        [Header("Color")]
-        [CucuReadOnly]
-        [SerializeField] private Color color;
-        [SerializeField] private Gradient gradient;
-        [SerializeField] private UnityEvent<Color> onColorChanged;
 
         protected override void UpdateEntityInternal()
         {

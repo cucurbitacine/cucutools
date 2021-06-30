@@ -8,6 +8,11 @@ namespace CucuTools.Blend
 {
     public class CucuBlendQueue : CucuBlendEntity, IList<BlendUnit>
     {
+        [Header("Queue")]
+        [CucuReadOnly]
+        [SerializeField] private float localBlend;
+        [SerializeField] private List<BlendUnit> units;
+        
         public List<BlendUnit> Units
         {
             get => units ?? (units = new List<BlendUnit>());
@@ -20,11 +25,6 @@ namespace CucuTools.Blend
             private set => localBlend = value;
         }
 
-        [Header("Queue")]
-        [CucuReadOnly]
-        [SerializeField] private float localBlend;
-        [SerializeField] private List<BlendUnit> units;
-        
         private float leftBlend;
         private float rightBlend;
         private int left;
@@ -35,7 +35,7 @@ namespace CucuTools.Blend
         {
             Units.Sort((a, b) => a.blend.CompareTo(b.blend));
         }
-        
+
         protected override void UpdateEntityInternal()
         {
             Cucu.IndexesOfBorder(out left, out right, Blend, Units);
@@ -49,15 +49,20 @@ namespace CucuTools.Blend
             else LocalBlend = (Blend - leftBlend) / (rightBlend - leftBlend);
 
             if (left >= 0)
-                if (Units[left].behaviour != null)
-                    Units[left].behaviour.Blend = LocalBlend;
+                if (Units[left].entity != null)
+                    Units[left].entity.Blend = LocalBlend;
 
-            for (int i = 0; i < Units.Count; i++)
+            for (var i = 0; i < Units.Count; i++)
             {
-                if (Units[i].behaviour != null)
+                if (Units[i].entity != null)
                 {
-                    if (i < left) Units[i].behaviour.Blend = 1f;
-                    else if (left < i) Units[i].behaviour.Blend = 0f;
+                    Units[i].entity.Blend = i.CompareTo(left) switch
+                    {
+                        -1 => 1f,
+                        0 => LocalBlend,
+                        1 => 0f,
+                        _ => Units[i].entity.Blend
+                    };
                 }
             }
         }
@@ -71,14 +76,14 @@ namespace CucuTools.Blend
         {
             base.OnValidate();
 
-            Units.RemoveAll(u => u.behaviour == this);
+            Units.RemoveAll(u => u.entity == this);
 
             foreach (var unit in Units)
             {
                 unit.displayName = $"[ {unit.blend:F2}";
-                unit.displayName += $" : {(unit.behaviour?.Blend ?? 0):F2} ]";
-                unit.displayName += $" {(unit.behaviour?.name ?? "<empty>")}";
-                unit.displayName += $" : {(unit.behaviour?.GetType().Name ?? "<unknown>")}";
+                unit.displayName += $" : {(unit.entity?.Blend ?? 0):F2} ]";
+                unit.displayName += $" {(unit.entity?.name ?? "<empty>")}";
+                unit.displayName += $" : {(unit.entity?.GetType().Name ?? "<unknown>")}";
             }
         }
 
@@ -175,7 +180,7 @@ namespace CucuTools.Blend
         
         [Range(0f, 1f)]
         public float blend;
-        public CucuBlendEntity behaviour;
+        public CucuBlendEntity entity;
 
         public int CompareTo(float other)
         {

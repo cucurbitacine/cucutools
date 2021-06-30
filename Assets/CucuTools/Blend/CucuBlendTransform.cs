@@ -5,6 +5,11 @@ namespace CucuTools.Blend
 {
     public class CucuBlendTransform : CucuBlendTransformBase
     {
+        [Header("Transform")]
+        [SerializeField] private bool changeLocal = true;
+        [SerializeField] private SyncInfo syncInfo = new SyncInfo(true, true, true);
+        [SerializeField] private TransformInfoParam transformInfo;
+        
         public bool ChangeLocal
         {
             get => changeLocal;
@@ -32,11 +37,6 @@ namespace CucuTools.Blend
                 UpdateEntity();
             }
         }
-        
-        [Header("Transform")]
-        [SerializeField] private bool changeLocal = true;
-        [SerializeField] private SyncInfo syncInfo = new SyncInfo(true, true, true);
-        [SerializeField] private TransformInfoParam transformInfo;
 
         private void UpdateTarget(TransformInfo info)
         {

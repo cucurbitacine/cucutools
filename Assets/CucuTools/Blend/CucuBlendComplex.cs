@@ -8,12 +8,12 @@ namespace CucuTools.Blend
 {
     public class CucuBlendComplex : CucuBlendEntity, IList<CucuBlendEntity>
     {
-        private const string GroupName = "Complex";
+        [Header("Blends")]
+        [SerializeField] private List<CucuBlendEntity> blends;
         
         public List<CucuBlendEntity> Blends => blends ?? (blends = new List<CucuBlendEntity>());
 
-        [Header("Blends")]
-        [SerializeField] private List<CucuBlendEntity> blends;
+        private const string GroupName = "Complex";
         
         [CucuButton("Get Blends", group: GroupName)]
         private void GetBlends()

@@ -7,6 +7,13 @@ namespace CucuTools.Blend
 {
     public class CucuTimer : CucuBehaviour
     {
+        [CucuReadOnly]
+        [SerializeField] private bool isPlaying;
+        [SerializeField] private bool paused;
+        [SerializeField] private bool autoStart;
+        [SerializeField] private TimerInfo info;
+        [SerializeField] private TimerEvents events;
+        
         public bool IsPlaying
         {
             get => isPlaying;
@@ -21,13 +28,6 @@ namespace CucuTools.Blend
         
         public TimerInfo Info => info ?? (info = new TimerInfo());
         public TimerEvents Events => events ?? (events = new TimerEvents());
-        
-        [CucuReadOnly]
-        [SerializeField] private bool isPlaying;
-        [SerializeField] private bool paused;
-        public bool autoStart;
-        [SerializeField] private TimerInfo info;
-        [SerializeField] private TimerEvents events;
 
         [CucuButton("Start", group: "Timer")]
         public void StartTimer()

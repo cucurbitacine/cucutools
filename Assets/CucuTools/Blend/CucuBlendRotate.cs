@@ -6,6 +6,10 @@ namespace CucuTools.Blend
 {
     public class CucuBlendRotate : CucuBlendTransformBase
     {
+        [Header("Rotate")]
+        [SerializeField] private bool changeLocal = true;
+        [SerializeField] private RotateInfoParam rotateInfo;
+        
         public bool ChangeLocal
         {
             get => changeLocal;
@@ -28,10 +32,6 @@ namespace CucuTools.Blend
             }
         }
 
-        [Header("Rotate")]
-        [SerializeField] private bool changeLocal = true;
-        [SerializeField] private RotateInfoParam rotateInfo;
-        
         protected override void UpdateEntityInternal()
         {
             if (ChangeLocal)
@@ -41,6 +41,26 @@ namespace CucuTools.Blend
             else
             {
                 Target.rotation = RotateInfo.Evaluate(Blend);
+            }
+        }
+
+        private const int count = 32;
+        private float t;
+        private Vector3[] dirs;
+        
+        private void OnDrawGizmosSelected()
+        {
+            if (Target != null)
+            {
+                if (dirs == null) dirs = new Vector3[count];
+                for (var i = 0; i < dirs.Length; i++)
+                {
+                    t = (float) i / (dirs.Length);
+                    
+                    dirs[i] = (RotateInfo.Evaluate(t) * (ChangeLocal && Target.parent != null ? Target.parent.forward : Vector3.forward)).normalized;
+                    Gizmos.color = CucuColor.Jet.Evaluate(t).AlphaTo(0.5f);
+                    Gizmos.DrawLine(Target.position, Target.position + dirs[i]);
+                }
             }
         }
     }
